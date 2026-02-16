@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tastefully Pixelated</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header>
+        <h1>Tastefully Pixelated</h1>
+        <p>Upload a photo, paint a user-assigned bikini-shaped mask, and export/share the result.</p>
+      </header>
+
+      <section class="controls card">
+        <label class="file-label" for="photoInput">Upload photo</label>
+        <input id="photoInput" type="file" accept="image/*" />
+
+        <div class="toolbar">
+          <label for="brushSize">Brush size</label>
+          <input id="brushSize" type="range" min="8" max="90" value="35" />
+          <output id="brushSizeValue">35 px</output>
+        </div>
+
+        <div class="toolbar">
+          <label for="pixelSize">Pixel size</label>
+          <input id="pixelSize" type="range" min="8" max="40" value="18" />
+          <output id="pixelSizeValue">18 px</output>
+        </div>
+
+        <div class="button-row">
+          <button id="drawBtn" disabled>Draw bikini mask</button>
+          <button id="eraseBtn" disabled>Erase</button>
+          <button id="clearMaskBtn" disabled>Clear mask</button>
+          <button id="applyBtn" disabled>Apply pixelation</button>
+        </div>
+      </section>
+
+      <section class="canvas-wrap card">
+        <div id="canvasContainer" class="canvas-container disabled">
+          <canvas id="baseCanvas"></canvas>
+          <canvas id="maskCanvas"></canvas>
+          <canvas id="outputCanvas" hidden></canvas>
+        </div>
+        <p class="hint">Tip: On mobile, use one finger to paint where the bikini-shaped pixelation should appear.</p>
+      </section>
+
+      <section class="exports card">
+        <div class="button-row">
+          <button id="downloadBtn" disabled>Download image</button>
+          <button id="shareBtn" disabled>Share</button>
+          <a id="smsShare" class="share-link disabled" aria-disabled="true">Share by text</a>
+          <a id="whatsAppShare" class="share-link disabled" aria-disabled="true" target="_blank" rel="noopener">Share on WhatsApp</a>
+        </div>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
