@@ -1,8 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-  /* ---------------- Elements ---------------- */
+  /* ---------- Elements ---------- */
 
-  const randomPrompt = document.getElementById('randomPrompt');
   const photoPickerBtn = document.getElementById('photoPickerBtn');
   const photoInput = document.getElementById('photoInput');
 
@@ -32,9 +31,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let drawing = false;
   let history = [];
-  let mode = 'position';
+  let mode = null; // cleaner state
 
-  /* ---------------- Mode Switching ---------------- */
+  /* ---------- Mode ---------- */
 
   function setMode(newMode) {
     mode = newMode;
@@ -42,91 +41,60 @@ document.addEventListener('DOMContentLoaded', () => {
     moveBtn.classList.remove('active');
     drawBtn.classList.remove('active');
 
-    if (mode === 'position') {
-      moveBtn.classList.add('active');
-      maskCanvas.style.pointerEvents = 'none';
-    } else {
-      drawBtn.classList.add('active');
-      maskCanvas.style.pointerEvents = 'auto';
-    }
+    if (mode === 'position') moveBtn.classList.add('active');
+    if (mode === 'draw') drawBtn.classList.add('active');
   }
 
   moveBtn.addEventListener('click', () => setMode('position'));
   drawBtn.addEventListener('click', () => setMode('draw'));
 
-  /* ---------------- Witty Prompt ---------------- */
-
-  const prompts = [
-    'Show some class and blur your junk.',
-    'Hide your shame.',
-    'Blur the junk in the trunk.',
-    'Place a pixel where the good Lord split ya.',
-    'Cover that already.',
-    'Gross, just gross.'
-  ];
-
-  if (randomPrompt) {
-    randomPrompt.textContent =
-      prompts[Math.floor(Math.random() * prompts.length)];
-  }
-
-  /* ---------------- File Picker ---------------- */
+  /* ---------- File Picker ---------- */
 
   photoPickerBtn.addEventListener('click', () => photoInput.click());
 
   photoInput.addEventListener('change', (event) => {
+
     const file = event.target.files[0];
     if (!file) return;
 
     const reader = new FileReader();
 
     reader.onload = function (e) {
+
       const img = new Image();
 
       img.onload = function () {
 
-        /* --------- NEW: Fit Image To Workspace --------- */
-
         const MAX_WIDTH = 900;
         const MAX_HEIGHT = 600;
 
-        let width = img.width;
-        let height = img.height;
+        const scale = Math.min(
+          MAX_WIDTH / img.width,
+          MAX_HEIGHT / img.height,
+          1
+        );
 
-        const widthRatio = MAX_WIDTH / width;
-        const heightRatio = MAX_HEIGHT / height;
+        const width = Math.floor(img.width * scale);
+        const height = Math.floor(img.height * scale);
 
-        const scale = Math.min(widthRatio, heightRatio, 1); // never upscale
+        baseCanvas.width = width;
+        baseCanvas.height = height;
+        maskCanvas.width = width;
+        maskCanvas.height = height;
+        outputCanvas.width = width;
+        outputCanvas.height = height;
 
-        const scaledWidth = Math.floor(width * scale);
-        const scaledHeight = Math.floor(height * scale);
+        baseCtx.clearRect(0, 0, width, height);
+        baseCtx.drawImage(img, 0, 0, width, height);
 
-        /* --------- Resize Canvases --------- */
-
-        baseCanvas.width = scaledWidth;
-        baseCanvas.height = scaledHeight;
-
-        maskCanvas.width = scaledWidth;
-        maskCanvas.height = scaledHeight;
-
-        outputCanvas.width = scaledWidth;
-        outputCanvas.height = scaledHeight;
-
-        /* --------- Draw Scaled Image --------- */
-
-        baseCtx.clearRect(0, 0, scaledWidth, scaledHeight);
-        baseCtx.drawImage(img, 0, 0, scaledWidth, scaledHeight);
-
-        maskCtx.clearRect(0, 0, scaledWidth, scaledHeight);
-
-        /* --------- Enable Controls --------- */
+        maskCtx.clearRect(0, 0, width, height);
 
         moveBtn.disabled = false;
         drawBtn.disabled = false;
         applyBtn.disabled = false;
         clearBtn.disabled = false;
 
-        setMode('position');
+        setMode('draw'); // default to draw so user can immediately use brush
       };
 
       img.src = e.target.result;
@@ -135,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
     reader.readAsDataURL(file);
   });
 
-  /* ---------------- Brush Size ---------------- */
+  /* ---------- Sliders ---------- */
 
   brushSizeInput.addEventListener('input', () => {
     brushSize = parseInt(brushSizeInput.value, 10);
@@ -145,24 +113,27 @@ document.addEventListener('DOMContentLoaded', () => {
     pixelSize = parseInt(pixelSizeInput.value, 10);
   });
 
-  /* ---------------- Drawing ---------------- */
+  /* ---------- Drawing ---------- */
 
-  maskCanvas.addEventListener('mousedown', startDraw);
-  maskCanvas.addEventListener('mousemove', draw);
-  maskCanvas.addEventListener('mouseup', stopDraw);
-  maskCanvas.addEventListener('mouseleave', stopDraw);
-
-  function startDraw(e) {
+  maskCanvas.addEventListener('mousedown', (e) => {
     if (mode !== 'draw') return;
     drawing = true;
     saveHistory();
     draw(e);
-  }
+  });
+
+  maskCanvas.addEventListener('mousemove', (e) => {
+    if (!drawing || mode !== 'draw') return;
+    draw(e);
+  });
+
+  window.addEventListener('mouseup', () => {
+    drawing = false;
+  });
 
   function draw(e) {
-    if (!drawing || mode !== 'draw') return;
-
     const rect = maskCanvas.getBoundingClientRect();
+
     const x = (e.clientX - rect.left) * (maskCanvas.width / rect.width);
     const y = (e.clientY - rect.top) * (maskCanvas.height / rect.height);
 
@@ -172,16 +143,10 @@ document.addEventListener('DOMContentLoaded', () => {
     maskCtx.fill();
   }
 
-  function stopDraw() {
-    drawing = false;
-  }
-
-  /* ---------------- Undo ---------------- */
+  /* ---------- Undo ---------- */
 
   function saveHistory() {
-    history.push(
-      maskCtx.getImageData(0, 0, maskCanvas.width, maskCanvas.height)
-    );
+    history.push(maskCtx.getImageData(0, 0, maskCanvas.width, maskCanvas.height));
     if (history.length > 20) history.shift();
     undoBtn.disabled = false;
   }
@@ -193,7 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
     undoBtn.disabled = history.length === 0;
   });
 
-  /* ---------------- Clear ---------------- */
+  /* ---------- Clear ---------- */
 
   clearBtn.addEventListener('click', () => {
     maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
@@ -201,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
     undoBtn.disabled = true;
   });
 
-  /* ---------------- Apply Pixelation ---------------- */
+  /* ---------- Apply Pixelation ---------- */
 
   applyBtn.addEventListener('click', () => {
 
@@ -257,7 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
     maskCanvas.hidden = true;
   });
 
-  /* ---------------- Modal ---------------- */
+  /* ---------- Modal ---------- */
 
   fileInfoBtn.addEventListener('click', () => {
     infoModal.classList.remove('hidden');
@@ -269,12 +234,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   infoModal.addEventListener('click', (e) => {
     if (e.target === infoModal) {
-      infoModal.classList.add('hidden');
-    }
-  });
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
       infoModal.classList.add('hidden');
     }
   });
