@@ -33,9 +33,10 @@ header h1 {
   margin: 0;
 }
 
-header p {
-  margin: 0.45rem 0 0;
-  color: var(--muted);
+.random-prompt {
+  margin-top: 0.6rem;
+  color: #ffd48f;
+  font-weight: 700;
 }
 
 .card {
@@ -61,8 +62,27 @@ header p {
   font-weight: 600;
 }
 
-input[type='file'] {
-  width: 100%;
+.sr-only-file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+.selected-file {
+  margin: -0.2rem 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.file-types {
+  margin: -0.2rem 0 0;
+  color: var(--muted);
+  font-size: 0.88rem;
 }
 
 .toolbar {
@@ -113,6 +133,11 @@ button:disabled,
   background: #61304d;
 }
 
+#moveBtn,
+#resetViewBtn {
+  background: #38405f;
+}
+
 #applyBtn {
   background: linear-gradient(135deg, var(--accent), var(--accent-strong));
   font-weight: 600;
@@ -121,7 +146,7 @@ button:disabled,
 .canvas-container {
   position: relative;
   width: 100%;
-  max-width: 680px;
+  max-width: 476px;
   border: 1px dashed color-mix(in srgb, var(--muted), transparent 60%);
   border-radius: 12px;
   min-height: 220px;
@@ -135,6 +160,59 @@ button:disabled,
   opacity: 0.55;
 }
 
+.dimensions-overlay {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 6;
+  margin: 0;
+  padding: 0.3rem 0.5rem;
+  border-radius: 8px;
+  background: color-mix(in srgb, #000, transparent 35%);
+  color: var(--text);
+  font-size: 0.8rem;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.upload-progress[hidden] {
+  display: none;
+}
+
+.upload-progress {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 0.55rem;
+  padding: 1rem;
+  text-align: center;
+  background: color-mix(in srgb, #120f18, transparent 20%);
+}
+
+.upload-progress p {
+  margin: 0;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.spinner {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  border: 3px solid color-mix(in srgb, var(--muted), transparent 40%);
+  border-top-color: var(--accent);
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 canvas {
   width: 100%;
   height: auto;
@@ -145,13 +223,6 @@ canvas {
   position: absolute;
   inset: 0;
   cursor: crosshair;
-}
-
-.hint {
-  margin-top: 0.8rem;
-  color: var(--muted);
-  text-align: center;
-  font-size: 0.92rem;
 }
 
 @media (max-width: 640px) {
@@ -168,4 +239,15 @@ canvas {
 
 button.active {
   outline: 2px solid var(--accent);
+}
+
+.status {
+  margin: 0.25rem 0 0;
+  color: var(--muted);
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+.status[data-level='error'] {
+  color: #ffb4c3;
 }

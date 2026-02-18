@@ -14,6 +14,7 @@ const refs = {
   applyBtn: document.getElementById('applyBtn'),
   downloadBtn: document.getElementById('downloadBtn'),
   shareBtn: document.getElementById('shareBtn'),
+  undoBtn: document.getElementById('undoBtn'),
   status: document.getElementById('statusText'),
   container: document.getElementById('canvasContainer'),
   baseCanvas: document.getElementById('baseCanvas'),
@@ -37,27 +38,6 @@ const maskDataCtx = maskDataCanvas.getContext('2d', { willReadFrequently: true }
 const resultCanvas = document.createElement('canvas');
 const resultCtx = resultCanvas.getContext('2d', { willReadFrequently: true });
 
-const randomPrompts = [
-  'Show some class and blur your junk.',
-  'Hide your shame.',
-  "Uh, ain't noone wanna see that.",
-  "Not even your mamma thinks that's OK.",
-  "Seriously dude, that's gross.",
-  'Eeeeuu',
-  "I think I'm going to barf.",
-  "Don't make me sick.",
-  'Place a pixel where the good Lord split yea.',
-  'Blur the junk in the trunk.',
-  'Cover that already.',
-  "I can't unsee that.",
-  'Gross, just gross.',
-];
-
-function setRandomPrompt() {
-  const index = Math.floor(Math.random() * randomPrompts.length);
-  refs.randomPrompt.textContent = randomPrompts[index];
-}
-
 const state = {
   brushSize: Number(refs.brushSize.value),
   pixelSize: Number(refs.pixelSize.value),
@@ -72,11 +52,17 @@ const state = {
   activePointerId: null,
   panStartX: 0,
   panStartY: 0,
+  history: [],
+  cursorX: 0,
+  cursorY: 0,
 };
+
+/* -------------------- Brush + Pixel Controls -------------------- */
 
 refs.brushSize.addEventListener('input', () => {
   state.brushSize = Number(refs.brushSize.value);
   refs.brushSizeValue.textContent = `${state.brushSize} px`;
+  showEditorFromCurrentView();
 });
 
 refs.pixelSize.addEventListener('input', () => {
@@ -85,108 +71,185 @@ refs.pixelSize.addEventListener('input', () => {
 });
 
 refs.zoom.addEventListener('input', () => {
-  const newZoom = Number(refs.zoom.value);
-  setZoom(newZoom);
+  setZoom(Number(refs.zoom.value));
 });
 
-refs.photoInput.addEventListener('change', loadPhoto);
-refs.drawBtn.addEventListener('click', () => setMode('draw'));
-refs.eraseBtn.addEventListener('click', () => setMode('erase'));
-refs.moveBtn.addEventListener('click', () => setMode('move'));
-refs.resetViewBtn.addEventListener('click', resetView);
-refs.clearMaskBtn.addEventListener('click', clearMask);
-refs.applyBtn.addEventListener('click', applyPixelation);
-refs.downloadBtn.addEventListener('click', downloadImage);
-refs.shareBtn.addEventListener('click', shareImage);
+refs.undoBtn?.addEventListener('click', undoMask);
+
+/* -------------------- Pointer Events -------------------- */
 
 refs.maskCanvas.addEventListener('pointerdown', onPointerDown);
 refs.maskCanvas.addEventListener('pointermove', onPointerMove);
 refs.maskCanvas.addEventListener('pointerup', onPointerUp);
 refs.maskCanvas.addEventListener('pointercancel', onPointerUp);
 
-/* -------------- (UNCHANGED CODE ABOVE) -------------- */
-/* All your original functions remain exactly the same */
-/* Except applyPixelation() below                      */
-/* -------------- */
-
-async function applyPixelation() {
+function onPointerDown(event) {
   if (!state.imageLoaded) return;
 
-  if (!hasMaskPixels()) {
-    setStatus('Draw a mask before applying pixelation.', 'error');
+  state.activePointerId = event.pointerId;
+  refs.maskCanvas.setPointerCapture(event.pointerId);
+
+  if (state.mode === 'move') {
+    state.panning = true;
+    state.panStartX = event.clientX;
+    state.panStartY = event.clientY;
+    refs.maskCanvas.style.cursor = 'grabbing';
     return;
   }
 
+  state.drawing = true;
+  pushHistory();
+  paint(event);
+}
+
+function onPointerMove(event) {
+  if (!state.imageLoaded) return;
+
+  state.cursorX = event.clientX;
+  state.cursorY = event.clientY;
+
+  if (state.panning && state.mode === 'move') {
+    const rect = refs.maskCanvas.getBoundingClientRect();
+    const dx = (event.clientX - state.panStartX) * (refs.maskCanvas.width / rect.width);
+    const dy = (event.clientY - state.panStartY) * (refs.maskCanvas.height / rect.height);
+
+    state.offsetX += dx;
+    state.offsetY += dy;
+    state.panStartX = event.clientX;
+    state.panStartY = event.clientY;
+    clampPan();
+    showEditorFromCurrentView();
+    return;
+  }
+
+  if (state.drawing) paint(event);
+
+  showEditorFromCurrentView();
+}
+
+function onPointerUp(event) {
+  if (event.pointerId !== state.activePointerId) return;
+
+  state.drawing = false;
+  state.panning = false;
+  state.activePointerId = null;
+
+  if (refs.maskCanvas.hasPointerCapture(event.pointerId)) {
+    refs.maskCanvas.releasePointerCapture(event.pointerId);
+  }
+
+  refs.maskCanvas.style.cursor = state.mode === 'move' ? 'grab' : 'crosshair';
+}
+
+/* -------------------- History -------------------- */
+
+function pushHistory() {
+  const snapshot = maskDataCtx.getImageData(0, 0, maskDataCanvas.width, maskDataCanvas.height);
+  state.history.push(snapshot);
+  if (state.history.length > 10) state.history.shift();
+  refs.undoBtn.disabled = false;
+}
+
+function undoMask() {
+  if (!state.history.length) return;
+  const previous = state.history.pop();
+  maskDataCtx.putImageData(previous, 0, 0);
+  refs.undoBtn.disabled = state.history.length === 0;
+  showEditorFromCurrentView();
+}
+
+/* -------------------- Brush Preview -------------------- */
+
+function renderBrushPreview() {
+  if (!state.imageLoaded || state.mode === 'move') return;
+
+  const rect = refs.maskCanvas.getBoundingClientRect();
+  const x = ((state.cursorX - rect.left) / rect.width) * refs.maskCanvas.width;
+  const y = ((state.cursorY - rect.top) / rect.height) * refs.maskCanvas.height;
+
+  const imageX = (x - state.offsetX) / state.zoom;
+  const imageY = (y - state.offsetY) / state.zoom;
+
+  maskCtx.save();
+  maskCtx.translate(state.offsetX, state.offsetY);
+  maskCtx.scale(state.zoom, state.zoom);
+
+  maskCtx.beginPath();
+  maskCtx.arc(imageX, imageY, state.brushSize / state.zoom, 0, Math.PI * 2);
+  maskCtx.strokeStyle = 'rgba(255,255,255,0.8)';
+  maskCtx.lineWidth = 1 / state.zoom;
+  maskCtx.stroke();
+
+  maskCtx.restore();
+}
+
+/* -------------------- Rendering -------------------- */
+
+function renderMaskOverlay() {
+  maskCtx.clearRect(0, 0, refs.maskCanvas.width, refs.maskCanvas.height);
+
+  maskCtx.save();
+  maskCtx.translate(state.offsetX, state.offsetY);
+  maskCtx.scale(state.zoom, state.zoom);
+  maskCtx.drawImage(maskDataCanvas, 0, 0);
+  maskCtx.restore();
+
+  maskCtx.globalCompositeOperation = 'source-in';
+  maskCtx.fillStyle = 'rgba(223,115,255,0.35)';
+  maskCtx.fillRect(0, 0, refs.maskCanvas.width, refs.maskCanvas.height);
+  maskCtx.globalCompositeOperation = 'source-over';
+}
+
+function showEditorFromCurrentView() {
+  if (!state.imageLoaded) return;
+
+  drawView(baseCtx, sourceCanvas);
+  renderMaskOverlay();
+  renderBrushPreview();
+}
+
+/* -------------------- Optimized Pixelation -------------------- */
+
+async function applyPixelation() {
+  if (!state.imageLoaded) return;
+  if (!hasMaskPixels()) return;
+
+  refs.applyBtn.textContent = 'Processing…';
   refs.applyBtn.disabled = true;
-  setStatus('Applying pixelation…');
-  await new Promise((resolve) => requestAnimationFrame(resolve));
+
+  await new Promise(r => requestAnimationFrame(r));
 
   const width = sourceCanvas.width;
   const height = sourceCanvas.height;
   const sourceData = sourceCtx.getImageData(0, 0, width, height);
   const maskData = maskDataCtx.getImageData(0, 0, width, height);
-
-  resultCtx.clearRect(0, 0, width, height);
-  resultCtx.putImageData(sourceData, 0, 0);
-  const outputData = resultCtx.getImageData(0, 0, width, height);
+  const outputData = resultCtx.createImageData(width, height);
+  outputData.data.set(sourceData.data);
 
   const block = state.pixelSize;
-  const halfBlock = Math.floor(block / 2);
+  const half = Math.floor(block / 2);
 
   for (let y = 0; y < height; y += block) {
     for (let x = 0; x < width; x += block) {
 
-      // 🔥 FAST MASK CHECK (single alpha sample)
-      const sampleX = Math.min(x + halfBlock, width - 1);
-      const sampleY = Math.min(y + halfBlock, height - 1);
-      const sampleIdx = (sampleY * width + sampleX) * 4;
+      const sampleX = Math.min(x + half, width - 1);
+      const sampleY = Math.min(y + half, height - 1);
+      const idxSample = (sampleY * width + sampleX) * 4;
 
-      if (maskData.data[sampleIdx + 3] === 0) continue;
+      if (maskData.data[idxSample + 3] === 0) continue;
 
+      let r = 0, g = 0, b = 0, count = 0;
       const yLimit = Math.min(y + block, height);
       const xLimit = Math.min(x + block, width);
 
-      let r = 0;
-      let g = 0;
-      let b = 0;
-      let count = 0;
-
       for (let yy = y; yy < yLimit; yy++) {
         for (let xx = x; xx < xLimit; xx++) {
-          const idx = (yy * width + xx) * 4;
-          r += sourceData.data[idx];
-          g += sourceData.data[idx + 1];
-          b += sourceData.data[idx + 2];
+          const i = (yy * width + xx) * 4;
+          r += sourceData.data[i];
+          g += sourceData.data[i + 1];
+          b += sourceData.data[i + 2];
           count++;
         }
       }
 
-      const avgR = (r / count) | 0;
-      const avgG = (g / count) | 0;
-      const avgB = (b / count) | 0;
-
-      for (let yy = y; yy < yLimit; yy++) {
-        for (let xx = x; xx < xLimit; xx++) {
-          const idx = (yy * width + xx) * 4;
-          outputData.data[idx] = avgR;
-          outputData.data[idx + 1] = avgG;
-          outputData.data[idx + 2] = avgB;
-        }
-      }
-    }
-  }
-
-  resultCtx.putImageData(outputData, 0, 0);
-  drawView(outputCtx, resultCanvas);
-
-  refs.outputCanvas.hidden = false;
-  refs.baseCanvas.hidden = true;
-  refs.maskCanvas.hidden = true;
-  state.hasResult = true;
-  toggleExportButtons(true);
-  refs.applyBtn.disabled = false;
-  setStatus('Pixelation applied. Download or share your zoomed/cropped result.');
-}
-
-setRandomPrompt();
-setStatus('Select a photo to begin.');
+      const avgR = (r / c
