@@ -58,7 +58,7 @@ header h1 {
 .file-row {
   display: flex;
   align-items: center;
-  justify-content: space-between; /* Right-align ? button */
+  justify-content: space-between;
 }
 
 .file-label {
@@ -89,17 +89,6 @@ header h1 {
   background: #5c3a85;
 }
 
-.sr-only-file-input {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  border: 0;
-}
-
 /* ---------- Toolbar ---------- */
 
 .toolbar {
@@ -110,4 +99,39 @@ header h1 {
 }
 
 .toolbar output {
-  color: var(--m
+  color: var(--muted);
+}
+
+/* ---------- Buttons (RESTORED ORIGINAL STYLE) ---------- */
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+button {
+  appearance: none;
+  border: 0;
+  border-radius: 10px;
+  padding: 0.55rem 0.8rem;  /* Original sizing */
+  font-size: 0.95rem;
+  background: #432b61;      /* Base button color */
+  color: var(--text);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+  background: #5c3a85;
+}
+
+button:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* Individual Button Colors (Restored) */
+
+#moveBtn {
+  background:
