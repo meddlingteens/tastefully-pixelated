@@ -32,6 +32,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let drawing = false;
   let history = [];
+  let mode = 'position'; // FIXED: mode control
+
+  /* ---------------- Mode Switching ---------------- */
+
+  function setMode(newMode) {
+    mode = newMode;
+
+    moveBtn.classList.remove('active');
+    drawBtn.classList.remove('active');
+
+    if (mode === 'position') {
+      moveBtn.classList.add('active');
+      maskCanvas.style.pointerEvents = 'none';
+    } else {
+      drawBtn.classList.add('active');
+      maskCanvas.style.pointerEvents = 'auto';
+    }
+  }
+
+  moveBtn.addEventListener('click', () => setMode('position'));
+  drawBtn.addEventListener('click', () => setMode('draw'));
 
   /* ---------------- Witty Prompt ---------------- */
 
@@ -44,10 +65,8 @@ document.addEventListener('DOMContentLoaded', () => {
     'Gross, just gross.'
   ];
 
-  if (randomPrompt) {
-    randomPrompt.textContent =
-      prompts[Math.floor(Math.random() * prompts.length)];
-  }
+  randomPrompt.textContent =
+    prompts[Math.floor(Math.random() * prompts.length)];
 
   /* ---------------- File Picker ---------------- */
 
@@ -61,6 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
     reader.onload = function (e) {
       const img = new Image();
       img.onload = function () {
+
         baseCanvas.width = img.width;
         baseCanvas.height = img.height;
         maskCanvas.width = img.width;
@@ -77,6 +97,8 @@ document.addEventListener('DOMContentLoaded', () => {
         drawBtn.disabled = false;
         applyBtn.disabled = false;
         clearBtn.disabled = false;
+
+        setMode('position'); // default
       };
       img.src = e.target.result;
     };
@@ -101,13 +123,14 @@ document.addEventListener('DOMContentLoaded', () => {
   maskCanvas.addEventListener('mouseleave', stopDraw);
 
   function startDraw(e) {
+    if (mode !== 'draw') return; // FIXED
     drawing = true;
     saveHistory();
     draw(e);
   }
 
   function draw(e) {
-    if (!drawing) return;
+    if (!drawing || mode !== 'draw') return;
 
     const rect = maskCanvas.getBoundingClientRect();
     const x = (e.clientX - rect.left) * (maskCanvas.width / rect.width);
@@ -212,12 +235,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   infoModal.addEventListener('click', (e) => {
     if (e.target === infoModal) {
-      infoModal.classList.add('hidden');
-    }
-  });
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
       infoModal.classList.add('hidden');
     }
   });
