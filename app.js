@@ -1,5 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+  /* -------------------- Element References -------------------- */
+
   const refs = {
     photoInput: document.getElementById('photoInput'),
     brushSize: document.getElementById('brushSize'),
@@ -29,7 +31,33 @@ document.addEventListener('DOMContentLoaded', () => {
     randomPrompt: document.getElementById('randomPrompt')
   };
 
-  /* ---------------- Modal Logic (Fixed) ---------------- */
+  /* -------------------- Random Prompt -------------------- */
+
+  const randomPrompts = [
+    'Show some class and blur your junk.',
+    'Hide your shame.',
+    "Uh, ain’t no one wanna see that.",
+    "Not even your mamma thinks that’s OK.",
+    "Seriously dude, that’s gross.",
+    'Eeeeuu.',
+    "I think I'm going to barf.",
+    "Don’t make me sick.",
+    'Place a pixel where the good Lord split ya.',
+    'Blur the junk in the trunk.',
+    'Cover that already.',
+    "I can’t unsee that.",
+    'Gross, just gross.'
+  ];
+
+  function setRandomPrompt() {
+    if (!refs.randomPrompt) return;
+    const index = Math.floor(Math.random() * randomPrompts.length);
+    refs.randomPrompt.textContent = randomPrompts[index];
+  }
+
+  setRandomPrompt();
+
+  /* -------------------- Modal Logic -------------------- */
 
   if (refs.fileInfoBtn && refs.infoModal && refs.closeModalBtn) {
 
@@ -54,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  /* ---------------- Canvas Setup ---------------- */
+  /* -------------------- Canvas Setup -------------------- */
 
   const baseCtx = refs.baseCanvas.getContext('2d', { willReadFrequently: true });
   const maskCtx = refs.maskCanvas.getContext('2d');
@@ -70,23 +98,28 @@ document.addEventListener('DOMContentLoaded', () => {
   const state = {
     brushSize: Number(refs.brushSize.value),
     pixelSize: Number(refs.pixelSize.value),
-    zoom: Number(refs.zoom.value),
+    zoom: 1,
     offsetX: 0,
     offsetY: 0,
     mode: 'draw',
     drawing: false,
     panning: false,
     imageLoaded: false,
-    hasResult: false,
-    activePointerId: null,
-    panStartX: 0,
-    panStartY: 0,
     history: [],
-    cursorX: 0,
-    cursorY: 0
+    activePointerId: null
   };
 
-  /* ---------------- Basic Controls ---------------- */
+  /* -------------------- Status -------------------- */
+
+  function setStatus(message) {
+    if (refs.status) {
+      refs.status.textContent = message;
+    }
+  }
+
+  setStatus('Select a photo to begin.');
+
+  /* -------------------- Brush Controls -------------------- */
 
   refs.brushSize.addEventListener('input', () => {
     state.brushSize = Number(refs.brushSize.value);
@@ -98,19 +131,21 @@ document.addEventListener('DOMContentLoaded', () => {
     refs.pixelSizeValue.textContent = `${state.pixelSize} px`;
   });
 
-  refs.drawBtn.addEventListener('click', () => setMode('draw'));
-  refs.moveBtn.addEventListener('click', () => setMode('move'));
-  refs.clearMaskBtn.addEventListener('click', clearMask);
-  refs.undoBtn.addEventListener('click', undoMask);
+  /* -------------------- Mode Controls -------------------- */
 
-  function setMode(mode) {
-    state.mode = mode;
-    refs.drawBtn.classList.toggle('active', mode === 'draw');
-    refs.moveBtn.classList.toggle('active', mode === 'move');
-    refs.maskCanvas.style.cursor = mode === 'move' ? 'grab' : 'crosshair';
-  }
+  refs.drawBtn.addEventListener('click', () => {
+    state.mode = 'draw';
+    refs.drawBtn.classList.add('active');
+    refs.moveBtn.classList.remove('active');
+  });
 
-  /* ---------------- Undo ---------------- */
+  refs.moveBtn.addEventListener('click', () => {
+    state.mode = 'move';
+    refs.moveBtn.classList.add('active');
+    refs.drawBtn.classList.remove('active');
+  });
+
+  /* -------------------- Mask History -------------------- */
 
   function pushHistory() {
     const snapshot = maskDataCtx.getImageData(0, 0, maskDataCanvas.width, maskDataCanvas.height);
@@ -119,26 +154,25 @@ document.addEventListener('DOMContentLoaded', () => {
     refs.undoBtn.disabled = false;
   }
 
-  function undoMask() {
+  refs.undoBtn.addEventListener('click', () => {
     if (!state.history.length) return;
     const previous = state.history.pop();
     maskDataCtx.putImageData(previous, 0, 0);
     refs.undoBtn.disabled = state.history.length === 0;
     renderMaskOverlay();
-  }
+  });
 
-  function clearMask() {
+  refs.clearMaskBtn.addEventListener('click', () => {
     maskDataCtx.clearRect(0, 0, maskDataCanvas.width, maskDataCanvas.height);
     state.history = [];
     refs.undoBtn.disabled = true;
     renderMaskOverlay();
-  }
+  });
 
-  /* ---------------- Mask Rendering ---------------- */
+  /* -------------------- Mask Rendering -------------------- */
 
   function renderMaskOverlay() {
     maskCtx.clearRect(0, 0, refs.maskCanvas.width, refs.maskCanvas.height);
-
     maskCtx.drawImage(maskDataCanvas, 0, 0);
 
     maskCtx.globalCompositeOperation = 'source-in';
@@ -147,13 +181,4 @@ document.addEventListener('DOMContentLoaded', () => {
     maskCtx.globalCompositeOperation = 'source-over';
   }
 
-  /* ---------------- Status ---------------- */
-
-  function setStatus(message) {
-    if (refs.status) {
-      refs.status.textContent = message;
-    }
-  }
-
-  setStatus('Select a photo to begin.');
 });
