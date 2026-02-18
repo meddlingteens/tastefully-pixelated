@@ -47,12 +47,6 @@ header h1 {
   backdrop-filter: blur(4px);
 }
 
-.controls,
-.exports {
-  display: grid;
-  gap: 0.85rem;
-}
-
 /* ---------- File Row ---------- */
 
 .file-row {
@@ -62,15 +56,11 @@ header h1 {
 }
 
 .file-label {
-  display: inline-flex;
-  width: fit-content;
   padding: 0.6rem 0.85rem;
   border-radius: 999px;
   background: linear-gradient(135deg, var(--accent), var(--accent-strong));
   font-weight: 600;
 }
-
-/* ---------- Info Button ---------- */
 
 .info-button {
   width: 26px;
@@ -81,57 +71,71 @@ header h1 {
   font-weight: 700;
   display: grid;
   place-items: center;
-  font-size: 0.85rem;
   cursor: pointer;
+  transition: transform 0.15s ease;
 }
 
 .info-button:hover {
   background: #5c3a85;
+  transform: translateY(-1px);
 }
 
-/* ---------- Toolbar ---------- */
+/* ---------- Dual Sliders ---------- */
 
-.toolbar {
+.dual-sliders {
+  display: flex;
+  justify-content: space-between;
+  gap: 5%;
+}
+
+.slider-group {
+  flex: 0 0 47.5%;
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
 }
 
-.toolbar output {
+.slider-group label,
+.slider-group output {
+  font-size: 0.85rem;
   color: var(--muted);
 }
 
-/* ---------- Buttons (RESTORED ORIGINAL STYLE) ---------- */
+/* ---------- Custom Range Styling ---------- */
 
-.button-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.55rem;
-}
-
-button {
+input[type="range"] {
+  -webkit-appearance: none;
   appearance: none;
-  border: 0;
-  border-radius: 10px;
-  padding: 0.55rem 0.8rem;  /* Original sizing */
-  font-size: 0.95rem;
-  background: #432b61;      /* Base button color */
-  color: var(--text);
-  text-decoration: none;
+  height: 6px;
+  border-radius: 6px;
+  background: linear-gradient(
+    to right,
+    var(--accent) 0%,
+    var(--accent) 50%,
+    #3a2b55 50%,
+    #3a2b55 100%
+  );
+  outline: none;
+  transition: background 0.2s ease;
+}
+
+/* Slider Thumb (Desktop + iOS) */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid #1b1225;
   cursor: pointer;
+  transition: transform 0.1s ease;
 }
 
-button:hover:not(:disabled) {
-  background: #5c3a85;
+input[type="range"]::-webkit-slider-thumb:active {
+  transform: scale(1.2);
 }
 
-button:disabled {
-  opacity: 0.4;
-  pointer-events: none;
-}
-
-/* Individual Button Colors (Restored) */
-
-#moveBtn {
-  background:
+/* Firefox */
+input[type="range"]::-moz-range-thumb {
+  width:
