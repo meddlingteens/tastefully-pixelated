@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let drawing = false;
   let history = [];
-  let mode = 'position'; // FIXED: mode control
+  let mode = 'position';
 
   /* ---------------- Mode Switching ---------------- */
 
@@ -65,8 +65,10 @@ document.addEventListener('DOMContentLoaded', () => {
     'Gross, just gross.'
   ];
 
-  randomPrompt.textContent =
-    prompts[Math.floor(Math.random() * prompts.length)];
+  if (randomPrompt) {
+    randomPrompt.textContent =
+      prompts[Math.floor(Math.random() * prompts.length)];
+  }
 
   /* ---------------- File Picker ---------------- */
 
@@ -77,31 +79,59 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!file) return;
 
     const reader = new FileReader();
+
     reader.onload = function (e) {
       const img = new Image();
+
       img.onload = function () {
 
-        baseCanvas.width = img.width;
-        baseCanvas.height = img.height;
-        maskCanvas.width = img.width;
-        maskCanvas.height = img.height;
-        outputCanvas.width = img.width;
-        outputCanvas.height = img.height;
+        /* --------- NEW: Fit Image To Workspace --------- */
 
-        baseCtx.clearRect(0, 0, img.width, img.height);
-        baseCtx.drawImage(img, 0, 0);
+        const MAX_WIDTH = 900;
+        const MAX_HEIGHT = 600;
 
-        maskCtx.clearRect(0, 0, img.width, img.height);
+        let width = img.width;
+        let height = img.height;
+
+        const widthRatio = MAX_WIDTH / width;
+        const heightRatio = MAX_HEIGHT / height;
+
+        const scale = Math.min(widthRatio, heightRatio, 1); // never upscale
+
+        const scaledWidth = Math.floor(width * scale);
+        const scaledHeight = Math.floor(height * scale);
+
+        /* --------- Resize Canvases --------- */
+
+        baseCanvas.width = scaledWidth;
+        baseCanvas.height = scaledHeight;
+
+        maskCanvas.width = scaledWidth;
+        maskCanvas.height = scaledHeight;
+
+        outputCanvas.width = scaledWidth;
+        outputCanvas.height = scaledHeight;
+
+        /* --------- Draw Scaled Image --------- */
+
+        baseCtx.clearRect(0, 0, scaledWidth, scaledHeight);
+        baseCtx.drawImage(img, 0, 0, scaledWidth, scaledHeight);
+
+        maskCtx.clearRect(0, 0, scaledWidth, scaledHeight);
+
+        /* --------- Enable Controls --------- */
 
         moveBtn.disabled = false;
         drawBtn.disabled = false;
         applyBtn.disabled = false;
         clearBtn.disabled = false;
 
-        setMode('position'); // default
+        setMode('position');
       };
+
       img.src = e.target.result;
     };
+
     reader.readAsDataURL(file);
   });
 
@@ -123,7 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
   maskCanvas.addEventListener('mouseleave', stopDraw);
 
   function startDraw(e) {
-    if (mode !== 'draw') return; // FIXED
+    if (mode !== 'draw') return;
     drawing = true;
     saveHistory();
     draw(e);
@@ -149,7 +179,9 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ---------------- Undo ---------------- */
 
   function saveHistory() {
-    history.push(maskCtx.getImageData(0, 0, maskCanvas.width, maskCanvas.height));
+    history.push(
+      maskCtx.getImageData(0, 0, maskCanvas.width, maskCanvas.height)
+    );
     if (history.length > 20) history.shift();
     undoBtn.disabled = false;
   }
@@ -172,6 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ---------------- Apply Pixelation ---------------- */
 
   applyBtn.addEventListener('click', () => {
+
     const width = baseCanvas.width;
     const height = baseCanvas.height;
 
@@ -218,6 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     outputCtx.putImageData(result, 0, 0);
+
     outputCanvas.hidden = false;
     baseCanvas.hidden = true;
     maskCanvas.hidden = true;
@@ -235,6 +269,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   infoModal.addEventListener('click', (e) => {
     if (e.target === infoModal) {
+      infoModal.classList.add('hidden');
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
       infoModal.classList.add('hidden');
     }
   });
