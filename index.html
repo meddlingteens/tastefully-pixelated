@@ -16,7 +16,7 @@
 
       <section class="controls card">
 
-        <!-- File Picker Row -->
+        <!-- File Row -->
         <div class="file-row">
           <label id="photoPickerLabel" class="file-label" for="photoInput">
             Select photo
@@ -44,18 +44,16 @@
           <div class="slider-group">
             <label for="brushSize">Brush size</label>
             <input id="brushSize" type="range" min="8" max="90" value="35" />
-            <output id="brushSizeValue">35 px</output>
           </div>
 
           <div class="slider-group">
             <label for="pixelSize">Pixel size</label>
             <input id="pixelSize" type="range" min="8" max="40" value="18" />
-            <output id="pixelSizeValue">18 px</output>
           </div>
         </div>
 
-        <!-- Zoom -->
-        <div class="toolbar">
+        <!-- Full Width Zoom -->
+        <div class="zoom-row">
           <label for="zoomLevel">Zoom</label>
           <input
             id="zoomLevel"
@@ -66,29 +64,21 @@
             value="1"
             disabled
           />
-          <output id="zoomLevelValue">100%</output>
         </div>
 
         <!-- Controls -->
         <div class="button-row">
-          <button id="moveBtn" disabled>Move image</button>
-          <button id="drawBtn" disabled>Draw mask</button>
+          <button id="moveBtn" disabled>Position</button>
+          <button id="drawBtn" disabled>Draw</button>
           <button id="undoBtn" disabled>Undo</button>
-          <button id="clearMaskBtn" disabled>Clear all</button>
-          <button id="applyBtn" disabled>Apply mask</button>
+          <button id="clearMaskBtn" disabled>Clear</button>
+          <button id="applyBtn" disabled>Apply</button>
         </div>
 
       </section>
 
       <section class="canvas-wrap card">
         <div id="canvasContainer" class="canvas-container disabled">
-          <p id="dimensionsOverlay" class="dimensions-overlay" hidden></p>
-
-          <div id="uploadProgress" class="upload-progress" hidden>
-            <div class="spinner" aria-hidden="true"></div>
-            <p id="uploadProgressText">Uploading image…</p>
-          </div>
-
           <canvas id="baseCanvas"></canvas>
           <canvas id="maskCanvas"></canvas>
           <canvas id="outputCanvas" hidden></canvas>
@@ -99,7 +89,7 @@
 
       <section class="exports card">
         <div class="button-row">
-          <button id="downloadBtn" disabled>Download image</button>
+          <button id="downloadBtn" disabled>Download</button>
           <button id="shareBtn" disabled>Share</button>
         </div>
       </section>
@@ -117,10 +107,6 @@
           <li>WEBP</li>
           <li>GIF</li>
         </ul>
-
-        <p class="modal-note">
-          HEIC and some mobile formats may not work in all browsers.
-        </p>
       </div>
     </div>
 

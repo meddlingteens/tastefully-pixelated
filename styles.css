@@ -1,17 +1,15 @@
 :root {
-  color-scheme: dark;
   --bg: #14111a;
   --card: #211a2d;
   --text: #f6f2ff;
   --muted: #baa9d9;
   --accent: #cb8cff;
   --accent-strong: #9150d0;
-  --danger: #f78198;
 }
 
 * {
   box-sizing: border-box;
-  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  font-family: Inter, system-ui, sans-serif;
 }
 
 body {
@@ -29,30 +27,18 @@ body {
   gap: 1rem;
 }
 
-header h1 {
-  margin: 0;
-}
-
-.random-prompt {
-  margin-top: 0.6rem;
-  color: #ffd48f;
-  font-weight: 700;
-}
-
 .card {
-  background: color-mix(in srgb, var(--card), transparent 10%);
-  border: 1px solid color-mix(in srgb, var(--muted), transparent 65%);
+  background: var(--card);
   border-radius: 16px;
   padding: 1rem;
-  backdrop-filter: blur(4px);
 }
 
-/* ---------- File Row ---------- */
+/* File Row */
 
 .file-row {
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
 }
 
 .file-label {
@@ -68,19 +54,12 @@ header h1 {
   border-radius: 50%;
   background: #3a2b55;
   color: var(--text);
-  font-weight: 700;
   display: grid;
   place-items: center;
   cursor: pointer;
-  transition: transform 0.15s ease;
 }
 
-.info-button:hover {
-  background: #5c3a85;
-  transform: translateY(-1px);
-}
-
-/* ---------- Dual Sliders ---------- */
+/* Sliders */
 
 .dual-sliders {
   display: flex;
@@ -90,52 +69,76 @@ header h1 {
 
 .slider-group {
   flex: 0 0 47.5%;
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
 }
 
-.slider-group label,
-.slider-group output {
-  font-size: 0.85rem;
-  color: var(--muted);
+.zoom-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
 }
 
-/* ---------- Custom Range Styling ---------- */
+/* Buttons */
 
-input[type="range"] {
-  -webkit-appearance: none;
-  appearance: none;
-  height: 6px;
-  border-radius: 6px;
-  background: linear-gradient(
-    to right,
-    var(--accent) 0%,
-    var(--accent) 50%,
-    #3a2b55 50%,
-    #3a2b55 100%
-  );
-  outline: none;
-  transition: background 0.2s ease;
+.button-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.55rem;
 }
 
-/* Slider Thumb (Desktop + iOS) */
-input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: var(--accent);
-  border: 2px solid #1b1225;
+.button-row button {
+  flex: 1;
+  border: 0;
+  border-radius: 10px;
+  padding: 0.55rem 0.8rem;
+  font-size: 0.95rem;
+  color: var(--text);
   cursor: pointer;
-  transition: transform 0.1s ease;
 }
 
-input[type="range"]::-webkit-slider-thumb:active {
-  transform: scale(1.2);
+#moveBtn { background: #38405f; }
+#drawBtn { background: #432b61; }
+#undoBtn { background: #4e345f; }
+#clearMaskBtn { background: #61304d; }
+#applyBtn {
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  font-weight: 600;
 }
 
-/* Firefox */
-input[type="range"]::-moz-range-thumb {
-  width:
+button:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* Modal */
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  display: grid;
+  place-items: center;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background: var(--card);
+  padding: 1.5rem;
+  border-radius: 16px;
+  position: relative;
+}
+
+.close-modal {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.8rem;
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
