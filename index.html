@@ -18,9 +18,9 @@
 
         <!-- File Row -->
         <div class="file-row">
-          <label id="photoPickerLabel" class="file-label" for="photoInput">
+          <button id="photoPickerBtn" class="file-label" type="button">
             Select photo
-          </label>
+          </button>
 
           <button
             id="fileInfoBtn"
@@ -34,9 +34,9 @@
 
         <input
           id="photoInput"
-          class="sr-only-file-input"
           type="file"
           accept=".jpg,.jpeg,.png,.webp,.gif,image/jpeg,image/png,image/webp,image/gif"
+          hidden
         />
 
         <!-- Dual Sliders -->
@@ -52,7 +52,7 @@
           </div>
         </div>
 
-        <!-- Full Width Zoom -->
+        <!-- Zoom -->
         <div class="zoom-row">
           <label for="zoomLevel">Zoom</label>
           <input

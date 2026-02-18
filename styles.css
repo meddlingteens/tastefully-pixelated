@@ -46,6 +46,9 @@ body {
   border-radius: 999px;
   background: linear-gradient(135deg, var(--accent), var(--accent-strong));
   font-weight: 600;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
 }
 
 .info-button {
@@ -56,6 +59,7 @@ body {
   color: var(--text);
   display: grid;
   place-items: center;
+  border: none;
   cursor: pointer;
 }
 
@@ -110,6 +114,17 @@ body {
 button:disabled {
   opacity: 0.4;
   pointer-events: none;
+}
+
+/* Canvas */
+
+.canvas-container {
+  position: relative;
+  width: 100%;
+  max-width: 476px;
+  border-radius: 12px;
+  margin-inline: auto;
+  overflow: hidden;
 }
 
 /* Modal */
