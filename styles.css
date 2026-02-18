@@ -6,6 +6,7 @@
   --muted: #baa9d9;
   --accent: #cb8cff;
   --accent-strong: #9150d0;
+  --danger: #f78198;
 }
 
 * {
@@ -28,54 +29,85 @@ body {
   gap: 1rem;
 }
 
+header h1 {
+  margin: 0;
+}
+
+.random-prompt {
+  margin-top: 0.6rem;
+  color: #ffd48f;
+  font-weight: 700;
+}
+
 .card {
   background: color-mix(in srgb, var(--card), transparent 10%);
+  border: 1px solid color-mix(in srgb, var(--muted), transparent 65%);
   border-radius: 16px;
   padding: 1rem;
+  backdrop-filter: blur(4px);
 }
+
+.controls,
+.exports {
+  display: grid;
+  gap: 0.85rem;
+}
+
+/* ---------- File Row ---------- */
 
 .file-row {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: space-between; /* Right-align ? button */
 }
 
+.file-label {
+  display: inline-flex;
+  width: fit-content;
+  padding: 0.6rem 0.85rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  font-weight: 600;
+}
+
+/* ---------- Info Button ---------- */
+
 .info-button {
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   background: #3a2b55;
+  color: var(--text);
   font-weight: 700;
   display: grid;
   place-items: center;
+  font-size: 0.85rem;
+  cursor: pointer;
 }
 
-.modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.65);
-  display: grid;
-  place-items: center;
-  z-index: 1000;
+.info-button:hover {
+  background: #5c3a85;
 }
 
-.modal.hidden {
-  display: none;
-}
-
-.modal-content {
-  background: var(--card);
-  border-radius: 16px;
-  padding: 1.5rem;
-  max-width: 360px;
-  width: 90%;
-  position: relative;
-}
-
-.close-modal {
+.sr-only-file-input {
   position: absolute;
-  top: 0.6rem;
-  right: 0.8rem;
-  background: transparent;
-  font-size: 1.2rem;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
 }
+
+/* ---------- Toolbar ---------- */
+
+.toolbar {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.toolbar output {
+  color: var(--m
