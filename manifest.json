@@ -1,0 +1,9 @@
+{
+  "name": "Tastefully Pixelated",
+  "short_name": "Pixelated",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#14111a",
+  "theme_color": "#14111a",
+  "icons": []
+}
