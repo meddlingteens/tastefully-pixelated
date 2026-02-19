@@ -1,115 +1,105 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tastefully Pixelated</title>
-    <link rel="stylesheet" href="styles.css" />
-  </head>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tastefully Pixelated</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
 
-  <body>
-    <main class="app">
-      <header>
-        <h1>Tastefully Pixelated</h1>
-        <p id="randomPrompt" class="random-prompt" aria-live="polite"></p>
-      </header>
+<body>
+  <main class="app">
 
-      <section class="controls card">
+    <header>
+      <h1>Tastefully Pixelated</h1>
+      <p id="randomPrompt"></p>
+    </header>
 
-        <!-- File Row -->
-        <div class="file-row">
-          <button id="photoPickerBtn" class="file-label" type="button">
-            Select photo
-          </button>
+    <section class="controls card">
 
-          <button
-            id="fileInfoBtn"
-            class="info-button"
-            type="button"
-            aria-label="Supported file types"
-          >
-            ?
-          </button>
-        </div>
+      <div class="file-row">
+        <button id="photoPickerBtn" class="file-label" type="button">
+          Select photo
+        </button>
 
-        <input
-          id="photoInput"
-          type="file"
-          accept=".jpg,.jpeg,.png,.webp,.gif,image/jpeg,image/png,image/webp,image/gif"
-          hidden
-        />
-
-        <!-- Dual Sliders -->
-        <div class="dual-sliders">
-          <div class="slider-group">
-            <label for="brushSize">Brush size</label>
-            <input id="brushSize" type="range" min="8" max="90" value="35" />
-          </div>
-
-          <div class="slider-group">
-            <label for="pixelSize">Pixel size</label>
-            <input id="pixelSize" type="range" min="8" max="40" value="18" />
-          </div>
-        </div>
-
-        <!-- Zoom -->
-        <div class="zoom-row">
-          <label for="zoomLevel">Zoom</label>
-          <input
-            id="zoomLevel"
-            type="range"
-            min="1"
-            max="4"
-            step="0.05"
-            value="1"
-            disabled
-          />
-        </div>
-
-        <!-- Controls -->
-        <div class="button-row">
-          <button id="moveBtn" disabled>Position</button>
-          <button id="drawBtn" disabled>Draw</button>
-          <button id="undoBtn" disabled>Undo</button>
-          <button id="clearMaskBtn" disabled>Clear</button>
-          <button id="applyBtn" disabled>Apply</button>
-        </div>
-
-      </section>
-
-      <section class="canvas-wrap card">
-        <div id="canvasContainer" class="canvas-container disabled">
-          <canvas id="baseCanvas"></canvas>
-          <canvas id="maskCanvas"></canvas>
-          <canvas id="outputCanvas" hidden></canvas>
-        </div>
-
-        <p id="statusText" class="status" aria-live="polite"></p>
-      </section>
-
-      <section class="exports card">
-        <div class="button-row">
-          <button id="downloadBtn" disabled>Download</button>
-          <button id="shareBtn" disabled>Share</button>
-        </div>
-      </section>
-    </main>
-
-    <!-- Modal -->
-    <div id="infoModal" class="modal hidden">
-      <div class="modal-content">
-        <button id="closeModalBtn" class="close-modal" type="button">×</button>
-
-        <h2>Supported File Types</h2>
-        <ul>
-          <li>JPG / JPEG</li>
-          <li>PNG</li>
-          <li>WEBP</li>
-          <li>GIF</li>
-        </ul>
+        <button id="fileInfoBtn" class="info-button" type="button">
+          ?
+        </button>
       </div>
-    </div>
 
-    <script src="app.js" defer></script>
-  </body>
+      <input
+        id="photoInput"
+        type="file"
+        accept=".jpg,.jpeg,.png,.webp,.gif,image/jpeg,image/png,image/webp,image/gif"
+        hidden
+      />
+
+      <div class="dual-sliders">
+        <div class="slider-group">
+          <label for="brushSize">Brush size</label>
+          <input id="brushSize" type="range" min="8" max="90" value="35" />
+        </div>
+
+        <div class="slider-group">
+          <label for="pixelSize">Pixel size</label>
+          <input id="pixelSize" type="range" min="8" max="40" value="18" />
+        </div>
+      </div>
+
+      <div class="zoom-row">
+        <label for="zoomLevel">Zoom</label>
+        <input
+          id="zoomLevel"
+          type="range"
+          min="1"
+          max="4"
+          step="0.05"
+          value="1"
+          disabled
+        />
+      </div>
+
+      <div class="button-row">
+        <button id="moveBtn" disabled>Position</button>
+        <button id="drawBtn" disabled>Draw</button>
+        <button id="undoBtn" disabled>Undo</button>
+        <button id="clearMaskBtn" disabled>Clear</button>
+        <button id="applyBtn" disabled>Apply</button>
+      </div>
+
+    </section>
+
+    <section class="canvas-wrap card">
+      <div id="canvasContainer" class="canvas-container">
+        <canvas id="baseCanvas"></canvas>
+        <canvas id="maskCanvas"></canvas>
+        <canvas id="outputCanvas" hidden></canvas>
+      </div>
+    </section>
+
+    <section class="exports card">
+      <div class="button-row">
+        <button id="downloadBtn" disabled>Download</button>
+        <button id="shareBtn" disabled>Share</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modal -->
+  <div id="infoModal" class="modal hidden">
+    <div class="modal-content">
+      <button id="closeModalBtn" class="close-modal" type="button">×</button>
+      <h2>Supported File Types</h2>
+      <ul>
+        <li>JPG / JPEG</li>
+        <li>PNG</li>
+        <li>WEBP</li>
+        <li>GIF</li>
+      </ul>
+    </div>
+  </div>
+
+  <script src="app.js?v=1000" defer></script>
+</body>
 </html>

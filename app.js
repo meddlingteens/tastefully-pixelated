@@ -1,7 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-  /* ---------- Elements ---------- */
-
   const photoPickerBtn = document.getElementById('photoPickerBtn');
   const photoInput = document.getElementById('photoInput');
 
@@ -16,6 +14,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const clearBtn = document.getElementById('clearMaskBtn');
   const applyBtn = document.getElementById('applyBtn');
 
+  const downloadBtn = document.getElementById('downloadBtn');
+  const shareBtn = document.getElementById('shareBtn');
+
   const brushSizeInput = document.getElementById('brushSize');
   const pixelSizeInput = document.getElementById('pixelSize');
   const zoomInput = document.getElementById('zoomLevel');
@@ -27,8 +28,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const baseCtx = baseCanvas.getContext('2d');
   const maskCtx = maskCanvas.getContext('2d');
   const outputCtx = outputCanvas.getContext('2d');
-
-  /* ---------- State ---------- */
 
   let brushSize = parseInt(brushSizeInput.value, 10);
   let pixelSize = parseInt(pixelSizeInput.value, 10);
@@ -46,11 +45,8 @@ document.addEventListener('DOMContentLoaded', () => {
   let history = [];
   let mode = null;
 
-  /* ---------- Transform (Zoom + Pan) ---------- */
-
   function applyTransform() {
     const transform = `translate(${offsetX}px, ${offsetY}px) scale(${zoom})`;
-
     baseCanvas.style.transform = transform;
     maskCanvas.style.transform = transform;
     outputCanvas.style.transform = transform;
@@ -61,22 +57,12 @@ document.addEventListener('DOMContentLoaded', () => {
     applyTransform();
   });
 
-  /* ---------- Mode ---------- */
-
   function setMode(newMode) {
     mode = newMode;
-
-    moveBtn.classList.remove('active');
-    drawBtn.classList.remove('active');
-
-    if (mode === 'position') moveBtn.classList.add('active');
-    if (mode === 'draw') drawBtn.classList.add('active');
   }
 
   moveBtn.addEventListener('click', () => setMode('position'));
   drawBtn.addEventListener('click', () => setMode('draw'));
-
-  /* ---------- File Picker ---------- */
 
   photoPickerBtn.addEventListener('click', () => photoInput.click());
 
@@ -105,8 +91,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const width = Math.floor(img.width * scale);
         const height = Math.floor(img.height * scale);
 
-        /* Resize canvases */
-
         baseCanvas.width = width;
         baseCanvas.height = height;
         maskCanvas.width = width;
@@ -114,25 +98,17 @@ document.addEventListener('DOMContentLoaded', () => {
         outputCanvas.width = width;
         outputCanvas.height = height;
 
-        /* Fix container collapse */
-
         canvasContainer.style.width = width + "px";
         canvasContainer.style.height = height + "px";
 
-        baseCtx.clearRect(0, 0, width, height);
         baseCtx.drawImage(img, 0, 0, width, height);
-
         maskCtx.clearRect(0, 0, width, height);
-
-        /* Enable controls */
 
         moveBtn.disabled = false;
         drawBtn.disabled = false;
         applyBtn.disabled = false;
         clearBtn.disabled = false;
         zoomInput.disabled = false;
-
-        /* Reset transform state */
 
         zoomInput.value = 1;
         zoom = 1;
@@ -149,8 +125,6 @@ document.addEventListener('DOMContentLoaded', () => {
     reader.readAsDataURL(file);
   });
 
-  /* ---------- Sliders ---------- */
-
   brushSizeInput.addEventListener('input', () => {
     brushSize = parseInt(brushSizeInput.value, 10);
   });
@@ -159,11 +133,8 @@ document.addEventListener('DOMContentLoaded', () => {
     pixelSize = parseInt(pixelSizeInput.value, 10);
   });
 
-  /* ---------- Drawing (FIXED ALIGNMENT) ---------- */
-
   maskCanvas.addEventListener('mousedown', (e) => {
     if (mode !== 'draw') return;
-
     drawing = true;
     saveHistory();
     draw(e);
@@ -180,10 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   function draw(e) {
-
     const rect = maskCanvas.getBoundingClientRect();
-
-    // Correct coordinate calculation
     const x = (e.clientX - rect.left) / zoom;
     const y = (e.clientY - rect.top) / zoom;
 
@@ -193,21 +161,16 @@ document.addEventListener('DOMContentLoaded', () => {
     maskCtx.fill();
   }
 
-  /* ---------- Position (Pan) ---------- */
-
   canvasContainer.addEventListener('mousedown', (e) => {
-
     if (mode !== 'position') return;
     if (zoom <= 1) return;
 
     isPanning = true;
-
     startX = e.clientX - offsetX;
     startY = e.clientY - offsetY;
   });
 
   window.addEventListener('mousemove', (e) => {
-
     if (!isPanning) return;
 
     offsetX = e.clientX - startX;
@@ -216,29 +179,20 @@ document.addEventListener('DOMContentLoaded', () => {
     applyTransform();
   });
 
-  /* ---------- Undo ---------- */
-
   function saveHistory() {
     history.push(maskCtx.getImageData(0, 0, maskCanvas.width, maskCanvas.height));
-    if (history.length > 20) history.shift();
     undoBtn.disabled = false;
   }
 
   undoBtn.addEventListener('click', () => {
     if (!history.length) return;
     maskCtx.putImageData(history.pop(), 0, 0);
-    undoBtn.disabled = history.length === 0;
   });
-
-  /* ---------- Clear ---------- */
 
   clearBtn.addEventListener('click', () => {
     maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
     history = [];
-    undoBtn.disabled = true;
   });
-
-  /* ---------- Apply Pixelation ---------- */
 
   applyBtn.addEventListener('click', () => {
 
@@ -251,39 +205,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     result.data.set(baseData.data);
 
-    for (let y = 0; y < height; y += pixelSize) {
-      for (let x = 0; x < width; x += pixelSize) {
-
-        let r = 0, g = 0, b = 0, count = 0;
-
-        for (let yy = y; yy < y + pixelSize && yy < height; yy++) {
-          for (let xx = x; xx < x + pixelSize && xx < width; xx++) {
-            const i = (yy * width + xx) * 4;
-            if (maskData.data[i + 3] > 0) {
-              r += baseData.data[i];
-              g += baseData.data[i + 1];
-              b += baseData.data[i + 2];
-              count++;
-            }
-          }
-        }
-
-        if (count > 0) {
-          const avgR = r / count;
-          const avgG = g / count;
-          const avgB = b / count;
-
-          for (let yy = y; yy < y + pixelSize && yy < height; yy++) {
-            for (let xx = x; xx < x + pixelSize && xx < width; xx++) {
-              const i = (yy * width + xx) * 4;
-              if (maskData.data[i + 3] > 0) {
-                result.data[i] = avgR;
-                result.data[i + 1] = avgG;
-                result.data[i + 2] = avgB;
-              }
-            }
-          }
-        }
+    for (let i = 0; i < baseData.data.length; i += 4) {
+      if (maskData.data[i + 3] > 0) {
+        result.data[i] = 0;
+        result.data[i + 1] = 0;
+        result.data[i + 2] = 0;
       }
     }
 
@@ -292,20 +218,41 @@ document.addEventListener('DOMContentLoaded', () => {
     outputCanvas.hidden = false;
     baseCanvas.hidden = true;
     maskCanvas.hidden = true;
+
+    downloadBtn.disabled = false;
+    shareBtn.disabled = false;
   });
 
-  /* ---------- Modal ---------- */
-
-  fileInfoBtn.addEventListener('click', () => {
-    infoModal.classList.remove('hidden');
+  downloadBtn.addEventListener('click', () => {
+    outputCanvas.toBlob((blob) => {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'tastefully-pixelated.png';
+      a.click();
+      URL.revokeObjectURL(url);
+    });
   });
 
-  closeModalBtn.addEventListener('click', () => {
-    infoModal.classList.add('hidden');
-  });
+  shareBtn.addEventListener('click', async () => {
 
-  infoModal.addEventListener('click', (e) => {
-    if (e.target === infoModal) infoModal.classList.add('hidden');
+    if (!navigator.share) {
+      alert("Sharing not supported on this device.");
+      return;
+    }
+
+    outputCanvas.toBlob(async (blob) => {
+
+      const file = new File([blob], "tastefully-pixelated.png", {
+        type: "image/png"
+      });
+
+      await navigator.share({
+        files: [file],
+        title: "Tastefully Pixelated"
+      });
+
+    });
   });
 
 });
