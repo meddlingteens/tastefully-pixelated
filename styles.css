@@ -43,7 +43,7 @@ header p {
   color: var(--muted);
 }
 
-/* Ad Banner */
+/* Banner */
 
 .ad-banner {
   background: #ffffff;
@@ -54,12 +54,6 @@ header p {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
-}
-
-.ad-content h2 {
-  margin: 0;
-  font-size: 1rem;
 }
 
 .ad-button {
@@ -69,7 +63,6 @@ header p {
   padding: 0.4rem 0.8rem;
   border-radius: 6px;
   font-size: 0.85rem;
-  cursor: default;
 }
 
 /* Controls */
@@ -78,16 +71,27 @@ header p {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.4rem;
+
+  /* 🔥 Added extra whitespace */
+  margin-bottom: 0.75rem;
 }
 
+/* 🔥 Updated Select Photo Button Shape */
+
 .file-label {
-  padding: 0.6rem 0.85rem;
-  border-radius: 999px;
+  padding: 0.55rem 0.8rem;
+  border-radius: 10px;   /* was 999px (pill) */
   background: linear-gradient(135deg, var(--accent), var(--accent-strong));
   border: none;
   color: var(--text);
+  font-size: 0.95rem;
   cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.file-label:hover {
+  transform: translateY(-1px);
+  opacity: 0.95;
 }
 
 .info-button {
@@ -101,6 +105,8 @@ header p {
   border: none;
   cursor: pointer;
 }
+
+/* Sliders */
 
 .dual-sliders {
   display: flex;
@@ -123,6 +129,8 @@ header p {
   margin-bottom: 0.4rem;
 }
 
+/* Buttons */
+
 .button-row {
   display: flex;
   justify-content: space-between;
@@ -137,6 +145,7 @@ header p {
   font-size: 0.95rem;
   color: var(--text);
   cursor: pointer;
+  transition: all 0.18s ease;
 }
 
 #moveBtn { background: #38405f; }
@@ -171,8 +180,7 @@ button:disabled {
 }
 
 #baseCanvas,
-#maskCanvas,
-#outputCanvas {
+#maskCanvas {
   position: absolute;
   top: 0;
   left: 0;
@@ -181,7 +189,6 @@ button:disabled {
 
 #baseCanvas { z-index: 1; }
 #maskCanvas { z-index: 2; cursor: crosshair; }
-#outputCanvas { z-index: 3; }
 
 /* Modal */
 
