@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const brushSizeInput = document.getElementById('brushSize');
   const pixelSizeInput = document.getElementById('pixelSize');
+  const zoomInput = document.getElementById('zoomLevel');
 
   const fileInfoBtn = document.getElementById('fileInfoBtn');
   const infoModal = document.getElementById('infoModal');
@@ -28,16 +29,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let brushSize = parseInt(brushSizeInput.value, 10);
   let pixelSize = parseInt(pixelSizeInput.value, 10);
+  let zoom = 1;
 
   let drawing = false;
   let history = [];
-  let mode = null; // cleaner state
+  let mode = null;
+
+  /* ---------- Zoom ---------- */
+
+  function applyZoom() {
+    baseCanvas.style.transform = `scale(${zoom})`;
+    maskCanvas.style.transform = `scale(${zoom})`;
+    outputCanvas.style.transform = `scale(${zoom})`;
+  }
+
+  zoomInput.addEventListener('input', () => {
+    zoom = parseFloat(zoomInput.value);
+    applyZoom();
+  });
 
   /* ---------- Mode ---------- */
 
   function setMode(newMode) {
     mode = newMode;
-
     moveBtn.classList.remove('active');
     drawBtn.classList.remove('active');
 
@@ -93,8 +107,13 @@ document.addEventListener('DOMContentLoaded', () => {
         drawBtn.disabled = false;
         applyBtn.disabled = false;
         clearBtn.disabled = false;
+        zoomInput.disabled = false;
 
-        setMode('draw'); // default to draw so user can immediately use brush
+        zoomInput.value = 1;
+        zoom = 1;
+        applyZoom();
+
+        setMode('draw');
       };
 
       img.src = e.target.result;
@@ -127,11 +146,10 @@ document.addEventListener('DOMContentLoaded', () => {
     draw(e);
   });
 
-  window.addEventListener('mouseup', () => {
-    drawing = false;
-  });
+  window.addEventListener('mouseup', () => drawing = false);
 
   function draw(e) {
+
     const rect = maskCanvas.getBoundingClientRect();
 
     const x = (e.clientX - rect.left) * (maskCanvas.width / rect.width);
@@ -153,8 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   undoBtn.addEventListener('click', () => {
     if (!history.length) return;
-    const last = history.pop();
-    maskCtx.putImageData(last, 0, 0);
+    maskCtx.putImageData(history.pop(), 0, 0);
     undoBtn.disabled = history.length === 0;
   });
 
@@ -216,7 +233,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     outputCtx.putImageData(result, 0, 0);
-
     outputCanvas.hidden = false;
     baseCanvas.hidden = true;
     maskCanvas.hidden = true;
@@ -233,9 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   infoModal.addEventListener('click', (e) => {
-    if (e.target === infoModal) {
-      infoModal.classList.add('hidden');
-    }
+    if (e.target === infoModal) infoModal.classList.add('hidden');
   });
 
 });
