@@ -33,12 +33,24 @@ body {
   padding: 1rem;
 }
 
+/* ---------------- Header ---------------- */
+
+header h1 {
+  margin: 0 0 0.25rem 0;
+}
+
+header p {
+  margin: 0;
+  color: var(--muted);
+}
+
 /* ---------------- File Row ---------------- */
 
 .file-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 0.4rem; /* MATCHES slider internal spacing */
 }
 
 .file-label {
@@ -69,19 +81,21 @@ body {
   display: flex;
   justify-content: space-between;
   gap: 5%;
+  margin-bottom: 0.4rem; /* consistent rhythm */
 }
 
 .slider-group {
   flex: 0 0 47.5%;
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.4rem; /* ~6–7px between label and slider */
 }
 
 .zoom-row {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
+  margin-bottom: 0.4rem;
 }
 
 /* ---------------- Buttons ---------------- */
@@ -106,7 +120,14 @@ body {
 #drawBtn { background: #432b61; }
 #undoBtn { background: #4e345f; }
 #clearMaskBtn { background: #61304d; }
+
 #applyBtn {
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  font-weight: 600;
+}
+
+#downloadBtn,
+#shareBtn {
   background: linear-gradient(135deg, var(--accent), var(--accent-strong));
   font-weight: 600;
 }
@@ -120,14 +141,14 @@ button:disabled {
   pointer-events: none;
 }
 
-/* ---------------- Canvas Container ---------------- */
+/* ---------------- Canvas ---------------- */
 
 .canvas-container {
   position: relative;
   width: 100%;
   max-width: 900px;
   margin: 0 auto;
-  overflow: auto; /* allows zoom panning */
+  overflow: auto; /* allows zoom + pan */
 }
 
 /* Base image canvas */
@@ -139,7 +160,7 @@ button:disabled {
   transform-origin: top left;
 }
 
-/* Mask canvas (must be above base for drawing) */
+/* Mask canvas (must sit above base) */
 #maskCanvas {
   position: absolute;
   top: 0;
