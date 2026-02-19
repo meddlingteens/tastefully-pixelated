@@ -1,6 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
-
-  /* ===== TAGLINES ===== */
+document.addEventListener("DOMContentLoaded", () => {
 
   const taglines = [
     "Just, eeuuuuu.",
@@ -26,21 +24,50 @@ document.addEventListener('DOMContentLoaded', () => {
     "Sell stuff here, bitches"
   ];
 
-  const randomPrompt = document.getElementById("randomPrompt");
-  if (randomPrompt) {
-    randomPrompt.textContent =
-      taglines[Math.floor(Math.random() * taglines.length)];
-  }
+  document.getElementById("randomPrompt").textContent =
+    taglines[Math.floor(Math.random() * taglines.length)];
 
-  const bannerHeadline = document.getElementById("bannerHeadline");
-  if (bannerHeadline) {
-    bannerHeadline.textContent =
-      bannerHeadlines[Math.floor(Math.random() * bannerHeadlines.length)];
-  }
+  document.getElementById("bannerHeadline").textContent =
+    bannerHeadlines[Math.floor(Math.random() * bannerHeadlines.length)];
 
-  /* ===== (All editor functionality remains fully intact here —
-     zoom, draw, touch, optimized pixelation, undo, apply, etc.)
-     Keeping stable from previous v1.0 implementation.
-  ===== */
+  const photoPickerBtn = document.getElementById("photoPickerBtn");
+  const photoInput = document.getElementById("photoInput");
+  const baseCanvas = document.getElementById("baseCanvas");
+  const maskCanvas = document.getElementById("maskCanvas");
+  const container = document.getElementById("canvasContainer");
+
+  const baseCtx = baseCanvas.getContext("2d");
+  const maskCtx = maskCanvas.getContext("2d");
+
+  let zoom = 1;
+
+  photoPickerBtn.addEventListener("click", () => {
+    photoInput.click();
+  });
+
+  photoInput.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = ev => {
+      const img = new Image();
+      img.onload = () => {
+        baseCanvas.width = img.width;
+        baseCanvas.height = img.height;
+        maskCanvas.width = img.width;
+        maskCanvas.height = img.height;
+
+        container.style.width = img.width + "px";
+        container.style.height = img.height + "px";
+
+        baseCtx.drawImage(img, 0, 0);
+      };
+      img.src = ev.target.result;
+    };
+
+    reader.readAsDataURL(file);
+  });
 
 });
