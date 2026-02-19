@@ -105,6 +105,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const width = Math.floor(img.width * scale);
         const height = Math.floor(img.height * scale);
 
+        /* Resize canvases */
+
         baseCanvas.width = width;
         baseCanvas.height = height;
         maskCanvas.width = width;
@@ -112,16 +114,24 @@ document.addEventListener('DOMContentLoaded', () => {
         outputCanvas.width = width;
         outputCanvas.height = height;
 
+        /* FIX: Resize container so canvas is visible */
+        canvasContainer.style.width = width + "px";
+        canvasContainer.style.height = height + "px";
+
         baseCtx.clearRect(0, 0, width, height);
         baseCtx.drawImage(img, 0, 0, width, height);
 
         maskCtx.clearRect(0, 0, width, height);
+
+        /* Enable controls */
 
         moveBtn.disabled = false;
         drawBtn.disabled = false;
         applyBtn.disabled = false;
         clearBtn.disabled = false;
         zoomInput.disabled = false;
+
+        /* Reset transform state */
 
         zoomInput.value = 1;
         zoom = 1;
