@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const baseCanvas = document.getElementById('baseCanvas');
   const maskCanvas = document.getElementById('maskCanvas');
   const outputCanvas = document.getElementById('outputCanvas');
+  const canvasContainer = document.getElementById('canvasContainer');
 
   const moveBtn = document.getElementById('moveBtn');
   const drawBtn = document.getElementById('drawBtn');
@@ -27,31 +28,44 @@ document.addEventListener('DOMContentLoaded', () => {
   const maskCtx = maskCanvas.getContext('2d');
   const outputCtx = outputCanvas.getContext('2d');
 
+  /* ---------- State ---------- */
+
   let brushSize = parseInt(brushSizeInput.value, 10);
   let pixelSize = parseInt(pixelSizeInput.value, 10);
+
   let zoom = 1;
+  let offsetX = 0;
+  let offsetY = 0;
 
   let drawing = false;
+  let isPanning = false;
+
+  let startX = 0;
+  let startY = 0;
+
   let history = [];
   let mode = null;
 
-  /* ---------- Zoom ---------- */
+  /* ---------- Transform (Zoom + Pan) ---------- */
 
-  function applyZoom() {
-    baseCanvas.style.transform = `scale(${zoom})`;
-    maskCanvas.style.transform = `scale(${zoom})`;
-    outputCanvas.style.transform = `scale(${zoom})`;
+  function applyTransform() {
+    const transform = `translate(${offsetX}px, ${offsetY}px) scale(${zoom})`;
+
+    baseCanvas.style.transform = transform;
+    maskCanvas.style.transform = transform;
+    outputCanvas.style.transform = transform;
   }
 
   zoomInput.addEventListener('input', () => {
     zoom = parseFloat(zoomInput.value);
-    applyZoom();
+    applyTransform();
   });
 
   /* ---------- Mode ---------- */
 
   function setMode(newMode) {
     mode = newMode;
+
     moveBtn.classList.remove('active');
     drawBtn.classList.remove('active');
 
@@ -103,19 +117,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         maskCtx.clearRect(0, 0, width, height);
 
-        /* Enable Controls */
-
         moveBtn.disabled = false;
         drawBtn.disabled = false;
         applyBtn.disabled = false;
         clearBtn.disabled = false;
-
-        /* Enable Zoom (THIS FIXES YOUR ISSUE) */
         zoomInput.disabled = false;
+
         zoomInput.value = 1;
         zoom = 1;
-        applyZoom();
+        offsetX = 0;
+        offsetY = 0;
 
+        applyTransform();
         setMode('draw');
       };
 
@@ -139,6 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   maskCanvas.addEventListener('mousedown', (e) => {
     if (mode !== 'draw') return;
+
     drawing = true;
     saveHistory();
     draw(e);
@@ -149,21 +163,46 @@ document.addEventListener('DOMContentLoaded', () => {
     draw(e);
   });
 
-  window.addEventListener('mouseup', () => drawing = false);
+  window.addEventListener('mouseup', () => {
+    drawing = false;
+    isPanning = false;
+  });
 
   function draw(e) {
 
     const rect = maskCanvas.getBoundingClientRect();
 
-    /* Zoom correction */
-    const x = (e.clientX - rect.left) / zoom;
-    const y = (e.clientY - rect.top) / zoom;
+    const x = (e.clientX - rect.left - offsetX) / zoom;
+    const y = (e.clientY - rect.top - offsetY) / zoom;
 
     maskCtx.fillStyle = "rgba(255,255,255,1)";
     maskCtx.beginPath();
     maskCtx.arc(x, y, brushSize, 0, Math.PI * 2);
     maskCtx.fill();
   }
+
+  /* ---------- Position (Pan) ---------- */
+
+  canvasContainer.addEventListener('mousedown', (e) => {
+
+    if (mode !== 'position') return;
+    if (zoom <= 1) return;
+
+    isPanning = true;
+
+    startX = e.clientX - offsetX;
+    startY = e.clientY - offsetY;
+  });
+
+  window.addEventListener('mousemove', (e) => {
+
+    if (!isPanning) return;
+
+    offsetX = e.clientX - startX;
+    offsetY = e.clientY - startY;
+
+    applyTransform();
+  });
 
   /* ---------- Undo ---------- */
 
@@ -237,6 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     outputCtx.putImageData(result, 0, 0);
+
     outputCanvas.hidden = false;
     baseCanvas.hidden = true;
     maskCanvas.hidden = true;
