@@ -33,7 +33,7 @@ body {
   padding: 1rem;
 }
 
-/* File Row */
+/* ---------------- File Row ---------------- */
 
 .file-row {
   display: flex;
@@ -63,7 +63,7 @@ body {
   cursor: pointer;
 }
 
-/* Sliders */
+/* ---------------- Sliders ---------------- */
 
 .dual-sliders {
   display: flex;
@@ -84,7 +84,7 @@ body {
   gap: 0.4rem;
 }
 
-/* Buttons */
+/* ---------------- Buttons ---------------- */
 
 .button-row {
   display: flex;
@@ -120,22 +120,45 @@ button:disabled {
   pointer-events: none;
 }
 
-/* Canvas */
+/* ---------------- Canvas Container ---------------- */
 
 .canvas-container {
   position: relative;
   width: 100%;
   max-width: 900px;
-  overflow: auto;
   margin: 0 auto;
+  overflow: auto; /* allows zoom panning */
 }
 
-.canvas-container canvas {
-  display: block;
+/* Base image canvas */
+#baseCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
   transform-origin: top left;
 }
 
-/* Modal */
+/* Mask canvas (must be above base for drawing) */
+#maskCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  cursor: crosshair;
+  transform-origin: top left;
+}
+
+/* Output canvas */
+#outputCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  transform-origin: top left;
+}
+
+/* ---------------- Modal ---------------- */
 
 .modal {
   position: fixed;
@@ -154,6 +177,7 @@ button:disabled {
   padding: 1.5rem;
   border-radius: 16px;
   position: relative;
+  width: min(400px, 90%);
 }
 
 .close-modal {
