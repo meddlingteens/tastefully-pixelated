@@ -1,10 +1,11 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Tastefully Pixelated</title>
-<link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tastefully Pixelated</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="manifest" href="manifest.json">
 </head>
 
 <body>
@@ -15,45 +16,30 @@
   <p id="randomPrompt"></p>
 </header>
 
-<!-- Banner -->
-<section class="ad-banner">
-  <div class="banner-inner">
-    <div class="banner-text">
-      <h2 id="bannerHeadline"></h2>
-    </div>
-
-    <div class="banner-spinner">
-      <img src="spinner.png" alt="Spinner" />
-    </div>
-
-    <div class="banner-cta">
-      <button class="spend-btn">Spend</button>
-    </div>
+<section class="canvas-wrap">
+  <div id="canvasContainer" class="canvas-container">
+    <div id="watermarkOverlay" class="watermark-overlay"></div>
+    <div id="imageMeta" class="image-meta"></div>
+    <canvas id="baseCanvas"></canvas>
+    <canvas id="maskCanvas"></canvas>
   </div>
 </section>
 
-<section class="controls card">
-  <div class="file-row">
-    <button id="photoPickerBtn" class="file-label">Select photo</button>
+<section class="controls">
+  <button id="photoPickerBtn">Select Photo</button>
+  <input id="photoInput" type="file" hidden accept="image/*">
+
+  <div class="sliders">
+    <label>Brush Size</label>
+    <input id="brushSize" type="range" min="5" max="80" value="30">
+
+    <label>Zoom</label>
+    <input id="zoomLevel" type="range" min="1" max="4" step="0.05" value="1" disabled>
   </div>
 
-  <input id="photoInput" type="file" hidden accept="image/*" />
-
-  <div class="dual-sliders">
-    <div class="slider-group">
-      <label>Brush size</label>
-      <input id="brushSize" type="range" min="5" max="80" value="30" />
-    </div>
-
-    <div class="slider-group">
-      <label>Zoom</label>
-      <input id="zoomLevel" type="range" min="1" max="4" step="0.05" value="1" disabled />
-    </div>
-  </div>
-
-  <div class="button-row">
-    <button id="moveBtn" disabled>Position</button>
+  <div class="buttons">
     <button id="drawBtn" disabled>Draw</button>
+    <button id="moveBtn" disabled>Move</button>
     <button id="undoBtn" disabled>Undo</button>
     <button id="applyBtn" disabled>Apply</button>
     <button id="restoreBtn" disabled>Restore</button>
@@ -62,16 +48,8 @@
   </div>
 </section>
 
-<section class="canvas-wrap card">
-  <div id="canvasContainer" class="canvas-container">
-    <div id="imageMeta" class="image-meta"></div>
-    <canvas id="baseCanvas"></canvas>
-    <canvas id="maskCanvas"></canvas>
-  </div>
-</section>
-
 </main>
 
-<script src="app.js?v=28001" defer></script>
+<script type="module" src="js/app.js"></script>
 </body>
 </html>
