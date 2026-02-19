@@ -103,12 +103,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         maskCtx.clearRect(0, 0, width, height);
 
+        /* Enable Controls */
+
         moveBtn.disabled = false;
         drawBtn.disabled = false;
         applyBtn.disabled = false;
         clearBtn.disabled = false;
-        zoomInput.disabled = false;
 
+        /* Enable Zoom (THIS FIXES YOUR ISSUE) */
+        zoomInput.disabled = false;
         zoomInput.value = 1;
         zoom = 1;
         applyZoom();
@@ -152,8 +155,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const rect = maskCanvas.getBoundingClientRect();
 
-    const x = (e.clientX - rect.left) * (maskCanvas.width / rect.width);
-    const y = (e.clientY - rect.top) * (maskCanvas.height / rect.height);
+    /* Zoom correction */
+    const x = (e.clientX - rect.left) / zoom;
+    const y = (e.clientY - rect.top) / zoom;
 
     maskCtx.fillStyle = "rgba(255,255,255,1)";
     maskCtx.beginPath();
