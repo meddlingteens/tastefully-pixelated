@@ -1,5 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+  /* ---------- Elements ---------- */
+
   const photoPickerBtn = document.getElementById('photoPickerBtn');
   const photoInput = document.getElementById('photoInput');
 
@@ -27,7 +29,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const baseCtx = baseCanvas.getContext('2d');
   const maskCtx = maskCanvas.getContext('2d');
-  const outputCtx = outputCanvas.getContext('2d');
+
+  /* ---------- State ---------- */
 
   let brushSize = parseInt(brushSizeInput.value, 10);
   let pixelSize = parseInt(pixelSizeInput.value, 10);
@@ -44,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let history = [];
   let mode = null;
 
-  /* ---------- Transform ---------- */
+  /* ---------- Transform (Zoom + Pan) ---------- */
 
   function applyTransform() {
     const transform = `translate(${offsetX}px, ${offsetY}px) scale(${zoom})`;
@@ -104,7 +107,9 @@ document.addEventListener('DOMContentLoaded', () => {
         canvasContainer.style.width = width + "px";
         canvasContainer.style.height = height + "px";
 
+        baseCtx.clearRect(0, 0, width, height);
         baseCtx.drawImage(img, 0, 0, width, height);
+
         maskCtx.clearRect(0, 0, width, height);
 
         zoomInput.disabled = false;
@@ -168,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
     maskCtx.fill();
   }
 
-  /* ---------- Position ---------- */
+  /* ---------- Position (Pan) ---------- */
 
   canvasContainer.addEventListener('mousedown', (e) => {
     if (mode !== 'position') return;
@@ -184,6 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     offsetX = e.clientX - startX;
     offsetY = e.clientY - startY;
+
     applyTransform();
   });
 
@@ -204,7 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
     history = [];
   });
 
-  /* ---------- Apply (Option A Clean) ---------- */
+  /* ---------- Apply Pixelation (Fixed) ---------- */
 
   applyBtn.addEventListener('click', () => {
 
@@ -214,7 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const baseData = baseCtx.getImageData(0, 0, width, height);
     const maskData = maskCtx.getImageData(0, 0, width, height);
 
-    const result = outputCtx.createImageData(width, height);
+    const result = baseCtx.createImageData(width, height);
     result.data.set(baseData.data);
 
     for (let y = 0; y < height; y += pixelSize) {
@@ -222,50 +228,103 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let r = 0, g = 0, b = 0, count = 0;
 
+        // Average entire block
+        for (let yy = y; yy < y + pixelSize && yy < height; yy++) {
+          for (let xx = x; xx < x + pixelSize && xx < width; xx++) {
+            const i = (yy * width + xx) * 4;
+            r += baseData.data[i];
+            g += baseData.data[i + 1];
+            b += baseData.data[i + 2];
+            count++;
+          }
+        }
+
+        if (count === 0) continue;
+
+        const avgR = r / count;
+        const avgG = g / count;
+        const avgB = b / count;
+
+        // Apply only where mask exists
         for (let yy = y; yy < y + pixelSize && yy < height; yy++) {
           for (let xx = x; xx < x + pixelSize && xx < width; xx++) {
             const i = (yy * width + xx) * 4;
             if (maskData.data[i + 3] > 0) {
-              r += baseData.data[i];
-              g += baseData.data[i + 1];
-              b += baseData.data[i + 2];
-              count++;
-            }
-          }
-        }
-
-        if (count > 0) {
-          const avgR = r / count;
-          const avgG = g / count;
-          const avgB = b / count;
-
-          for (let yy = y; yy < y + pixelSize && yy < height; yy++) {
-            for (let xx = x; xx < x + pixelSize && xx < width; xx++) {
-              const i = (yy * width + xx) * 4;
-              if (maskData.data[i + 3] > 0) {
-                result.data[i] = avgR;
-                result.data[i + 1] = avgG;
-                result.data[i + 2] = avgB;
-              }
+              result.data[i] = avgR;
+              result.data[i + 1] = avgG;
+              result.data[i + 2] = avgB;
             }
           }
         }
       }
     }
 
-    outputCtx.putImageData(result, 0, 0);
+    baseCtx.putImageData(result, 0, 0);
 
-    /* Replace base with output */
-    baseCtx.clearRect(0, 0, width, height);
-    baseCtx.drawImage(outputCanvas, 0, 0);
-
-    /* Reset state */
     maskCtx.clearRect(0, 0, width, height);
     history = [];
     undoBtn.disabled = true;
 
     downloadBtn.disabled = false;
     shareBtn.disabled = false;
+  });
+
+  /* ---------- Download ---------- */
+
+  downloadBtn.addEventListener('click', () => {
+    baseCanvas.toBlob((blob) => {
+      if (!blob) return;
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'tastefully-pixelated.png';
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+  });
+
+  /* ---------- Share ---------- */
+
+  shareBtn.addEventListener('click', async () => {
+
+    if (!navigator.share) {
+      alert("Sharing not supported on this device.");
+      return;
+    }
+
+    baseCanvas.toBlob(async (blob) => {
+
+      if (!blob) return;
+
+      const file = new File([blob], "tastefully-pixelated.png", {
+        type: "image/png"
+      });
+
+      try {
+        await navigator.share({
+          files: [file],
+          title: "Tastefully Pixelated"
+        });
+      } catch (err) {
+        console.log("Share cancelled:", err);
+      }
+
+    });
+  });
+
+  /* ---------- Modal ---------- */
+
+  fileInfoBtn.addEventListener('click', () => {
+    infoModal.classList.remove('hidden');
+  });
+
+  closeModalBtn.addEventListener('click', () => {
+    infoModal.classList.add('hidden');
+  });
+
+  infoModal.addEventListener('click', (e) => {
+    if (e.target === infoModal) infoModal.classList.add('hidden');
   });
 
 });
