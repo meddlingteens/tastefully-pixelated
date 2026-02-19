@@ -15,47 +15,33 @@
       <p id="randomPrompt"></p>
     </header>
 
-    <!-- Banner -->
-    <section class="ad-banner">
-      <div class="banner-inner">
-        <div class="banner-text">
-          <h2 id="bannerHeadline"></h2>
-        </div>
-        <div class="banner-spinner">
-          <img src="spinner.png" alt="Spinner" />
-        </div>
-        <div class="banner-cta">
-          <button class="spend-btn">Spend</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- Controls -->
     <section class="controls card">
-
       <div class="file-row">
         <button id="photoPickerBtn" class="file-label">Select photo</button>
-        <button id="fileInfoBtn" class="info-button">?</button>
       </div>
 
-      <input id="photoInput" type="file" hidden
-        accept=".jpg,.jpeg,.png,.webp,.gif,image/jpeg,image/png,image/webp,image/gif" />
+      <input id="photoInput" type="file" hidden accept="image/*" />
 
       <div class="dual-sliders">
         <div class="slider-group">
-          <label for="brushSize">Brush size</label>
-          <input id="brushSize" type="range" min="8" max="90" value="35" />
+          <label>Brush size</label>
+          <input id="brushSize" type="range" min="5" max="80" value="30" />
         </div>
 
         <div class="slider-group">
-          <label for="zoomLevel">Zoom</label>
+          <label>Zoom</label>
           <input id="zoomLevel" type="range" min="1" max="4" step="0.05" value="1" disabled />
         </div>
       </div>
 
+      <div class="button-row">
+        <button id="moveBtn" disabled>Position</button>
+        <button id="drawBtn" disabled>Draw</button>
+        <button id="undoBtn" disabled>Undo</button>
+        <button id="applyBtn" disabled>Apply</button>
+      </div>
     </section>
 
-    <!-- Canvas -->
     <section class="canvas-wrap card">
       <div id="canvasContainer" class="canvas-container">
         <div id="imageMeta" class="image-meta"></div>
@@ -66,6 +52,6 @@
 
   </main>
 
-  <script src="app.js?v=24001" defer></script>
+  <script src="app.js?v=25001" defer></script>
 </body>
 </html>
