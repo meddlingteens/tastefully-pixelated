@@ -23,7 +23,7 @@ body {
   margin: 0 auto;
   padding: 1rem;
   display: grid;
-  gap: 1rem;
+  gap: 1.2rem;
 }
 
 .card {
@@ -32,77 +32,76 @@ body {
   padding: 1rem;
 }
 
-/* ---------------- Header ---------------- */
-
-header h1 {
-  margin: 0 0 0.25rem 0;
-}
-
-header p {
-  margin: 0;
-  color: var(--muted);
-}
-
-/* ---------------- Stylized Banner ---------------- */
+/* ============================= */
+/* Banner */
+/* ============================= */
 
 .ad-banner {
-  background: transparent;
+  margin-top: 10px;
+}
+
+.banner-inner {
+  display: grid;
+  grid-template-columns: 50% 25% 25%;
+  align-items: center;
   border: 3px solid #ffffff;
   border-radius: 16px;
-  position: relative;
+  padding: 24px 32px;
+  min-height: 160px;
 }
 
-.ad-content {
-  display: flex;
-  flex-direction: column;
-  min-height: 110px;
-  position: relative;
-}
-
-.ad-content h2 {
-  margin: 0;
-  font-size: 1.05rem;
-  font-weight: 600;
+.banner-text h2 {
   color: #ffffff;
-  max-width: 85%;
+  margin: 0;
+  font-size: 26px;
+  line-height: 1.3;
 }
 
-.ad-button {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
-  color: var(--text);
-  border: none;
-  padding: 0.45rem 0.9rem;
+.banner-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.banner-spinner img {
+  max-height: 110px;
+  width: auto;
+}
+
+.banner-cta {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+}
+
+.spend-btn {
+  background: #ffffff;
+  color: #2d0b4f;
   border-radius: 8px;
-  font-size: 0.85rem;
-  cursor: default;
+  padding: 10px 24px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
 }
 
-/* ---------------- Controls ---------------- */
+/* ============================= */
+/* Controls */
+/* ============================= */
 
 .file-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.75rem; /* Added extra whitespace */
+  margin-bottom: 0.75rem;
 }
 
 .file-label {
   padding: 0.55rem 0.8rem;
-  border-radius: 10px; /* unified shape */
+  border-radius: 10px;
   background: linear-gradient(135deg, var(--accent), var(--accent-strong));
-  border: none;
   color: var(--text);
-  font-size: 0.95rem;
+  border: none;
   cursor: pointer;
-  transition: all 0.18s ease;
-}
-
-.file-label:hover {
-  transform: translateY(-1px);
-  opacity: 0.95;
 }
 
 .info-button {
@@ -111,19 +110,13 @@ header p {
   border-radius: 50%;
   background: #3a2b55;
   color: var(--text);
-  display: grid;
-  place-items: center;
   border: none;
   cursor: pointer;
 }
 
-/* ---------------- Sliders ---------------- */
-
 .dual-sliders {
   display: flex;
-  justify-content: space-between;
   gap: 5%;
-  margin-bottom: 0.4rem;
 }
 
 .slider-group {
@@ -134,59 +127,34 @@ header p {
 }
 
 .zoom-row {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  margin-bottom: 0.4rem;
+  margin-top: 0.5rem;
 }
-
-/* ---------------- Buttons ---------------- */
 
 .button-row {
   display: flex;
-  justify-content: space-between;
-  gap: 0.55rem;
+  gap: 0.6rem;
+  margin-top: 0.7rem;
 }
 
 .button-row button {
   flex: 1;
-  border: 0;
   border-radius: 10px;
-  padding: 0.55rem 0.8rem;
-  font-size: 0.95rem;
-  color: var(--text);
+  padding: 0.55rem;
+  border: none;
   cursor: pointer;
-  transition: all 0.18s ease;
+  color: var(--text);
 }
-
-#moveBtn { background: #38405f; }
-#drawBtn { background: #432b61; }
-#undoBtn { background: #4e345f; }
-#clearMaskBtn { background: #61304d; }
 
 #applyBtn,
 #downloadBtn,
 #shareBtn {
   background: linear-gradient(135deg, var(--accent), var(--accent-strong));
-  font-weight: 600;
 }
 
-button.active {
-  outline: 2px solid var(--accent);
-  box-shadow: 0 0 0 3px rgba(203, 140, 255, 0.25);
-}
-
-button:disabled {
-  opacity: 0.4;
-  pointer-events: none;
-}
-
-/* ---------------- Canvas ---------------- */
+/* Canvas */
 
 .canvas-container {
   position: relative;
-  max-width: 900px;
-  margin: 0 auto;
   overflow: auto;
 }
 
@@ -198,10 +166,7 @@ button:disabled {
   transform-origin: top left;
 }
 
-#baseCanvas { z-index: 1; }
-#maskCanvas { z-index: 2; cursor: crosshair; }
-
-/* ---------------- Modal ---------------- */
+/* Modal */
 
 .modal {
   position: fixed;
@@ -210,7 +175,6 @@ button:disabled {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 9999;
 }
 
 .modal.hidden {
@@ -221,15 +185,4 @@ button:disabled {
   background: var(--card);
   padding: 1.5rem;
   border-radius: 16px;
-  width: min(400px, 90%);
-}
-
-.close-modal {
-  position: absolute;
-  top: 0.6rem;
-  right: 0.8rem;
-  border: none;
-  background: transparent;
-  color: var(--text);
-  cursor: pointer;
 }
