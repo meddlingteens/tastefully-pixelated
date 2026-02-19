@@ -1,5 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
 
+  /* Taglines */
+
   const taglines = [
     "Just, eeuuuuu.",
     "Ain't no one wanna see that.",
@@ -35,6 +37,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const baseCanvas = document.getElementById("baseCanvas");
   const maskCanvas = document.getElementById("maskCanvas");
   const container = document.getElementById("canvasContainer");
+  const imageMeta = document.getElementById("imageMeta");
+  const zoomSlider = document.getElementById("zoomLevel");
 
   const baseCtx = baseCanvas.getContext("2d");
   const maskCtx = maskCanvas.getContext("2d");
@@ -46,6 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   photoInput.addEventListener("change", (e) => {
+
     const file = e.target.files[0];
     if (!file) return;
 
@@ -53,21 +58,50 @@ document.addEventListener("DOMContentLoaded", () => {
 
     reader.onload = ev => {
       const img = new Image();
+
       img.onload = () => {
-        baseCanvas.width = img.width;
-        baseCanvas.height = img.height;
-        maskCanvas.width = img.width;
-        maskCanvas.height = img.height;
 
-        container.style.width = img.width + "px";
-        container.style.height = img.height + "px";
+        const maxW = container.clientWidth;
+        const maxH = container.clientHeight;
 
-        baseCtx.drawImage(img, 0, 0);
+        const scale = Math.min(maxW / img.width, maxH / img.height, 1);
+
+        const w = Math.floor(img.width * scale);
+        const h = Math.floor(img.height * scale);
+
+        baseCanvas.width = w;
+        baseCanvas.height = h;
+        maskCanvas.width = w;
+        maskCanvas.height = h;
+
+        baseCtx.clearRect(0,0,w,h);
+        baseCtx.drawImage(img, 0, 0, w, h);
+
+        maskCtx.clearRect(0,0,w,h);
+
+        imageMeta.textContent = `${img.width} × ${img.height}`;
+
+        zoomSlider.disabled = false;
+        zoomSlider.value = 1;
+        zoom = 1;
+        applyZoom();
       };
+
       img.src = ev.target.result;
     };
 
     reader.readAsDataURL(file);
+  });
+
+  function applyZoom() {
+    const transform = `scale(${zoom})`;
+    baseCanvas.style.transform = transform;
+    maskCanvas.style.transform = transform;
+  }
+
+  zoomSlider.addEventListener("input", (e) => {
+    zoom = parseFloat(e.target.value);
+    applyZoom();
   });
 
 });

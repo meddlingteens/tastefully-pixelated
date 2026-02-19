@@ -21,11 +21,9 @@
         <div class="banner-text">
           <h2 id="bannerHeadline"></h2>
         </div>
-
         <div class="banner-spinner">
           <img src="spinner.png" alt="Spinner" />
         </div>
-
         <div class="banner-cta">
           <button class="spend-btn">Spend</button>
         </div>
@@ -50,55 +48,24 @@
         </div>
 
         <div class="slider-group">
-          <label for="pixelSize">Pixel size</label>
-          <input id="pixelSize" type="range" min="8" max="40" value="18" />
+          <label for="zoomLevel">Zoom</label>
+          <input id="zoomLevel" type="range" min="1" max="4" step="0.05" value="1" disabled />
         </div>
-      </div>
-
-      <div class="zoom-row">
-        <label for="zoomLevel">Zoom</label>
-        <input id="zoomLevel" type="range" min="1" max="4" step="0.05" value="1" disabled />
-      </div>
-
-      <div class="button-row">
-        <button id="moveBtn" disabled>Position</button>
-        <button id="drawBtn" disabled>Draw</button>
-        <button id="undoBtn" disabled>Undo</button>
-        <button id="clearMaskBtn" disabled>Clear</button>
-        <button id="applyBtn" disabled>Apply</button>
       </div>
 
     </section>
 
+    <!-- Canvas -->
     <section class="canvas-wrap card">
       <div id="canvasContainer" class="canvas-container">
+        <div id="imageMeta" class="image-meta"></div>
         <canvas id="baseCanvas"></canvas>
         <canvas id="maskCanvas"></canvas>
       </div>
     </section>
 
-    <section class="exports card">
-      <div class="button-row">
-        <button id="downloadBtn" disabled>Download</button>
-        <button id="shareBtn" disabled>Share</button>
-      </div>
-    </section>
-
   </main>
 
-  <div id="infoModal" class="modal hidden">
-    <div class="modal-content">
-      <button id="closeModalBtn" class="close-modal">×</button>
-      <h2>Supported File Types</h2>
-      <ul>
-        <li>JPG / JPEG</li>
-        <li>PNG</li>
-        <li>WEBP</li>
-        <li>GIF</li>
-      </ul>
-    </div>
-  </div>
-
-  <script src="app.js?v=22001" defer></script>
+  <script src="app.js?v=24001" defer></script>
 </body>
 </html>
