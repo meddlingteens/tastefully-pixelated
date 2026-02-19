@@ -32,7 +32,47 @@ body {
   padding: 1rem;
 }
 
-/* File Row */
+/* Header */
+
+header h1 {
+  margin: 0 0 0.25rem 0;
+}
+
+header p {
+  margin: 0;
+  color: var(--muted);
+}
+
+/* Ad Banner */
+
+.ad-banner {
+  background: #ffffff;
+  color: #111;
+}
+
+.ad-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.ad-content h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.ad-button {
+  background: #111;
+  color: #fff;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: default;
+}
+
+/* Controls */
 
 .file-row {
   display: flex;
@@ -62,8 +102,6 @@ body {
   cursor: pointer;
 }
 
-/* Sliders */
-
 .dual-sliders {
   display: flex;
   justify-content: space-between;
@@ -85,8 +123,6 @@ body {
   margin-bottom: 0.4rem;
 }
 
-/* Buttons */
-
 .button-row {
   display: flex;
   justify-content: space-between;
@@ -101,7 +137,6 @@ body {
   font-size: 0.95rem;
   color: var(--text);
   cursor: pointer;
-  transition: all 0.18s ease;
 }
 
 #moveBtn { background: #38405f; }

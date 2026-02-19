@@ -45,6 +45,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const pixelSizeInput = document.getElementById('pixelSize');
   const zoomInput = document.getElementById('zoomLevel');
 
+  const fileInfoBtn = document.getElementById('fileInfoBtn');
+  const infoModal = document.getElementById('infoModal');
+  const closeModalBtn = document.getElementById('closeModalBtn');
+
   const baseCtx = baseCanvas.getContext('2d');
   const maskCtx = maskCanvas.getContext('2d');
 
@@ -79,8 +83,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   moveBtn.addEventListener('click', () => setMode('position'));
   drawBtn.addEventListener('click', () => setMode('draw'));
-
-  /* ========= ENABLE EDITING ========= */
 
   function enableEditing() {
     moveBtn.disabled = false;
@@ -284,19 +286,77 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     baseCtx.putImageData(result, 0, 0);
-
     maskCtx.clearRect(0, 0, w, h);
+
     history = [];
     undoBtn.disabled = true;
 
     downloadBtn.disabled = false;
     shareBtn.disabled = false;
 
-    setTimeout(() => {
-      applyBtn.classList.remove('active');
-    }, 300);
+    setTimeout(() => applyBtn.classList.remove('active'), 300);
 
     enableEditing();
   });
+
+  /* ========= DOWNLOAD ========= */
+
+  downloadBtn.addEventListener('click', () => {
+    baseCanvas.toBlob((blob) => {
+      if (!blob) return;
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'tastefully-pixelated.png';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+  });
+
+  /* ========= SHARE ========= */
+
+  shareBtn.addEventListener('click', async () => {
+    if (!navigator.share) {
+      alert("Sharing not supported on this device.");
+      return;
+    }
+
+    baseCanvas.toBlob(async (blob) => {
+      if (!blob) return;
+
+      const file = new File([blob], "tastefully-pixelated.png", {
+        type: "image/png"
+      });
+
+      try {
+        await navigator.share({
+          files: [file],
+          title: "Tastefully Pixelated"
+        });
+      } catch (err) {
+        console.log("Share cancelled:", err);
+      }
+    });
+  });
+
+  /* ========= MODAL ========= */
+
+  if (fileInfoBtn && infoModal && closeModalBtn) {
+    fileInfoBtn.addEventListener('click', () => {
+      infoModal.classList.remove('hidden');
+    });
+
+    closeModalBtn.addEventListener('click', () => {
+      infoModal.classList.add('hidden');
+    });
+
+    infoModal.addEventListener('click', (e) => {
+      if (e.target === infoModal) {
+        infoModal.classList.add('hidden');
+      }
+    });
+  }
 
 });
