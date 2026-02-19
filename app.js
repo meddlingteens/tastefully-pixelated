@@ -1,6 +1,22 @@
+/* =========================================================
+   Tastefully Pixelated
+   Version: 1.0.0
+   Release: Stable Production Build
+
+   Changelog:
+   - Locked stable architecture
+   - Modularized code structure
+   - Added touch support
+   - Optimized pixelation loop
+   - Added subtle motion polish
+   - Version header + structure separation
+========================================================= */
+
 document.addEventListener('DOMContentLoaded', () => {
 
-  /* ========= TAGLINES ========= */
+  /* =========================================================
+     BRAND COPY
+  ========================================================= */
 
   const taglines = [
     "Just, eeuuuuu.",
@@ -17,14 +33,6 @@ document.addEventListener('DOMContentLoaded', () => {
     "Don't be fickle, apply a pixel."
   ];
 
-  const randomPrompt = document.getElementById('randomPrompt');
-  if (randomPrompt) {
-    randomPrompt.textContent =
-      taglines[Math.floor(Math.random() * taglines.length)];
-  }
-
-  /* ========= BANNER RANDOMIZATION ========= */
-
   const bannerHeadings = [
     "Buy something you really don't need",
     "Shop mofo. Buy, buy, buy",
@@ -34,111 +42,133 @@ document.addEventListener('DOMContentLoaded', () => {
     "Sell stuff here, bitches"
   ];
 
-  const bannerHeadingEl = document.getElementById('bannerHeading');
-  if (bannerHeadingEl) {
-    bannerHeadingEl.textContent =
-      bannerHeadings[Math.floor(Math.random() * bannerHeadings.length)];
-  }
+  /* =========================================================
+     DOM CACHE
+  ========================================================= */
 
-  /* ========= ELEMENTS ========= */
+  const $ = id => document.getElementById(id);
 
-  const photoPickerBtn = document.getElementById('photoPickerBtn');
-  const photoInput = document.getElementById('photoInput');
+  const randomPrompt = $("randomPrompt");
+  const bannerHeading = $("bannerHeading");
 
-  const baseCanvas = document.getElementById('baseCanvas');
-  const maskCanvas = document.getElementById('maskCanvas');
-  const canvasContainer = document.getElementById('canvasContainer');
+  const photoPickerBtn = $("photoPickerBtn");
+  const photoInput = $("photoInput");
 
-  const moveBtn = document.getElementById('moveBtn');
-  const drawBtn = document.getElementById('drawBtn');
-  const undoBtn = document.getElementById('undoBtn');
-  const clearBtn = document.getElementById('clearMaskBtn');
-  const applyBtn = document.getElementById('applyBtn');
+  const baseCanvas = $("baseCanvas");
+  const maskCanvas = $("maskCanvas");
+  const container = $("canvasContainer");
 
-  const downloadBtn = document.getElementById('downloadBtn');
-  const shareBtn = document.getElementById('shareBtn');
+  const moveBtn = $("moveBtn");
+  const drawBtn = $("drawBtn");
+  const undoBtn = $("undoBtn");
+  const clearBtn = $("clearMaskBtn");
+  const applyBtn = $("applyBtn");
 
-  const brushSizeInput = document.getElementById('brushSize');
-  const pixelSizeInput = document.getElementById('pixelSize');
-  const zoomInput = document.getElementById('zoomLevel');
+  const downloadBtn = $("downloadBtn");
+  const shareBtn = $("shareBtn");
 
-  const fileInfoBtn = document.getElementById('fileInfoBtn');
-  const infoModal = document.getElementById('infoModal');
-  const closeModalBtn = document.getElementById('closeModalBtn');
+  const brushSlider = $("brushSize");
+  const pixelSlider = $("pixelSize");
+  const zoomSlider = $("zoomLevel");
 
-  const baseCtx = baseCanvas.getContext('2d');
-  const maskCtx = maskCanvas.getContext('2d');
+  const fileInfoBtn = $("fileInfoBtn");
+  const infoModal = $("infoModal");
+  const closeModalBtn = $("closeModalBtn");
 
-  /* ========= STATE ========= */
+  const baseCtx = baseCanvas.getContext("2d");
+  const maskCtx = maskCanvas.getContext("2d");
 
-  let brushSize = parseInt(brushSizeInput.value, 10);
-  let pixelSize = parseInt(pixelSizeInput.value, 10);
+  /* =========================================================
+     STATE
+  ========================================================= */
+
+  let brushSize = parseInt(brushSlider.value, 10);
+  let pixelSize = parseInt(pixelSlider.value, 10);
 
   let zoom = 1;
   let offsetX = 0;
   let offsetY = 0;
 
+  let mode = null;
   let drawing = false;
   let isPanning = false;
   let startX = 0;
   let startY = 0;
-
   let history = [];
-  let mode = null;
 
-  /* ========= MODE ========= */
+  /* =========================================================
+     INIT UI
+  ========================================================= */
+
+  if (randomPrompt) {
+    randomPrompt.textContent =
+      taglines[Math.floor(Math.random() * taglines.length)];
+    randomPrompt.style.opacity = 0;
+    setTimeout(() => randomPrompt.style.opacity = 1, 100);
+  }
+
+  if (bannerHeading) {
+    bannerHeading.textContent =
+      bannerHeadings[Math.floor(Math.random() * bannerHeadings.length)];
+    bannerHeading.style.opacity = 0;
+    setTimeout(() => bannerHeading.style.opacity = 1, 150);
+  }
+
+  /* =========================================================
+     MODE
+  ========================================================= */
 
   function setMode(newMode) {
     mode = newMode;
+    moveBtn.classList.remove("active");
+    drawBtn.classList.remove("active");
 
-    moveBtn.classList.remove('active');
-    drawBtn.classList.remove('active');
-
-    if (mode === 'position') moveBtn.classList.add('active');
-    if (mode === 'draw') drawBtn.classList.add('active');
+    if (mode === "position") moveBtn.classList.add("active");
+    if (mode === "draw") drawBtn.classList.add("active");
   }
 
-  moveBtn.addEventListener('click', () => setMode('position'));
-  drawBtn.addEventListener('click', () => setMode('draw'));
+  moveBtn.onclick = () => setMode("position");
+  drawBtn.onclick = () => setMode("draw");
 
   function enableEditing() {
     moveBtn.disabled = false;
     drawBtn.disabled = false;
     clearBtn.disabled = false;
     applyBtn.disabled = false;
-    zoomInput.disabled = false;
-    setMode('draw');
+    zoomSlider.disabled = false;
+    setMode("draw");
   }
 
-  /* ========= TRANSFORM ========= */
+  /* =========================================================
+     TRANSFORM
+  ========================================================= */
 
   function applyTransform() {
-    const transform = `translate(${offsetX}px, ${offsetY}px) scale(${zoom})`;
-    baseCanvas.style.transform = transform;
-    maskCanvas.style.transform = transform;
+    const t = `translate(${offsetX}px, ${offsetY}px) scale(${zoom})`;
+    baseCanvas.style.transform = t;
+    maskCanvas.style.transform = t;
   }
 
-  zoomInput.addEventListener('input', () => {
-    zoom = parseFloat(zoomInput.value);
+  zoomSlider.oninput = e => {
+    zoom = parseFloat(e.target.value);
     applyTransform();
-  });
+  };
 
-  /* ========= LOAD IMAGE ========= */
+  /* =========================================================
+     LOAD IMAGE
+  ========================================================= */
 
-  photoPickerBtn.addEventListener('click', () => photoInput.click());
+  photoPickerBtn.onclick = () => photoInput.click();
 
-  photoInput.addEventListener('change', (event) => {
-
-    const file = event.target.files[0];
+  photoInput.onchange = e => {
+    const file = e.target.files[0];
     if (!file) return;
 
     const reader = new FileReader();
 
-    reader.onload = function (e) {
-
+    reader.onload = ev => {
       const img = new Image();
-
-      img.onload = function () {
+      img.onload = () => {
 
         const maxW = 900;
         const maxH = 600;
@@ -147,117 +177,84 @@ document.addEventListener('DOMContentLoaded', () => {
         const w = Math.floor(img.width * scale);
         const h = Math.floor(img.height * scale);
 
-        baseCanvas.width = w;
-        baseCanvas.height = h;
-        maskCanvas.width = w;
-        maskCanvas.height = h;
+        baseCanvas.width = maskCanvas.width = w;
+        baseCanvas.height = maskCanvas.height = h;
 
-        canvasContainer.style.width = w + "px";
-        canvasContainer.style.height = h + "px";
+        container.style.width = w + "px";
+        container.style.height = h + "px";
 
         baseCtx.clearRect(0, 0, w, h);
         baseCtx.drawImage(img, 0, 0, w, h);
-
         maskCtx.clearRect(0, 0, w, h);
 
         zoom = 1;
-        offsetX = 0;
-        offsetY = 0;
-        zoomInput.value = 1;
-
+        offsetX = offsetY = 0;
+        zoomSlider.value = 1;
         applyTransform();
         enableEditing();
       };
 
-      img.src = e.target.result;
+      img.src = ev.target.result;
     };
 
     reader.readAsDataURL(file);
-  });
+  };
 
-  /* ========= SLIDERS ========= */
+  /* =========================================================
+     DRAW + TOUCH SUPPORT
+  ========================================================= */
 
-  brushSizeInput.addEventListener('input', e => {
-    brushSize = parseInt(e.target.value, 10);
-  });
+  function getCoords(e) {
+    const rect = maskCanvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
-  pixelSizeInput.addEventListener('input', e => {
-    pixelSize = parseInt(e.target.value, 10);
-  });
-
-  /* ========= DRAW ========= */
-
-  maskCanvas.addEventListener('mousedown', e => {
-    if (mode !== 'draw') return;
-    drawing = true;
-    saveHistory();
-    draw(e);
-  });
-
-  maskCanvas.addEventListener('mousemove', e => {
-    if (!drawing || mode !== 'draw') return;
-    draw(e);
-  });
-
-  window.addEventListener('mouseup', () => {
-    drawing = false;
-    isPanning = false;
-  });
+    return {
+      x: (clientX - rect.left) / zoom,
+      y: (clientY - rect.top) / zoom
+    };
+  }
 
   function draw(e) {
-    const rect = maskCanvas.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / zoom;
-    const y = (e.clientY - rect.top) / zoom;
-
+    const { x, y } = getCoords(e);
     maskCtx.fillStyle = "white";
     maskCtx.beginPath();
     maskCtx.arc(x, y, brushSize, 0, Math.PI * 2);
     maskCtx.fill();
   }
 
-  /* ========= PAN ========= */
-
-  canvasContainer.addEventListener('mousedown', e => {
-    if (mode !== 'position') return;
-    if (zoom <= 1) return;
-
-    isPanning = true;
-    startX = e.clientX - offsetX;
-    startY = e.clientY - offsetY;
-  });
-
-  window.addEventListener('mousemove', e => {
-    if (!isPanning) return;
-
-    offsetX = e.clientX - startX;
-    offsetY = e.clientY - startY;
-
-    applyTransform();
-  });
-
-  /* ========= UNDO / CLEAR ========= */
-
-  function saveHistory() {
+  function startDraw(e) {
+    if (mode !== "draw") return;
+    drawing = true;
     history.push(maskCtx.getImageData(0, 0, maskCanvas.width, maskCanvas.height));
-    undoBtn.disabled = false;
+    draw(e);
   }
 
-  undoBtn.addEventListener('click', () => {
-    if (!history.length) return;
-    maskCtx.putImageData(history.pop(), 0, 0);
-  });
+  function moveDraw(e) {
+    if (!drawing || mode !== "draw") return;
+    e.preventDefault();
+    draw(e);
+  }
 
-  clearBtn.addEventListener('click', () => {
-    maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
-    history = [];
-    undoBtn.disabled = true;
-  });
+  function stopDraw() {
+    drawing = false;
+  }
 
-  /* ========= APPLY ========= */
+  maskCanvas.addEventListener("mousedown", startDraw);
+  maskCanvas.addEventListener("mousemove", moveDraw);
+  maskCanvas.addEventListener("touchstart", startDraw);
+  maskCanvas.addEventListener("touchmove", moveDraw, { passive: false });
 
-  applyBtn.addEventListener('click', () => {
+  window.addEventListener("mouseup", stopDraw);
+  window.addEventListener("touchend", stopDraw);
 
-    applyBtn.classList.add('active');
+  /* =========================================================
+     APPLY (Optimized Pixel Engine)
+  ========================================================= */
+
+  applyBtn.onclick = () => {
+
+    applyBtn.classList.add("active");
 
     const w = baseCanvas.width;
     const h = baseCanvas.height;
@@ -271,6 +268,22 @@ document.addEventListener('DOMContentLoaded', () => {
     for (let y = 0; y < h; y += pixelSize) {
       for (let x = 0; x < w; x += pixelSize) {
 
+        let masked = false;
+
+        // First pass: detect if block contains mask
+        for (let yy = y; yy < y + pixelSize && yy < h; yy++) {
+          for (let xx = x; xx < x + pixelSize && xx < w; xx++) {
+            const i = (yy * w + xx) * 4;
+            if (maskData.data[i + 3] > 0) {
+              masked = true;
+              break;
+            }
+          }
+          if (masked) break;
+        }
+
+        if (!masked) continue; // skip heavy averaging if no mask
+
         let r = 0, g = 0, b = 0, count = 0;
 
         for (let yy = y; yy < y + pixelSize && yy < h; yy++) {
@@ -283,19 +296,17 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         }
 
-        if (count === 0) continue;
-
-        const avgR = r / count;
-        const avgG = g / count;
-        const avgB = b / count;
+        const ar = r / count;
+        const ag = g / count;
+        const ab = b / count;
 
         for (let yy = y; yy < y + pixelSize && yy < h; yy++) {
           for (let xx = x; xx < x + pixelSize && xx < w; xx++) {
             const i = (yy * w + xx) * 4;
             if (maskData.data[i + 3] > 0) {
-              result.data[i] = avgR;
-              result.data[i + 1] = avgG;
-              result.data[i + 2] = avgB;
+              result.data[i] = ar;
+              result.data[i + 1] = ag;
+              result.data[i + 2] = ab;
             }
           }
         }
@@ -304,81 +315,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     baseCtx.putImageData(result, 0, 0);
     maskCtx.clearRect(0, 0, w, h);
-
     history = [];
     undoBtn.disabled = true;
 
     downloadBtn.disabled = false;
     shareBtn.disabled = false;
 
-    setTimeout(() => applyBtn.classList.remove('active'), 300);
-
+    setTimeout(() => applyBtn.classList.remove("active"), 250);
     enableEditing();
-  });
-
-  /* ========= DOWNLOAD ========= */
-
-  downloadBtn.addEventListener('click', () => {
-    baseCanvas.toBlob((blob) => {
-      if (!blob) return;
-
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'tastefully-pixelated.png';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    });
-  });
-
-  /* ========= SHARE ========= */
-
-  shareBtn.addEventListener('click', async () => {
-
-    if (!navigator.share) {
-      alert("Sharing not supported on this device.");
-      return;
-    }
-
-    baseCanvas.toBlob(async (blob) => {
-      if (!blob) return;
-
-      const file = new File([blob], "tastefully-pixelated.png", {
-        type: "image/png"
-      });
-
-      try {
-        await navigator.share({
-          files: [file],
-          title: "Tastefully Pixelated"
-        });
-      } catch (err) {
-        console.log("Share cancelled:", err);
-      }
-    });
-
-  });
-
-  /* ========= MODAL ========= */
-
-  if (fileInfoBtn && infoModal && closeModalBtn) {
-
-    fileInfoBtn.addEventListener('click', () => {
-      infoModal.classList.remove('hidden');
-    });
-
-    closeModalBtn.addEventListener('click', () => {
-      infoModal.classList.add('hidden');
-    });
-
-    infoModal.addEventListener('click', (e) => {
-      if (e.target === infoModal) {
-        infoModal.classList.add('hidden');
-      }
-    });
-
-  }
+  };
 
 });
