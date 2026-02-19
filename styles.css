@@ -13,22 +13,30 @@ html, body {
   background: linear-gradient(180deg, #0f0d1a, #151225);
   color: #f2f1f7;
   min-height: 100vh;
+
+  /* Center entire app vertically */
+  display: flex;
+  justify-content: center;
 }
 
 /* =========================
-   App Container
+   App Container (Centered + 800px cap)
 ========================= */
 
 .app {
   width: 100%;
   max-width: 800px;
-  margin: 0 auto;
-  padding: 32px 20px 60px;
+  padding: 40px 20px 60px;
 }
+
+/* =========================
+   Header
+========================= */
 
 h1 {
   text-align: center;
   margin-bottom: 24px;
+  font-weight: 700;
 }
 
 /* =========================
@@ -38,34 +46,38 @@ h1 {
 .banner {
   border: 2px solid rgba(255,255,255,0.5);
   border-radius: 16px;
-  padding: 20px;
+  padding: 22px 24px;
   margin-bottom: 28px;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
+  gap: 24px;
 }
 
 .banner h2 {
-  flex: 1 1 50%;
+  flex: 0 0 50%;
   margin: 0;
   font-weight: 500;
   color: #ffffff;
 }
 
+/* Spinner container */
 .banner-spinner {
   flex: 0 0 25%;
   display: flex;
   justify-content: center;
+  align-items: center;
 }
 
+/* Resize spinner image */
 .banner-spinner img {
-  width: 50px;
-  height: 50px;
+  width: 48px;       /* controlled size */
+  height: 48px;
   object-fit: contain;
 }
 
+/* Spend button */
 .spend-btn {
   background: #ffffff;
   color: #241c48;
@@ -121,8 +133,12 @@ h1 {
 }
 
 /* =========================
-   Buttons
+   Controls
 ========================= */
+
+.controls {
+  margin-top: 10px;
+}
 
 .button-row {
   display: flex;
@@ -149,6 +165,10 @@ h1 {
 ========================= */
 
 @media (max-width: 768px) {
+
+  html, body {
+    display: block;
+  }
 
   .banner {
     flex-direction: column;
