@@ -32,7 +32,23 @@ body {
   padding: 1rem;
 }
 
+/* ================= Header ================= */
+
+header h1 {
+  margin: 0 0 0.25rem 0;
+}
+
+header p {
+  margin: 0;
+  color: var(--muted);
+  transition: opacity 0.3s ease;
+}
+
 /* ================= Banner ================= */
+
+.ad-banner {
+  margin-top: 10px;
+}
 
 .banner-inner {
   display: grid;
@@ -79,6 +95,12 @@ body {
   font-weight: 600;
   border: none;
   cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.spend-btn:hover {
+  transform: translateY(-2px);
+  opacity: 0.95;
 }
 
 /* ================= Controls ================= */
@@ -97,6 +119,12 @@ body {
   color: var(--text);
   border: none;
   cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.file-label:hover {
+  transform: translateY(-2px);
+  opacity: 0.95;
 }
 
 .info-button {
@@ -108,6 +136,8 @@ body {
   border: none;
   cursor: pointer;
 }
+
+/* ================= Sliders ================= */
 
 .dual-sliders {
   display: flex;
@@ -125,6 +155,8 @@ body {
   margin-top: 0.5rem;
 }
 
+/* ================= Buttons ================= */
+
 .button-row {
   display: flex;
   gap: 0.6rem;
@@ -137,16 +169,58 @@ body {
   padding: 0.55rem;
   border: none;
   cursor: pointer;
-  color: var(--text);
+  font-weight: 600;
+  transition: all 0.18s ease;
+  color: #fff;
 }
 
+/* Position – deep indigo */
+#moveBtn {
+  background: linear-gradient(135deg, #38405f, #2b3149);
+}
+
+/* Draw – complementary teal */
+#drawBtn {
+  background: linear-gradient(135deg, #1f7a8c, #145f6b);
+}
+
+/* Undo – muted slate */
+#undoBtn {
+  background: linear-gradient(135deg, #4e5d73, #3c495c);
+}
+
+/* Clear – warm rose */
+#clearMaskBtn {
+  background: linear-gradient(135deg, #8c3f5e, #6e3048);
+}
+
+/* Primary actions – brand purple */
 #applyBtn,
 #downloadBtn,
 #shareBtn {
   background: linear-gradient(135deg, var(--accent), var(--accent-strong));
 }
 
-/* Canvas */
+/* Active state */
+button.active {
+  outline: 2px solid var(--accent);
+  box-shadow: 0 0 0 3px rgba(203, 140, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+/* Hover polish */
+.button-row button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  opacity: 0.95;
+}
+
+/* Disabled */
+button:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* ================= Canvas ================= */
 
 .canvas-container {
   position: relative;
@@ -161,7 +235,7 @@ body {
   transform-origin: top left;
 }
 
-/* Modal */
+/* ================= Modal ================= */
 
 .modal {
   position: fixed;
