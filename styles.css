@@ -27,20 +27,35 @@ html, body {
   padding: 40px 20px 60px;
 }
 
-h1 {
-  text-align: center;
+/* =========================
+   Header
+========================= */
+
+.header {
   margin-bottom: 24px;
+}
+
+.app-title {
+  margin: 0;
   font-weight: 700;
+  text-align: left;
+}
+
+.subhead {
+  margin-top: 6px;
+  font-size: 14px;
+  opacity: 0.8;
+  text-align: left;
 }
 
 /* =========================
-   Banner (Desktop)
+   Banner
 ========================= */
 
 .banner {
   border: 2px solid rgba(255,255,255,0.5);
   border-radius: 16px;
-  padding: 22px 28px;
+  padding: 20px 24px;
   margin-bottom: 28px;
 
   display: flex;
@@ -139,20 +154,59 @@ h1 {
 
 .button-row button {
   flex: 1;
-  padding: 9px 0;
+  padding: 10px 0;
   border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.06);
-  background: linear-gradient(
-    180deg,
-    rgba(255,255,255,0.04),
-    rgba(0,0,0,0.15)
-  );
-  color: #e8e5f0;
+  border: none;
+  font-weight: 600;
+  color: white;
   cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.button-row button:hover {
+  transform: translateY(-2px);
+  opacity: 0.95;
 }
 
 /* =========================
-   Mobile Fixes
+   Button Colors (Restored)
+========================= */
+
+#drawBtn {
+  background: #3b82f6; /* blue */
+}
+
+#moveBtn {
+  background: #14b8a6; /* teal */
+}
+
+#undoBtn {
+  background: #f59e0b; /* amber */
+}
+
+#applyBtn {
+  background: #8b5cf6; /* purple */
+}
+
+#restoreBtn {
+  background: #ef4444; /* red */
+}
+
+#exportBtn {
+  background: #06b6d4; /* cyan */
+}
+
+#shareBtn {
+  background: #a855f7; /* violet */
+}
+
+.button-row button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* =========================
+   Mobile
 ========================= */
 
 @media (max-width: 768px) {
@@ -169,13 +223,6 @@ h1 {
     flex-direction: column;
     align-items: flex-start;
     gap: 16px;
-    padding: 18px 20px;
-  }
-
-  .banner h2 {
-    width: 100%;
-    flex: none;
-    font-size: 16px;
   }
 
   .banner-spinner {
@@ -183,11 +230,12 @@ h1 {
   }
 
   .banner-spinner img {
-    width: 48px;  /* slightly smaller on mobile */
+    width: 48px;
     height: 48px;
   }
 
   .button-row {
     flex-direction: column;
   }
+
 }
