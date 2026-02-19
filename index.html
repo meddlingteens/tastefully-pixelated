@@ -10,36 +10,35 @@
 <body>
   <main class="app">
 
+    <!-- Header -->
     <header>
       <h1>Tastefully Pixelated</h1>
       <p id="randomPrompt"></p>
     </header>
 
-    <!-- Placeholder Banner Ad -->
+    <!-- Stylized Banner -->
     <section class="ad-banner card">
       <div class="ad-content">
-        <h2>Buy something that you really don't need!</h2>
-        <button class="ad-button" type="button">spend</button>
+        <h2 id="bannerHeading"></h2>
+        <button class="ad-button" type="button">Spend</button>
       </div>
     </section>
 
+    <!-- Controls -->
     <section class="controls card">
 
       <div class="file-row">
         <button id="photoPickerBtn" class="file-label" type="button">
           Select photo
         </button>
-
-        <button id="fileInfoBtn" class="info-button" type="button">
-          ?
-        </button>
+        <button id="fileInfoBtn" class="info-button" type="button">?</button>
       </div>
 
       <input
         id="photoInput"
         type="file"
-        accept=".jpg,.jpeg,.png,.webp,.gif,image/jpeg,image/png,image/webp,image/gif"
         hidden
+        accept=".jpg,.jpeg,.png,.webp,.gif,image/jpeg,image/png,image/webp,image/gif"
       />
 
       <div class="dual-sliders">
@@ -56,7 +55,15 @@
 
       <div class="zoom-row">
         <label for="zoomLevel">Zoom</label>
-        <input id="zoomLevel" type="range" min="1" max="4" step="0.05" value="1" disabled />
+        <input
+          id="zoomLevel"
+          type="range"
+          min="1"
+          max="4"
+          step="0.05"
+          value="1"
+          disabled
+        />
       </div>
 
       <div class="button-row">
@@ -69,14 +76,15 @@
 
     </section>
 
+    <!-- Canvas -->
     <section class="canvas-wrap card">
       <div id="canvasContainer" class="canvas-container">
         <canvas id="baseCanvas"></canvas>
         <canvas id="maskCanvas"></canvas>
-        <canvas id="outputCanvas" hidden></canvas>
       </div>
     </section>
 
+    <!-- Export -->
     <section class="exports card">
       <div class="button-row">
         <button id="downloadBtn" disabled>Download</button>
@@ -100,6 +108,8 @@
     </div>
   </div>
 
-  <script src="app.js?v=10002" defer></script>
+  <!-- Script -->
+  <script src="app.js?v=11001" defer></script>
+
 </body>
 </html>
