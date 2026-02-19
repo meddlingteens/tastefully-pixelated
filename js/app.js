@@ -37,22 +37,45 @@ const shareBtn = document.getElementById("shareBtn");
 
 updateWatermark();
 setupDrawing(maskCanvas);
-canvasContainer.classList.add("empty");
+
+if (canvasContainer) canvasContainer.classList.add("empty");
 
 /* =========================
-   Control Enable
+   Active Button System
+========================= */
+
+function setActiveButton(activeBtn) {
+  const buttons = document.querySelectorAll(".button-row button");
+  buttons.forEach(btn => btn.classList.remove("active"));
+  if (activeBtn) activeBtn.classList.add("active");
+}
+
+function flashButton(btn) {
+  if (!btn) return;
+  btn.classList.add("active");
+  setTimeout(() => {
+    btn.classList.remove("active");
+  }, 300);
+}
+
+/* =========================
+   Enable Controls
 ========================= */
 
 const controls = {
   enable() {
-    zoomSlider.disabled = false;
-    drawBtn.disabled = false;
-    moveBtn.disabled = false;
-    undoBtn.disabled = false;
-    applyBtn.disabled = false;
-    restoreBtn.disabled = false;
-    exportBtn.disabled = false;
-    shareBtn.disabled = false;
+    if (zoomSlider) zoomSlider.disabled = false;
+    if (drawBtn) drawBtn.disabled = false;
+    if (moveBtn) moveBtn.disabled = false;
+    if (undoBtn) undoBtn.disabled = false;
+    if (applyBtn) applyBtn.disabled = false;
+    if (restoreBtn) restoreBtn.disabled = false;
+    if (exportBtn) exportBtn.disabled = false;
+    if (shareBtn) shareBtn.disabled = false;
+
+    // Default mode
+    state.mode = "draw";
+    setActiveButton(drawBtn);
   }
 };
 
@@ -60,66 +83,117 @@ const controls = {
    Canvas Click (Before Load)
 ========================= */
 
-canvasContainer.onclick = () => {
-  if (!state.imageLoaded) {
-    photoInput.click();
-  }
-};
+if (canvasContainer && photoInput) {
+  canvasContainer.onclick = () => {
+    if (!state.imageLoaded) {
+      photoInput.click();
+    }
+  };
+}
 
-canvasSelectBtn.onclick = (e) => {
-  e.stopPropagation();
-  photoInput.click();
-};
+if (canvasSelectBtn && photoInput) {
+  canvasSelectBtn.onclick = (e) => {
+    e.stopPropagation();
+    photoInput.click();
+  };
+}
 
 /* =========================
    Image Load
 ========================= */
 
-photoInput.onchange = (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
+if (photoInput) {
+  photoInput.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-  loadImage(file, baseCanvas, maskCanvas, imageMeta, controls);
+    loadImage(file, baseCanvas, maskCanvas, imageMeta, controls);
 
-  canvasOverlay.classList.add("hidden");
-  canvasContainer.classList.remove("empty");
-  canvasContainer.classList.add("editing");
-};
+    if (canvasOverlay) canvasOverlay.classList.add("hidden");
+    if (canvasContainer) {
+      canvasContainer.classList.remove("empty");
+      canvasContainer.classList.add("editing");
+    }
+  };
+}
 
 /* =========================
    Sliders
 ========================= */
 
-brushSlider.oninput = (e) => {
-  state.brushSize = parseInt(e.target.value);
-};
+if (brushSlider) {
+  brushSlider.oninput = (e) => {
+    state.brushSize = parseInt(e.target.value);
+  };
+}
 
-zoomSlider.oninput = (e) => {
-  state.zoom = parseFloat(e.target.value);
-  applyTransform(baseCanvas, maskCanvas);
-};
+if (zoomSlider) {
+  zoomSlider.oninput = (e) => {
+    state.zoom = parseFloat(e.target.value);
+    applyTransform(baseCanvas, maskCanvas);
+  };
+}
 
 /* =========================
    Mode Buttons
 ========================= */
 
-drawBtn.onclick = () => state.mode = "draw";
-moveBtn.onclick = () => state.mode = "move";
+if (drawBtn) {
+  drawBtn.onclick = () => {
+    state.mode = "draw";
+    setActiveButton(drawBtn);
+  };
+}
 
-undoBtn.onclick = () => {
-  if (state.history.length > 0) {
-    const ctx = maskCanvas.getContext("2d");
-    ctx.putImageData(state.history.pop(), 0, 0);
-  }
-};
+if (moveBtn) {
+  moveBtn.onclick = () => {
+    state.mode = "move";
+    setActiveButton(moveBtn);
+  };
+}
 
-applyBtn.onclick = () => applyPixelation(baseCanvas, maskCanvas);
+/* =========================
+   Action Buttons
+========================= */
 
-restoreBtn.onclick = () => {
-  if (state.applyHistory) {
-    baseCanvas.getContext("2d").putImageData(state.applyHistory, 0, 0);
-  }
-};
+if (undoBtn) {
+  undoBtn.onclick = () => {
+    if (state.history.length > 0) {
+      const ctx = maskCanvas.getContext("2d");
+      ctx.putImageData(state.history.pop(), 0, 0);
+      flashButton(undoBtn);
+    }
+  };
+}
 
-exportBtn.onclick = () => exportImage(baseCanvas);
-shareBtn.onclick = () => shareImage(baseCanvas);
+if (applyBtn) {
+  applyBtn.onclick = () => {
+    applyPixelation(baseCanvas, maskCanvas);
+    flashButton(applyBtn);
+  };
+}
+
+if (restoreBtn) {
+  restoreBtn.onclick = () => {
+    if (state.applyHistory) {
+      baseCanvas
+        .getContext("2d")
+        .putImageData(state.applyHistory, 0, 0);
+      flashButton(restoreBtn);
+    }
+  };
+}
+
+if (exportBtn) {
+  exportBtn.onclick = () => {
+    exportImage(baseCanvas);
+    flashButton(exportBtn);
+  };
+}
+
+if (shareBtn) {
+  shareBtn.onclick = () => {
+    shareImage(baseCanvas);
+    flashButton(shareBtn);
+  };
+}
