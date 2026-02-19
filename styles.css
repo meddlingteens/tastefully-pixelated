@@ -1,90 +1,26 @@
-body {
-  margin: 0;
-  font-family: Inter, sans-serif;
-  background: #14111a;
-  color: #f6f2ff;
+/* Subtle animation polish */
+
+.banner-inner {
+  animation: fadeIn 0.6s ease forwards;
+  opacity: 0;
 }
 
-.app {
-  max-width: 1000px;
-  margin: auto;
-  padding: 20px;
-}
-
-.card {
-  background: #211a2d;
-  border-radius: 16px;
-  padding: 16px;
-  margin-bottom: 20px;
-}
-
-.file-label {
-  padding: 10px 16px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #cb8cff, #9150d0);
-  border: none;
-  color: white;
-  cursor: pointer;
-}
-
-.dual-sliders {
-  display: flex;
-  gap: 5%;
-}
-
-.slider-group {
-  flex: 0 0 47.5%;
-  display: flex;
-  flex-direction: column;
-}
-
-.button-row {
-  display: flex;
-  gap: 10px;
-  margin-top: 15px;
+@keyframes fadeIn {
+  to { opacity: 1; }
 }
 
 .button-row button {
-  flex: 1;
-  border-radius: 10px;
-  padding: 8px;
-  border: none;
-  cursor: pointer;
-  font-weight: 600;
-  color: white;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.2s ease;
 }
 
-#moveBtn { background: #38405f; }
-#drawBtn { background: #1f7a8c; }
-#undoBtn { background: #4e5d73; }
-#applyBtn { background: #cb8cff; }
+.button-row button:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+.button-row button.active {
+  box-shadow: 0 0 0 3px rgba(203,140,255,0.3);
+}
 
 .canvas-container {
-  position: relative;
-  width: 100%;
-  max-width: 900px;
-  height: 600px;
-  margin: auto;
-  overflow: hidden;
-  background: #000;
-}
-
-#baseCanvas,
-#maskCanvas {
-  position: absolute;
-  top: 0;
-  left: 0;
-  transform-origin: top left;
-}
-
-.image-meta {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: rgba(0,0,0,0.6);
-  padding: 6px 10px;
-  border-radius: 8px;
-  font-size: 12px;
-  pointer-events: none;
-  z-index: 10;
+  transition: transform 0.2s ease;
 }
