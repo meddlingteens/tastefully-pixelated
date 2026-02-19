@@ -1,192 +1,13 @@
-:root {
-  --bg: #14111a;
-  --card: #211a2d;
-  --text: #f6f2ff;
-  --muted: #baa9d9;
-  --accent: #cb8cff;
-  --accent-strong: #9150d0;
-}
-
-* {
-  box-sizing: border-box;
-  font-family: Inter, system-ui, sans-serif;
-}
-
-body {
-  margin: 0;
-  background: radial-gradient(circle at top, #2b1d43, var(--bg) 40%);
-  color: var(--text);
-  min-height: 100vh;
-}
-
-.app {
-  width: min(980px, 100%);
-  margin: 0 auto;
-  padding: 1rem;
-  display: grid;
-  gap: 1rem;
-}
-
-.card {
-  background: var(--card);
-  border-radius: 16px;
-  padding: 1rem;
-}
-
-/* ---------------- Header ---------------- */
-
-header h1 {
-  margin: 0 0 0.25rem 0;
-}
-
-header p {
-  margin: 0;
-  color: var(--muted);
-}
-
-/* ---------------- File Row ---------------- */
-
-.file-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.4rem; /* MATCHES slider internal spacing */
-}
-
-.file-label {
-  padding: 0.6rem 0.85rem;
-  border-radius: 999px;
-  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
-  font-weight: 600;
-  border: none;
-  color: var(--text);
-  cursor: pointer;
-}
-
-.info-button {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  background: #3a2b55;
-  color: var(--text);
-  display: grid;
-  place-items: center;
-  border: none;
-  cursor: pointer;
-}
-
-/* ---------------- Sliders ---------------- */
-
-.dual-sliders {
-  display: flex;
-  justify-content: space-between;
-  gap: 5%;
-  margin-bottom: 0.4rem; /* consistent rhythm */
-}
-
-.slider-group {
-  flex: 0 0 47.5%;
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem; /* ~6–7px between label and slider */
-}
-
-.zoom-row {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  margin-bottom: 0.4rem;
-}
-
-/* ---------------- Buttons ---------------- */
-
-.button-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 0.55rem;
-}
-
-.button-row button {
-  flex: 1;
-  border: 0;
-  border-radius: 10px;
-  padding: 0.55rem 0.8rem;
-  font-size: 0.95rem;
-  color: var(--text);
-  cursor: pointer;
-}
-
-#moveBtn { background: #38405f; }
-#drawBtn { background: #432b61; }
-#undoBtn { background: #4e345f; }
-#clearMaskBtn { background: #61304d; }
-
-#applyBtn {
-  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
-  font-weight: 600;
-}
-
-#downloadBtn,
-#shareBtn {
-  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
-  font-weight: 600;
-}
-
-button.active {
-  outline: 2px solid var(--accent);
-}
-
-button:disabled {
-  opacity: 0.4;
-  pointer-events: none;
-}
-
-/* ---------------- Canvas ---------------- */
-
-.canvas-container {
-  position: relative;
-  width: 100%;
-  max-width: 900px;
-  margin: 0 auto;
-  overflow: auto; /* allows zoom + pan */
-}
-
-/* Base image canvas */
-#baseCanvas {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 1;
-  transform-origin: top left;
-}
-
-/* Mask canvas (must sit above base) */
-#maskCanvas {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 2;
-  cursor: crosshair;
-  transform-origin: top left;
-}
-
-/* Output canvas */
-#outputCanvas {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 3;
-  transform-origin: top left;
-}
-
-/* ---------------- Modal ---------------- */
+/* --- Modal --- */
 
 .modal {
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.65);
-  display: grid;
-  place-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; /* IMPORTANT FIX */
 }
 
 .modal.hidden {
@@ -194,7 +15,7 @@ button:disabled {
 }
 
 .modal-content {
-  background: var(--card);
+  background: #211a2d;
   padding: 1.5rem;
   border-radius: 16px;
   position: relative;

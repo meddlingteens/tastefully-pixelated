@@ -208,9 +208,10 @@ document.addEventListener('DOMContentLoaded', () => {
   clearBtn.addEventListener('click', () => {
     maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
     history = [];
+    undoBtn.disabled = true;
   });
 
-  /* ---------- Apply Pixelation (Fixed) ---------- */
+  /* ---------- Apply Pixelation ---------- */
 
   applyBtn.addEventListener('click', () => {
 
@@ -228,7 +229,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let r = 0, g = 0, b = 0, count = 0;
 
-        // Average entire block
         for (let yy = y; yy < y + pixelSize && yy < height; yy++) {
           for (let xx = x; xx < x + pixelSize && xx < width; xx++) {
             const i = (yy * width + xx) * 4;
@@ -245,7 +245,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const avgG = g / count;
         const avgB = b / count;
 
-        // Apply only where mask exists
         for (let yy = y; yy < y + pixelSize && yy < height; yy++) {
           for (let xx = x; xx < x + pixelSize && xx < width; xx++) {
             const i = (yy * width + xx) * 4;
@@ -274,7 +273,6 @@ document.addEventListener('DOMContentLoaded', () => {
   downloadBtn.addEventListener('click', () => {
     baseCanvas.toBlob((blob) => {
       if (!blob) return;
-
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -324,7 +322,9 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   infoModal.addEventListener('click', (e) => {
-    if (e.target === infoModal) infoModal.classList.add('hidden');
+    if (e.target === infoModal) {
+      infoModal.classList.add('hidden');
+    }
   });
 
 });
