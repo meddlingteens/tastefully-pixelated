@@ -1,111 +1,72 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tastefully Pixelated</title>
-
-
-<link rel="stylesheet" href="./styles.css?v=2" />
-
-
-  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="./styles.css?v=5" />
 </head>
 
 <body>
 
 <main class="app">
 
-  <!-- Header -->
-  <header class="app-header">
-    <h1>Tastefully Pixelated</h1>
-    <p id="randomPrompt" class="subtitle"></p>
-  </header>
+  <h1>Tastefully Pixelated</h1>
 
-  <!-- Banner Placeholder -->
-  <section class="banner-section">
-    <div class="banner-container">
-      <div class="banner-content">
-        <div class="banner-text" id="bannerHeadline">
-          Buy something you really don't need
-        </div>
-        <div class="banner-spinner">
-          <!-- Placeholder spinner element -->
-          <div class="spinner"></div>
-        </div>
-        <div class="banner-cta">
-          <button class="banner-btn">Spend</button>
-        </div>
-      </div>
+  <!-- Banner -->
+  <div class="banner">
+
+    <h2 id="bannerHeading">
+      Buy something you really don't need
+    </h2>
+
+    <div class="banner-spinner">
+      <img src="./images/spinner.png" alt="Spinner" />
     </div>
-  </section>
 
-  <!-- Canvas (Primary Surface) -->
-  <section class="canvas-wrap">
-    <div id="canvasContainer" class="canvas-container empty">
+    <button class="spend-btn">
+      Spend
+    </button>
 
-      <!-- Select Photo Overlay -->
-      <div id="canvasOverlay" class="canvas-overlay">
-        <button id="canvasSelectBtn" class="primary-btn">
-          Select Photo
-        </button>
-      </div>
+  </div>
 
-      <!-- Hidden File Input -->
-      <input id="photoInput" type="file" hidden accept="image/*">
+  <!-- Canvas -->
+  <div id="canvasContainer" class="canvas-container">
 
-      <!-- Watermark -->
-      <div id="watermarkOverlay" class="watermark-overlay"></div>
-
-      <!-- Image Meta -->
-      <div id="imageMeta" class="image-meta"></div>
-
-      <!-- Canvases -->
-      <canvas id="baseCanvas"></canvas>
-      <canvas id="maskCanvas"></canvas>
-
+    <div id="canvasOverlay" class="canvas-overlay">
+      <button id="canvasSelectBtn">
+        Select Photo
+      </button>
     </div>
-  </section>
+
+    <input id="photoInput" type="file" hidden accept="image/*">
+
+    <canvas id="baseCanvas"></canvas>
+    <canvas id="maskCanvas"></canvas>
+
+  </div>
 
   <!-- Controls -->
-  <section class="controls">
+  <div class="controls">
 
-    <!-- Sliders -->
-    <div class="sliders">
-
-      <div class="slider-group">
-        <label for="brushSize">Brush Size</label>
-        <input id="brushSize" type="range" min="5" max="80" value="30">
-      </div>
-
-      <div class="slider-group">
-        <label for="zoomLevel">Zoom</label>
-        <input id="zoomLevel" type="range" min="1" max="4" step="0.05" value="1" disabled>
-      </div>
-
-    </div>
-
-    <!-- Buttons Row 1 -->
     <div class="button-row">
-      <button id="drawBtn" disabled>Draw</button>
-      <button id="moveBtn" disabled>Position</button>
-      <button id="undoBtn" disabled>Undo</button>
+      <button id="drawBtn">Draw</button>
+      <button id="moveBtn">Position</button>
+      <button id="undoBtn">Undo</button>
     </div>
 
-    <!-- Buttons Row 2 -->
     <div class="button-row">
-      <button id="applyBtn" disabled>Apply</button>
-      <button id="restoreBtn" disabled>Restore</button>
-      <button id="exportBtn" disabled>Export</button>
-      <button id="shareBtn" disabled>Share</button>
+      <button id="applyBtn">Apply</button>
+      <button id="restoreBtn">Restore</button>
+      <button id="exportBtn">Export</button>
+      <button id="shareBtn">Share</button>
     </div>
 
-  </section>
+  </div>
 
 </main>
 
-<!-- Modular App Entry -->
-<script type="module" src="./js/app.js"></script>
+<script type="module" src="./js/app.js?v=5"></script>
 
 </body>
 </html>
