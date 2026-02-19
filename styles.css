@@ -16,15 +16,19 @@ html, body {
 }
 
 /* =========================
-   Container (Constrained)
+   App Container (800px cap)
 ========================= */
 
-.container {
+.app {
   width: 100%;
   max-width: 800px;
   margin: 0 auto;
   padding: 32px 20px 60px;
 }
+
+/* =========================
+   Header
+========================= */
 
 h1 {
   text-align: center;
@@ -38,7 +42,6 @@ h1 {
 ========================= */
 
 .banner {
-  position: relative;
   border: 2px solid rgba(255,255,255,0.45);
   border-radius: 16px;
   padding: 22px 24px;
@@ -139,54 +142,12 @@ h1 {
 }
 
 /* =========================
-   Image Meta
-========================= */
-
-.image-meta {
-  position: absolute;
-  top: 12px;
-  right: 14px;
-  font-size: 12px;
-  background: rgba(0,0,0,0.6);
-  padding: 6px 10px;
-  border-radius: 8px;
-  color: #ddd;
-  pointer-events: none;
-}
-
-/* =========================
    Controls
 ========================= */
 
 .controls {
   margin-top: 10px;
 }
-
-.control-row {
-  display: flex;
-  gap: 24px;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.control-group {
-  flex: 1;
-}
-
-label {
-  display: block;
-  margin-bottom: 8px;
-  font-size: 14px;
-  color: #d7d5e6;
-}
-
-input[type="range"] {
-  width: 100%;
-}
-
-/* =========================
-   Button Rows
-========================= */
 
 .button-row {
   display: flex;
@@ -223,54 +184,6 @@ input[type="range"] {
   pointer-events: none;
 }
 
-.button-row button.active {
-  border-color: rgba(255,255,255,0.15);
-}
-
-/* Glow by role */
-
-#drawBtn.active {
-  box-shadow: 0 0 0 2px rgba(70,140,255,0.25),
-              0 6px 18px rgba(70,140,255,0.18);
-  color: #6fa8ff;
-}
-
-#moveBtn.active {
-  box-shadow: 0 0 0 2px rgba(90,180,170,0.25),
-              0 6px 18px rgba(90,180,170,0.18);
-  color: #6fd4c6;
-}
-
-#undoBtn.active {
-  box-shadow: 0 0 0 2px rgba(255,190,90,0.25),
-              0 6px 18px rgba(255,190,90,0.18);
-  color: #ffcc88;
-}
-
-#applyBtn.active {
-  box-shadow: 0 0 0 2px rgba(120,90,255,0.30),
-              0 6px 22px rgba(120,90,255,0.25);
-  color: #a992ff;
-}
-
-#restoreBtn.active {
-  box-shadow: 0 0 0 2px rgba(255,100,120,0.25),
-              0 6px 18px rgba(255,100,120,0.18);
-  color: #ff8aa0;
-}
-
-#exportBtn.active {
-  box-shadow: 0 0 0 2px rgba(80,220,255,0.25),
-              0 6px 18px rgba(80,220,255,0.18);
-  color: #8be9ff;
-}
-
-#shareBtn.active {
-  box-shadow: 0 0 0 2px rgba(180,120,255,0.25),
-              0 6px 18px rgba(180,120,255,0.18);
-  color: #c5a8ff;
-}
-
 /* =========================
    Mobile
 ========================= */
@@ -290,8 +203,4 @@ input[type="range"] {
     flex-direction: column;
   }
 
-  .control-row {
-    flex-direction: column;
-    gap: 18px;
-  }
 }
