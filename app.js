@@ -114,7 +114,8 @@ document.addEventListener('DOMContentLoaded', () => {
         outputCanvas.width = width;
         outputCanvas.height = height;
 
-        /* FIX: Resize container so canvas is visible */
+        /* Fix container collapse */
+
         canvasContainer.style.width = width + "px";
         canvasContainer.style.height = height + "px";
 
@@ -158,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
     pixelSize = parseInt(pixelSizeInput.value, 10);
   });
 
-  /* ---------- Drawing ---------- */
+  /* ---------- Drawing (FIXED ALIGNMENT) ---------- */
 
   maskCanvas.addEventListener('mousedown', (e) => {
     if (mode !== 'draw') return;
@@ -182,8 +183,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const rect = maskCanvas.getBoundingClientRect();
 
-    const x = (e.clientX - rect.left - offsetX) / zoom;
-    const y = (e.clientY - rect.top - offsetY) / zoom;
+    // Correct coordinate calculation
+    const x = (e.clientX - rect.left) / zoom;
+    const y = (e.clientY - rect.top) / zoom;
 
     maskCtx.fillStyle = "rgba(255,255,255,1)";
     maskCtx.beginPath();
