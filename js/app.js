@@ -68,10 +68,9 @@ let pixelSize = parseInt(pixelSlider.value);
 let zoom = 1;
 let isDragging = false;
 let originalImageData = null;
-let imageLoaded = false;
 
 /* =====================================================
-   BRUSH CURSOR
+   BRUSH CURSOR PREVIEW
 ===================================================== */
 
 const brushCursor = document.createElement("div");
@@ -80,6 +79,7 @@ brushCursor.style.pointerEvents = "none";
 brushCursor.style.border = "1px solid rgba(255,255,255,0.9)";
 brushCursor.style.background = "rgba(255,255,255,0.08)";
 brushCursor.style.borderRadius = "50%";
+brushCursor.style.boxShadow = "0 0 6px rgba(0,0,0,0.6)";
 brushCursor.style.zIndex = "20";
 brushCursor.style.display = "none";
 
@@ -95,7 +95,7 @@ function updateBrushCursor(x, y) {
 
 container.addEventListener("mousemove", e => {
 
-  if (!imageLoaded || mode !== "draw") {
+  if (mode !== "draw") {
     brushCursor.style.display = "none";
     return;
   }
@@ -119,11 +119,6 @@ container.addEventListener("mouseleave", () => {
 ===================================================== */
 
 function updateCursor() {
-  if (!imageLoaded) {
-    container.style.cursor = "default";
-    return;
-  }
-
   if (mode === "draw") {
     container.style.cursor = "none";
   } else {
@@ -148,17 +143,14 @@ updateCursor();
 ===================================================== */
 
 maskCanvas.addEventListener("mousedown", () => {
-  if (!imageLoaded || mode !== "position") return;
-
+  if (mode !== "position") return;
   isDragging = true;
   container.style.cursor = "grabbing";
 });
 
 window.addEventListener("mouseup", () => {
   if (!isDragging) return;
-
   isDragging = false;
-
   if (mode === "position")
     container.style.cursor = "grab";
 });
@@ -244,9 +236,6 @@ photoInput.addEventListener("change", () => {
       maskCanvas.style.left = left+"px";
       maskCanvas.style.top  = top+"px";
 
-      imageLoaded = true;
-      updateCursor();
-
       overlay.classList.add("hidden");
     };
 
@@ -257,7 +246,7 @@ photoInput.addEventListener("change", () => {
 });
 
 /* =====================================================
-   SLIDERS
+   ZOOM
 ===================================================== */
 
 brushSlider.addEventListener("input",
