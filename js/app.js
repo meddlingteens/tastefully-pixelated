@@ -18,6 +18,7 @@ const undoBtn = document.getElementById("undoBtn");
 const applyBtn = document.getElementById("applyBtn");
 const restoreBtn = document.getElementById("restoreBtn");
 const exportBtn = document.getElementById("exportBtn");
+const shareBtn = document.getElementById("shareBtn");
 
 const brushSlider = document.getElementById("brushSlider");
 const pixelSlider = document.getElementById("pixelSlider");
@@ -38,6 +39,53 @@ let zoom = 1;
 let isDragging = false;
 let originalImageData = null;
 let maskUndoStack = [];
+
+/* =====================================================
+   BRUSH CURSOR PREVIEW
+===================================================== */
+
+const brushCursor = document.createElement("div");
+brushCursor.style.position = "absolute";
+brushCursor.style.pointerEvents = "none";
+brushCursor.style.border = "1px solid rgba(255,255,255,0.9)";
+brushCursor.style.background = "rgba(255,255,255,0.08)";
+brushCursor.style.borderRadius = "50%";
+brushCursor.style.boxShadow = "0 0 6px rgba(0,0,0,0.6)";
+brushCursor.style.zIndex = "20";
+brushCursor.style.display = "none";
+
+container.appendChild(brushCursor);
+
+function updateBrushCursor(x, y) {
+  const size = brushSize * zoom;
+  brushCursor.style.width = size + "px";
+  brushCursor.style.height = size + "px";
+  brushCursor.style.left = (x - size/2) + "px";
+  brushCursor.style.top  = (y - size/2) + "px";
+}
+
+/* Cursor Tracking */
+
+container.addEventListener("mousemove", e => {
+
+  if (mode !== "draw") {
+    brushCursor.style.display = "none";
+    return;
+  }
+
+  brushCursor.style.display = "block";
+
+  const rect = container.getBoundingClientRect();
+
+  updateBrushCursor(
+    e.clientX - rect.left,
+    e.clientY - rect.top
+  );
+});
+
+container.addEventListener("mouseleave", () => {
+  brushCursor.style.display = "none";
+});
 
 /* =====================================================
    SELECT BUTTON
@@ -66,7 +114,7 @@ photoInput.addEventListener("change", () => {
       const cw = container.clientWidth;
       const ch = container.clientHeight;
 
-      /* ---- Blur ---- */
+      /* Blur Background */
 
       blurCanvas.width = cw;
       blurCanvas.height = ch;
@@ -75,6 +123,7 @@ photoInput.addEventListener("change", () => {
       const coverW = img.width * coverScale;
       const coverH = img.height * coverScale;
 
+      blurCtx.clearRect(0,0,cw,ch);
       blurCtx.drawImage(
         img,
         (cw-coverW)/2,
@@ -83,7 +132,7 @@ photoInput.addEventListener("change", () => {
         coverH
       );
 
-      /* ---- Fit ---- */
+      /* Fit Main */
 
       const fitScale = Math.min(cw/img.width, ch/img.height, 1);
       const w = Math.floor(img.width * fitScale);
@@ -106,6 +155,13 @@ photoInput.addEventListener("change", () => {
       baseCanvas.style.top  = top+"px";
       maskCanvas.style.left = left+"px";
       maskCanvas.style.top  = top+"px";
+
+      baseCanvas.style.transformOrigin = "center center";
+      maskCanvas.style.transformOrigin = "center center";
+
+      zoom = 1;
+      baseCanvas.style.transform = "scale(1)";
+      maskCanvas.style.transform = "scale(1)";
 
       overlay.classList.add("hidden");
     };
@@ -161,24 +217,15 @@ maskCanvas.addEventListener("mousemove", e=>{
 applyBtn.addEventListener("click", ()=>{
 
   const maskData =
-    maskCtx.getImageData(
-      0,0,
-      maskCanvas.width,
-      maskCanvas.height
-    );
+    maskCtx.getImageData(0,0,maskCanvas.width,maskCanvas.height);
 
   const imgData =
-    baseCtx.getImageData(
-      0,0,
-      baseCanvas.width,
-      baseCanvas.height
-    );
+    baseCtx.getImageData(0,0,baseCanvas.width,baseCanvas.height);
 
   for(let y=0; y<baseCanvas.height; y+=pixelSize){
     for(let x=0; x<baseCanvas.width; x+=pixelSize){
 
-      const index =
-        ((y*baseCanvas.width)+x)*4;
+      const index = ((y*baseCanvas.width)+x)*4;
 
       if(maskData.data[index+3] > 0){
 
@@ -186,22 +233,13 @@ applyBtn.addEventListener("click", ()=>{
         const g = imgData.data[index+1];
         const b = imgData.data[index+2];
 
-        baseCtx.fillStyle =
-          `rgb(${r},${g},${b})`;
-
-        baseCtx.fillRect(
-          x,y,
-          pixelSize,pixelSize
-        );
+        baseCtx.fillStyle = `rgb(${r},${g},${b})`;
+        baseCtx.fillRect(x,y,pixelSize,pixelSize);
       }
     }
   }
 
-  maskCtx.clearRect(
-    0,0,
-    maskCanvas.width,
-    maskCanvas.height
-  );
+  maskCtx.clearRect(0,0,maskCanvas.width,maskCanvas.height);
 });
 
 /* =====================================================
@@ -210,15 +248,9 @@ applyBtn.addEventListener("click", ()=>{
 
 restoreBtn.addEventListener("click", ()=>{
   if(originalImageData)
-    baseCtx.putImageData(
-      originalImageData,0,0
-    );
+    baseCtx.putImageData(originalImageData,0,0);
 
-  maskCtx.clearRect(
-    0,0,
-    maskCanvas.width,
-    maskCanvas.height
-  );
+  maskCtx.clearRect(0,0,maskCanvas.width,maskCanvas.height);
 });
 
 /* =====================================================
@@ -227,10 +259,7 @@ restoreBtn.addEventListener("click", ()=>{
 
 undoBtn.addEventListener("click", ()=>{
   if(!maskUndoStack.length) return;
-  maskCtx.putImageData(
-    maskUndoStack.pop(),
-    0,0
-  );
+  maskCtx.putImageData(maskUndoStack.pop(),0,0);
 });
 
 /* =====================================================
@@ -241,15 +270,47 @@ drawBtn.addEventListener("click", ()=>mode="draw");
 moveBtn.addEventListener("click", ()=>mode="position");
 
 /* =====================================================
-   ZOOM
+   POSITION MODE
 ===================================================== */
+
+maskCanvas.addEventListener("mousedown", ()=>{
+  if(mode==="position") isDragging=true;
+});
+
+window.addEventListener("mouseup", ()=>{
+  isDragging=false;
+});
+
+window.addEventListener("mousemove", e=>{
+  if(!isDragging) return;
+
+  baseCanvas.style.left =
+    (parseFloat(baseCanvas.style.left)+e.movementX)+"px";
+
+  maskCanvas.style.left =
+    (parseFloat(maskCanvas.style.left)+e.movementX)+"px";
+
+  baseCanvas.style.top =
+    (parseFloat(baseCanvas.style.top)+e.movementY)+"px";
+
+  maskCanvas.style.top =
+    (parseFloat(maskCanvas.style.top)+e.movementY)+"px";
+});
+
+/* =====================================================
+   SLIDERS
+===================================================== */
+
+brushSlider.addEventListener("input",
+  e=>brushSize=parseInt(e.target.value));
+
+pixelSlider.addEventListener("input",
+  e=>pixelSize=parseInt(e.target.value));
 
 zoomSlider.addEventListener("input", e=>{
   zoom=parseFloat(e.target.value);
-  baseCanvas.style.transform =
-    `scale(${zoom})`;
-  maskCanvas.style.transform =
-    `scale(${zoom})`;
+  baseCanvas.style.transform = `scale(${zoom})`;
+  maskCanvas.style.transform = `scale(${zoom})`;
 });
 
 });
