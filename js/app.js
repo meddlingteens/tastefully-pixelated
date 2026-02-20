@@ -1,9 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-const state = {
-  originalImageData: null
-};
-
 const baseCanvas = document.getElementById("baseCanvas");
 const maskCanvas = document.getElementById("maskCanvas");
 const blurCanvas = document.getElementById("blurCanvas");
@@ -35,7 +31,9 @@ photoInput.addEventListener("change", () => {
       const containerWidth = canvasContainer.clientWidth;
       const containerHeight = canvasContainer.clientHeight;
 
-      /* ----- BLUR COVER ----- */
+      /* =============================
+         BLUR BACKGROUND (COVER)
+      ============================= */
 
       blurCanvas.width = containerWidth;
       blurCanvas.height = containerHeight;
@@ -52,15 +50,11 @@ photoInput.addEventListener("change", () => {
       const coverY = (containerHeight - coverHeight) / 2;
 
       blurCtx.clearRect(0, 0, containerWidth, containerHeight);
-      blurCtx.drawImage(
-        img,
-        coverX,
-        coverY,
-        coverWidth,
-        coverHeight
-      );
+      blurCtx.drawImage(img, coverX, coverY, coverWidth, coverHeight);
 
-      /* ----- MAIN FIT ----- */
+      /* =============================
+         MAIN IMAGE (FIT + CENTER)
+      ============================= */
 
       const fitScale = Math.min(
         containerWidth / img.width,
@@ -71,16 +65,26 @@ photoInput.addEventListener("change", () => {
       const scaledWidth = Math.floor(img.width * fitScale);
       const scaledHeight = Math.floor(img.height * fitScale);
 
-      baseCanvas.width = maskCanvas.width = scaledWidth;
-      baseCanvas.height = maskCanvas.height = scaledHeight;
+      baseCanvas.width = scaledWidth;
+      baseCanvas.height = scaledHeight;
+
+      maskCanvas.width = scaledWidth;
+      maskCanvas.height = scaledHeight;
 
       baseCtx.clearRect(0, 0, scaledWidth, scaledHeight);
       baseCtx.drawImage(img, 0, 0, scaledWidth, scaledHeight);
-
-      state.originalImageData =
-        baseCtx.getImageData(0, 0, scaledWidth, scaledHeight);
-
       maskCtx.clearRect(0, 0, scaledWidth, scaledHeight);
+
+      /* Proper centering via absolute positioning */
+
+      const offsetX = (containerWidth - scaledWidth) / 2;
+      const offsetY = (containerHeight - scaledHeight) / 2;
+
+      baseCanvas.style.left = offsetX + "px";
+      baseCanvas.style.top = offsetY + "px";
+
+      maskCanvas.style.left = offsetX + "px";
+      maskCanvas.style.top = offsetY + "px";
 
       canvasOverlay.classList.add("hidden");
     };
