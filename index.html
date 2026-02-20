@@ -25,8 +25,12 @@
   <!-- Workspace -->
   <section class="canvas-container" id="canvasContainer">
 
-    <canvas id="baseCanvas"></canvas>
-    <canvas id="maskCanvas"></canvas>
+    <!-- Blurred background -->
+    <canvas id="blurCanvas"></canvas>
+
+    <!-- Main canvases -->
+    <canvas id="baseCanvas" class="main-canvas"></canvas>
+    <canvas id="maskCanvas" class="main-canvas"></canvas>
 
     <div id="canvasOverlay" class="canvas-overlay">
       <button id="canvasSelectBtn" class="primary-btn">
@@ -38,7 +42,6 @@
   </section>
 
   <!-- Sliders -->
-
   <div class="slider-group">
     <label>Brush Size</label>
     <input type="range" id="brushSlider" min="5" max="80" value="25" />
@@ -55,7 +58,6 @@
   </div>
 
   <!-- Controls -->
-
   <div class="button-row">
     <button id="drawBtn">Draw</button>
     <button id="moveBtn">Position</button>
@@ -71,8 +73,6 @@
 
 </div>
 
-<!-- ✅ FIXED PATH -->
 <script src="./js/app.js"></script>
-
 </body>
 </html>
