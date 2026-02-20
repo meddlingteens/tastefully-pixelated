@@ -49,13 +49,15 @@ const bannerHeadlines = [
   "What the world really needs is more advertising"
 ];
 
-if (subheadEl)
+if (subheadEl) {
   subheadEl.textContent =
     subheads[Math.floor(Math.random() * subheads.length)];
+}
 
-if (bannerHeadlineEl)
+if (bannerHeadlineEl) {
   bannerHeadlineEl.textContent =
     bannerHeadlines[Math.floor(Math.random() * bannerHeadlines.length)];
+}
 
 /* ================================
    STATE
@@ -69,7 +71,7 @@ let isDragging = false;
 let originalImageData = null;
 
 /* ================================
-   BRUSH CURSOR
+   BRUSH CURSOR PREVIEW
 ================================ */
 
 const brushCursor = document.createElement("div");
@@ -101,6 +103,7 @@ container.addEventListener("mousemove", e => {
   brushCursor.style.display = "block";
 
   const rect = container.getBoundingClientRect();
+
   updateBrushCursor(
     e.clientX - rect.left,
     e.clientY - rect.top
