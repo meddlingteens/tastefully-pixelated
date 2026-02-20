@@ -15,7 +15,7 @@ body {
   font-family: system-ui, -apple-system, sans-serif;
   color: #ffffff;
 
-  /* Full brightness background */
+  /* Full brightness pixel background */
   background-image: url("./images/backgroundPixelsLarge.webp");
   background-size: 110%;
   background-position: center 0px;
@@ -38,10 +38,68 @@ body.loaded {
   max-width: 800px;
   margin: 30px auto;
   padding: 10px 24px;
+
   background: rgba(10, 9, 20, 0.92);
   border: 3px solid rgba(255,255,255,0.9);
   border-radius: 22px;
+
   box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.app-title {
+  margin: 0 0 4px 0;
+  font-size: 40px;
+  font-weight: 700;
+}
+
+.subhead {
+  margin: 0 0 10px 0;
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+/* =========================
+   BANNER
+========================= */
+
+.banner {
+  width: 100%;
+  border: 2px solid rgba(255,255,255,0.6);
+  border-radius: 16px;
+  padding: 18px 24px;
+  margin-bottom: 20px;
+
+  display: flex;
+  align-items: center;
+  gap: 24px;
+
+  background: rgba(0,0,0,0.35);
+}
+
+.banner h2 {
+  flex: 1;
+  margin: 0;
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 1.4;
+}
+
+.banner-spinner img {
+  width: 80px;
+}
+
+.spend-btn {
+  background: #ffffff;
+  color: #241c48;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 14px;
+  font-weight: 600;
+  cursor: pointer;
 }
 
 /* =========================
@@ -57,14 +115,14 @@ body.loaded {
   margin-bottom: 12px;
 }
 
-/* ----- BLUR LAYER (BACKGROUND) ----- */
-
+/* 🔥 Blur background layer
+   IMPORTANT: NO width/height here
+   JS controls its resolution
+*/
 #blurCanvas {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
 
   filter: blur(30px);
   transform: scale(1.1);
@@ -73,8 +131,7 @@ body.loaded {
   z-index: 0;
 }
 
-/* ----- MAIN IMAGE CANVASES ----- */
-
+/* Main image canvases */
 #baseCanvas,
 #maskCanvas {
   position: absolute;
@@ -82,12 +139,26 @@ body.loaded {
 }
 
 /* =========================
-   CONTROLS
+   SLIDERS
 ========================= */
 
 .slider-group {
   margin-bottom: 12px;
 }
+
+.slider-group label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+
+.slider-group input[type="range"] {
+  width: 100%;
+}
+
+/* =========================
+   BUTTON ROWS
+========================= */
 
 .button-row {
   display: flex;
@@ -102,4 +173,9 @@ body.loaded {
   border: none;
   font-weight: 600;
   cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
