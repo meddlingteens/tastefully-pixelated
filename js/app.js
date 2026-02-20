@@ -35,11 +35,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const baseCanvas = document.getElementById("baseCanvas");
   const maskCanvas = document.getElementById("maskCanvas");
-  const blurCanvas = document.getElementById("blurCanvas");
 
   const baseCtx = baseCanvas.getContext("2d");
   const maskCtx = maskCanvas.getContext("2d");
-  const blurCtx = blurCanvas.getContext("2d");
 
   const canvasContainer = document.getElementById("canvasContainer");
   const overlay = document.getElementById("canvasOverlay");
@@ -57,7 +55,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const revertBtn = document.getElementById("revertBtn");
 
   let image = null;
-  let originalImageData = null;
+  let originalImage = null;
 
   let isDrawing = false;
   let mode = "draw";
@@ -68,7 +66,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   let offsetX = 0;
   let offsetY = 0;
-  let startX, startY;
+  let startX = 0;
+  let startY = 0;
 
   /* ================================
      RESIZE
@@ -77,10 +76,11 @@ document.addEventListener("DOMContentLoaded", function () {
   function resizeCanvas() {
     const rect = canvasContainer.getBoundingClientRect();
 
-    [baseCanvas, maskCanvas, blurCanvas].forEach(c => {
-      c.width = rect.width;
-      c.height = rect.height;
-    });
+    baseCanvas.width = rect.width;
+    baseCanvas.height = rect.height;
+
+    maskCanvas.width = rect.width;
+    maskCanvas.height = rect.height;
 
     if (image) drawImage();
   }
@@ -94,29 +94,39 @@ document.addEventListener("DOMContentLoaded", function () {
 
   selectBtn.addEventListener("click", () => photoInput.click());
 
-  photoInput.addEventListener("change", function(e) {
+  photoInput.addEventListener("change", function (e) {
+
     const file = e.target.files[0];
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = function(evt) {
+
+    reader.onload = function (evt) {
+
       image = new Image();
-      image.onload = function() {
+
+      image.onload = function () {
+
         overlay.classList.add("hidden");
+
         offsetX = 0;
         offsetY = 0;
         zoomLevel = 1;
         zoomSlider.value = 1;
+
+        originalImage = image;
+
         drawImage();
-        originalImageData =
-          baseCtx.getImageData(0, 0, baseCanvas.width, baseCanvas.height);
       };
+
       image.src = evt.target.result;
     };
+
     reader.readAsDataURL(file);
   });
 
   function drawImage() {
+
     baseCtx.clearRect(0, 0, baseCanvas.width, baseCanvas.height);
 
     const imgRatio = image.width / image.height;
@@ -139,10 +149,11 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   /* ================================
-     BRUSH PREVIEW + DRAW
+     DRAW / MOVE
   ================================= */
 
-  maskCanvas.addEventListener("mousemove", function(e) {
+  maskCanvas.addEventListener("mousemove", function (e) {
+
     if (!image) return;
 
     const rect = maskCanvas.getBoundingClientRect();
@@ -171,25 +182,25 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  maskCanvas.addEventListener("mousedown", function(e) {
+  maskCanvas.addEventListener("mousedown", function (e) {
+
     if (!image) return;
 
-    if (mode === "draw") {
-      isDrawing = true;
-    } else if (mode === "move") {
-      isDrawing = true;
+    isDrawing = true;
+
+    if (mode === "move") {
       startX = e.clientX - offsetX;
       startY = e.clientY - offsetY;
       maskCanvas.style.cursor = "grabbing";
     }
   });
 
-  maskCanvas.addEventListener("mouseup", function() {
+  maskCanvas.addEventListener("mouseup", function () {
     isDrawing = false;
     if (mode === "move") maskCanvas.style.cursor = "grab";
   });
 
-  maskCanvas.addEventListener("mouseleave", function() {
+  maskCanvas.addEventListener("mouseleave", function () {
     isDrawing = false;
     maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
   });
@@ -198,13 +209,12 @@ document.addEventListener("DOMContentLoaded", function () {
      APPLY PIXELATION
   ================================= */
 
-  applyBtn.addEventListener("click", function() {
+  applyBtn.addEventListener("click", function () {
+
     if (!image) return;
 
-    const maskData =
-      maskCtx.getImageData(0, 0, maskCanvas.width, maskCanvas.height);
-    const baseData =
-      baseCtx.getImageData(0, 0, baseCanvas.width, baseCanvas.height);
+    const maskData = maskCtx.getImageData(0, 0, maskCanvas.width, maskCanvas.height);
+    const baseData = baseCtx.getImageData(0, 0, baseCanvas.width, baseCanvas.height);
 
     for (let y = 0; y < baseCanvas.height; y += pixelSize) {
       for (let x = 0; x < baseCanvas.width; x += pixelSize) {
@@ -246,26 +256,27 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   /* ================================
-     REVERT BUTTON (UPDATED + SAFE)
+     REVERT (FIXED + STABLE)
   ================================= */
 
   if (revertBtn) {
 
-    revertBtn.addEventListener("click", function() {
+    revertBtn.addEventListener("click", function () {
 
-      if (!originalImageData) return;
+      if (!originalImage) return;
+
+      offsetX = 0;
+      offsetY = 0;
+      zoomLevel = 1;
+      zoomSlider.value = 1;
+
+      image = originalImage;
+
+      drawImage();
 
       revertBtn.classList.add("active");
-
-      baseCtx.putImageData(originalImageData, 0, 0);
-      maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
-
-      setTimeout(() => {
-        revertBtn.classList.remove("active");
-      }, 300);
-
+      setTimeout(() => revertBtn.classList.remove("active"), 300);
     });
-
   }
 
   /* ================================
@@ -282,19 +293,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
   zoomSlider.addEventListener("input", e => {
     zoomLevel = parseFloat(e.target.value);
-    drawImage();
+    if (image) drawImage();
   });
 
   /* ================================
-     MODE BUTTONS
+     MODE
   ================================= */
 
-  drawBtn.addEventListener("click", function() {
+  drawBtn.addEventListener("click", function () {
     mode = "draw";
     maskCanvas.style.cursor = image ? "crosshair" : "default";
   });
 
-  moveBtn.addEventListener("click", function() {
+  moveBtn.addEventListener("click", function () {
     mode = "move";
     maskCanvas.style.cursor = image ? "grab" : "default";
   });
