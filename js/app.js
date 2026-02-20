@@ -10,8 +10,8 @@ const baseCtx = baseCanvas.getContext("2d");
 const maskCtx = maskCanvas.getContext("2d");
 const blurCtx = blurCanvas.getContext("2d");
 
-const canvasContainer = document.getElementById("canvasContainer");
-const canvasOverlay = document.getElementById("canvasOverlay");
+const container = document.getElementById("canvasContainer");
+const overlay = document.getElementById("canvasOverlay");
 const photoInput = document.getElementById("photoInput");
 
 window.addEventListener("load", () => {
@@ -28,57 +28,54 @@ photoInput.addEventListener("change", () => {
 
     img.onload = () => {
 
-      const containerWidth = canvasContainer.clientWidth;
-      const containerHeight = canvasContainer.clientHeight;
+      const containerW = container.clientWidth;
+      const containerH = container.clientHeight;
 
-      /* =============================
-         BLUR BACKGROUND (COVER)
-      ============================= */
+      /* ---------- BLUR (COVER) ---------- */
 
-      blurCanvas.width = containerWidth;
-      blurCanvas.height = containerHeight;
+      blurCanvas.width = containerW;
+      blurCanvas.height = containerH;
 
       const coverScale = Math.max(
-        containerWidth / img.width,
-        containerHeight / img.height
+        containerW / img.width,
+        containerH / img.height
       );
 
-      const coverWidth = img.width * coverScale;
-      const coverHeight = img.height * coverScale;
+      const coverW = img.width * coverScale;
+      const coverH = img.height * coverScale;
 
-      const coverX = (containerWidth - coverWidth) / 2;
-      const coverY = (containerHeight - coverHeight) / 2;
+      const coverX = (containerW - coverW) / 2;
+      const coverY = (containerH - coverH) / 2;
 
-      blurCtx.clearRect(0, 0, containerWidth, containerHeight);
-      blurCtx.drawImage(img, coverX, coverY, coverWidth, coverHeight);
+      blurCtx.clearRect(0, 0, containerW, containerH);
+      blurCtx.drawImage(img, coverX, coverY, coverW, coverH);
 
-      /* =============================
-         MAIN IMAGE (FIT + CENTER)
-      ============================= */
+      /* ---------- MAIN IMAGE (FIT) ---------- */
 
       const fitScale = Math.min(
-        containerWidth / img.width,
-        containerHeight / img.height,
+        containerW / img.width,
+        containerH / img.height,
         1
       );
 
-      const scaledWidth = Math.floor(img.width * fitScale);
-      const scaledHeight = Math.floor(img.height * fitScale);
+      const scaledW = Math.floor(img.width * fitScale);
+      const scaledH = Math.floor(img.height * fitScale);
 
-      baseCanvas.width = scaledWidth;
-      baseCanvas.height = scaledHeight;
+      baseCanvas.width = scaledW;
+      baseCanvas.height = scaledH;
 
-      maskCanvas.width = scaledWidth;
-      maskCanvas.height = scaledHeight;
+      maskCanvas.width = scaledW;
+      maskCanvas.height = scaledH;
 
-      baseCtx.clearRect(0, 0, scaledWidth, scaledHeight);
-      baseCtx.drawImage(img, 0, 0, scaledWidth, scaledHeight);
-      maskCtx.clearRect(0, 0, scaledWidth, scaledHeight);
+      baseCtx.clearRect(0, 0, scaledW, scaledH);
+      baseCtx.drawImage(img, 0, 0, scaledW, scaledH);
 
-      /* Proper centering via absolute positioning */
+      maskCtx.clearRect(0, 0, scaledW, scaledH);
 
-      const offsetX = (containerWidth - scaledWidth) / 2;
-      const offsetY = (containerHeight - scaledHeight) / 2;
+      /* ---------- CENTERING ---------- */
+
+      const offsetX = Math.floor((containerW - scaledW) / 2);
+      const offsetY = Math.floor((containerH - scaledH) / 2);
 
       baseCanvas.style.left = offsetX + "px";
       baseCanvas.style.top = offsetY + "px";
@@ -86,7 +83,7 @@ photoInput.addEventListener("change", () => {
       maskCanvas.style.left = offsetX + "px";
       maskCanvas.style.top = offsetY + "px";
 
-      canvasOverlay.classList.add("hidden");
+      overlay.classList.add("hidden");
     };
 
     img.src = e.target.result;
