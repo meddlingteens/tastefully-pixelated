@@ -1,10 +1,8 @@
+document.addEventListener("DOMContentLoaded", () => {
+
 /* ==========================================
    Tastefully Pixelated
    Advanced Stable Build
-   - Non-destructive apply
-   - Undo + Redo
-   - Touch support
-   - Scale-to-fit image loading
 ========================================== */
 
 const state = {
@@ -74,11 +72,18 @@ const bannerHeadlines = [
   "Sell stuff here, bitches"
 ];
 
-document.getElementById("subhead").textContent =
-  subheads[Math.floor(Math.random() * subheads.length)];
+const subheadEl = document.getElementById("subhead");
+const bannerHeadlineEl = document.getElementById("bannerHeadline");
 
-document.getElementById("bannerHeadline").textContent =
-  bannerHeadlines[Math.floor(Math.random() * bannerHeadlines.length)];
+if (subheadEl) {
+  subheadEl.textContent =
+    subheads[Math.floor(Math.random() * subheads.length)];
+}
+
+if (bannerHeadlineEl) {
+  bannerHeadlineEl.textContent =
+    bannerHeadlines[Math.floor(Math.random() * bannerHeadlines.length)];
+}
 
 /* =========================
    INITIAL STATE
@@ -88,7 +93,7 @@ toggleControls(false);
 setActiveMode("draw");
 
 /* =========================
-   IMAGE LOADING (SCALE TO FIT)
+   IMAGE LOADING
 ========================= */
 
 canvasOverlay.addEventListener("click", () => photoInput.click());
@@ -116,7 +121,6 @@ photoInput.addEventListener("change", () => {
       baseCanvas.width = maskCanvas.width = w;
       baseCanvas.height = maskCanvas.height = h;
 
-      baseCtx.clearRect(0,0,w,h);
       baseCtx.drawImage(img, 0, 0, w, h);
 
       state.originalImageData =
@@ -174,189 +178,6 @@ drawBtn.onclick = () => setActiveMode("draw");
 moveBtn.onclick = () => setActiveMode("move");
 
 /* =========================
-   DRAW + TOUCH SUPPORT
-========================= */
-
-let drawing = false;
-let isPanning = false;
-let startX = 0;
-let startY = 0;
-
-function getCoords(e) {
-  const rect = maskCanvas.getBoundingClientRect();
-  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
-  return {
-    x: (clientX - rect.left - state.offsetX) / state.zoom,
-    y: (clientY - rect.top - state.offsetY) / state.zoom
-  };
-}
-
-function start(e) {
-  if (state.mode === "draw") {
-    drawing = true;
-    saveHistory();
-    draw(e);
-  } else if (state.mode === "move") {
-    isPanning = true;
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    startX = clientX - state.offsetX;
-    startY = clientY - state.offsetY;
-  }
-}
-
-function draw(e) {
-  if (!drawing) return;
-  const { x, y } = getCoords(e);
-  maskCtx.fillStyle = "white";
-  maskCtx.beginPath();
-  maskCtx.arc(x, y, state.brushSize, 0, Math.PI * 2);
-  maskCtx.fill();
-}
-
-function move(e) {
-  if (drawing) draw(e);
-
-  if (isPanning) {
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    state.offsetX = clientX - startX;
-    state.offsetY = clientY - startY;
-    applyTransform();
-  }
-}
-
-function stop() {
-  drawing = false;
-  isPanning = false;
-}
-
-maskCanvas.addEventListener("mousedown", start);
-maskCanvas.addEventListener("mousemove", move);
-window.addEventListener("mouseup", stop);
-
-maskCanvas.addEventListener("touchstart", start, { passive: false });
-maskCanvas.addEventListener("touchmove", move, { passive: false });
-window.addEventListener("touchend", stop);
-
-/* =========================
-   UNDO / REDO
-========================= */
-
-function saveHistory() {
-  state.history.push(
-    maskCtx.getImageData(0,0,maskCanvas.width,maskCanvas.height)
-  );
-  state.redoStack = [];
-  if (state.history.length > 30) state.history.shift();
-}
-
-undoBtn.onclick = () => {
-  if (!state.history.length) return;
-  state.redoStack.push(
-    maskCtx.getImageData(0,0,maskCanvas.width,maskCanvas.height)
-  );
-  maskCtx.putImageData(state.history.pop(),0,0);
-};
-
-document.addEventListener("keydown", e => {
-  if (e.metaKey && e.key === "z") undoBtn.click();
-  if (e.metaKey && e.key === "y" && state.redoStack.length) {
-    state.history.push(
-      maskCtx.getImageData(0,0,maskCanvas.width,maskCanvas.height)
-    );
-    maskCtx.putImageData(state.redoStack.pop(),0,0);
-  }
-});
-
-/* =========================
-   APPLY (NON-DESTRUCTIVE)
-========================= */
-
-applyBtn.onclick = () => {
-
-  if (!state.originalImageData) return;
-
-  baseCtx.putImageData(state.originalImageData, 0, 0);
-
-  const w = baseCanvas.width;
-  const h = baseCanvas.height;
-
-  const imgData = baseCtx.getImageData(0,0,w,h);
-  const maskData = maskCtx.getImageData(0,0,w,h);
-
-  const block = state.pixelSize;
-
-  for (let y = 0; y < h; y += block) {
-    for (let x = 0; x < w; x += block) {
-
-      let masked = false;
-      for (let yy = y; yy < y + block && yy < h; yy++) {
-        for (let xx = x; xx < x + block && xx < w; xx++) {
-          if (maskData.data[(yy*w+xx)*4+3] > 0) {
-            masked = true;
-            break;
-          }
-        }
-        if (masked) break;
-      }
-
-      if (!masked) continue;
-
-      let r=0,g=0,b=0,count=0;
-
-      for (let yy = y; yy < y + block && yy < h; yy++) {
-        for (let xx = x; xx < x + block && xx < w; xx++) {
-          const i = (yy*w+xx)*4;
-          r+=imgData.data[i];
-          g+=imgData.data[i+1];
-          b+=imgData.data[i+2];
-          count++;
-        }
-      }
-
-      r/=count; g/=count; b/=count;
-
-      for (let yy = y; yy < y + block && yy < h; yy++) {
-        for (let xx = x; xx < x + block && xx < w; xx++) {
-          const i = (yy*w+xx)*4;
-          if (maskData.data[i+3] > 0) {
-            imgData.data[i]=r;
-            imgData.data[i+1]=g;
-            imgData.data[i+2]=b;
-          }
-        }
-      }
-    }
-  }
-
-  baseCtx.putImageData(imgData,0,0);
-  maskCtx.clearRect(0,0,w,h);
-};
-
-/* =========================
-   EXPORT / SHARE
-========================= */
-
-exportBtn.onclick = () => {
-  const link = document.createElement("a");
-  link.download = "tastefully-pixelated.png";
-  link.href = baseCanvas.toDataURL();
-  link.click();
-};
-
-shareBtn.onclick = async () => {
-  if (navigator.share) {
-    baseCanvas.toBlob(async blob => {
-      const file = new File([blob], "pixelated.png", { type: "image/png" });
-      await navigator.share({ files: [file] });
-    });
-  }
-};
-
-/* =========================
    CONTROL TOGGLE
 ========================= */
 
@@ -364,3 +185,5 @@ function toggleControls(enabled) {
   [drawBtn, moveBtn, undoBtn, applyBtn, restoreBtn, exportBtn, shareBtn]
     .forEach(btn => btn.disabled = !enabled);
 }
+
+});
