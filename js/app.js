@@ -1,20 +1,17 @@
 /* ==========================================
    Tastefully Pixelated
-   Stable Build
-   Subheads + Banner + Core Functionality
+   Stable Build – Bug Fix + UX Upgrade
 ========================================== */
-
-/* =========================
-   STATE
-========================= */
 
 const state = {
   mode: "draw",
   brushSize: 25,
+  pixelSize: 12,
   zoom: 1,
   offsetX: 0,
   offsetY: 0,
-  history: []
+  history: [],
+  imageLoaded: false
 };
 
 /* =========================
@@ -33,6 +30,7 @@ const photoInput = document.getElementById("photoInput");
 
 const brushSlider = document.getElementById("brushSlider");
 const zoomSlider = document.getElementById("zoomSlider");
+const pixelSlider = document.getElementById("pixelSlider");
 
 const drawBtn = document.getElementById("drawBtn");
 const moveBtn = document.getElementById("moveBtn");
@@ -43,69 +41,26 @@ const exportBtn = document.getElementById("exportBtn");
 const shareBtn = document.getElementById("shareBtn");
 
 /* =========================
-   RANDOM SUBHEADS
+   INITIAL STATE
 ========================= */
 
-const subheads = [
-  "Just, eeuuuuu.",
-  "Ain't no one wanna see that.",
-  "Hide your shame.",
-  "Seriously, that's gross.",
-  "I can't unsee that.",
-  "WTF?",
-  "Place a pixel where the good lord split yea.",
-  "Leave everything for your imagination.",
-  "Uh, really?",
-  "Yeah, nah, yeah, nah, nah, nah.",
-  "I think I just puked a little in my mouth.",
-  "Don't be fickle, apply a pixel."
-];
-
-const subheadEl = document.getElementById("subhead");
-if (subheadEl) {
-  subheadEl.textContent =
-    subheads[Math.floor(Math.random() * subheads.length)];
-}
+toggleControls(false);
 
 /* =========================
-   RANDOM BANNER HEADLINES
+   TRANSFORM
 ========================= */
 
-const bannerHeadlines = [
-  "Buy something you really don't need",
-  "Shop mofo. Buy, buy, buy",
-  "This is where you can advertise your useless crap",
-  "What the world really needs is more advertising",
-  "Wanna buy one of those endlessly spinning top things?",
-  "Sell stuff here, bitches"
-];
-
-const bannerHeadlineEl = document.getElementById("bannerHeadline");
-if (bannerHeadlineEl) {
-  bannerHeadlineEl.textContent =
-    bannerHeadlines[Math.floor(Math.random() * bannerHeadlines.length)];
+function applyTransform() {
+  const t = `translate(${state.offsetX}px, ${state.offsetY}px) scale(${state.zoom})`;
+  baseCanvas.style.transform = t;
+  maskCanvas.style.transform = t;
 }
-
-/* =========================
-   CANVAS SETUP
-========================= */
-
-function resizeCanvas() {
-  const rect = canvasContainer.getBoundingClientRect();
-  baseCanvas.width = rect.width;
-  baseCanvas.height = rect.height;
-  maskCanvas.width = rect.width;
-  maskCanvas.height = rect.height;
-}
-
-resizeCanvas();
-window.addEventListener("resize", resizeCanvas);
 
 /* =========================
    IMAGE LOADING
 ========================= */
 
-canvasContainer.addEventListener("click", () => {
+canvasOverlay.addEventListener("click", () => {
   photoInput.click();
 });
 
@@ -121,25 +76,19 @@ photoInput.addEventListener("change", () => {
   reader.onload = function(e) {
     const img = new Image();
     img.onload = () => {
-      resizeCanvas();
 
-      const scale = Math.min(
-        baseCanvas.width / img.width,
-        baseCanvas.height / img.height
-      );
+      baseCanvas.width = maskCanvas.width = img.width;
+      baseCanvas.height = maskCanvas.height = img.height;
 
-      const w = img.width * scale;
-      const h = img.height * scale;
+      baseCtx.clearRect(0,0,img.width,img.height);
+      baseCtx.drawImage(img, 0, 0);
 
-      const x = (baseCanvas.width - w) / 2;
-      const y = (baseCanvas.height - h) / 2;
-
-      baseCtx.clearRect(0,0,baseCanvas.width,baseCanvas.height);
-      baseCtx.drawImage(img, x, y, w, h);
-
-      maskCtx.clearRect(0,0,maskCanvas.width,maskCanvas.height);
+      maskCtx.clearRect(0,0,img.width,img.height);
 
       canvasOverlay.classList.add("hidden");
+
+      state.imageLoaded = true;
+      toggleControls(true);
     };
     img.src = e.target.result;
   };
@@ -147,12 +96,38 @@ photoInput.addEventListener("change", () => {
 });
 
 /* =========================
-   BRUSH SIZE
+   SLIDERS
 ========================= */
 
 brushSlider.addEventListener("input", () => {
   state.brushSize = parseInt(brushSlider.value);
 });
+
+zoomSlider.addEventListener("input", () => {
+  state.zoom = parseFloat(zoomSlider.value);
+  applyTransform();
+});
+
+pixelSlider.addEventListener("input", () => {
+  state.pixelSize = parseInt(pixelSlider.value);
+});
+
+/* =========================
+   MODE SWITCH
+========================= */
+
+function setActiveMode(mode) {
+  state.mode = mode;
+
+  drawBtn.classList.remove("active");
+  moveBtn.classList.remove("active");
+
+  if (mode === "draw") drawBtn.classList.add("active");
+  if (mode === "move") moveBtn.classList.add("active");
+}
+
+drawBtn.onclick = () => setActiveMode("draw");
+moveBtn.onclick = () => setActiveMode("move");
 
 /* =========================
    DRAWING
@@ -189,26 +164,32 @@ function stopDraw() {
 }
 
 /* =========================
-   ZOOM
+   MOVE (PAN)
 ========================= */
 
-zoomSlider.addEventListener("input", () => {
-  state.zoom = parseFloat(zoomSlider.value);
+let isPanning = false;
+let startX = 0;
+let startY = 0;
+
+maskCanvas.addEventListener("mousedown", e => {
+  if (state.mode !== "move") return;
+
+  isPanning = true;
+  startX = e.clientX - state.offsetX;
+  startY = e.clientY - state.offsetY;
+});
+
+window.addEventListener("mousemove", e => {
+  if (!isPanning) return;
+
+  state.offsetX = e.clientX - startX;
+  state.offsetY = e.clientY - startY;
   applyTransform();
 });
 
-function applyTransform() {
-  const t = `translate(${state.offsetX}px, ${state.offsetY}px) scale(${state.zoom})`;
-  baseCanvas.style.transform = t;
-  maskCanvas.style.transform = t;
-}
-
-/* =========================
-   MODE SWITCH
-========================= */
-
-drawBtn.onclick = () => state.mode = "draw";
-moveBtn.onclick = () => state.mode = "move";
+window.addEventListener("mouseup", () => {
+  isPanning = false;
+});
 
 /* =========================
    UNDO
@@ -218,6 +199,7 @@ function saveHistory() {
   state.history.push(
     maskCtx.getImageData(0,0,maskCanvas.width,maskCanvas.height)
   );
+  if (state.history.length > 30) state.history.shift();
 }
 
 undoBtn.onclick = () => {
@@ -230,46 +212,47 @@ undoBtn.onclick = () => {
 ========================= */
 
 applyBtn.onclick = () => {
-  const pixelSize = 12;
+
+  const maskData = maskCtx.getImageData(0,0,maskCanvas.width,maskCanvas.height);
+  const hasMask = maskData.data.some((v,i)=> i%4===3 && v>0);
+  if (!hasMask) return;
+
+  baseCtx.imageSmoothingEnabled = false;
+
+  const pixelSize = state.pixelSize;
 
   const imgData = baseCtx.getImageData(0,0,baseCanvas.width,baseCanvas.height);
-  const maskData = maskCtx.getImageData(0,0,maskCanvas.width,maskCanvas.height);
 
   for (let y = 0; y < baseCanvas.height; y += pixelSize) {
     for (let x = 0; x < baseCanvas.width; x += pixelSize) {
 
       const i = (y * baseCanvas.width + x) * 4;
+      if (maskData.data[i+3] === 0) continue;
 
-      if (maskData.data[i+3] > 0) {
+      let r=0,g=0,b=0,count=0;
 
-        let r=0,g=0,b=0,count=0;
-
-        for (let yy=0; yy<pixelSize; yy++) {
-          for (let xx=0; xx<pixelSize; xx++) {
-
-            const px = x+xx;
-            const py = y+yy;
-            if (px>=baseCanvas.width || py>=baseCanvas.height) continue;
-
-            const idx = (py * baseCanvas.width + px) * 4;
-
-            r += imgData.data[idx];
-            g += imgData.data[idx+1];
-            b += imgData.data[idx+2];
-            count++;
-          }
+      for (let yy=0; yy<pixelSize; yy++) {
+        for (let xx=0; xx<pixelSize; xx++) {
+          const px = x+xx;
+          const py = y+yy;
+          if (px>=baseCanvas.width || py>=baseCanvas.height) continue;
+          const idx = (py * baseCanvas.width + px) * 4;
+          r+=imgData.data[idx];
+          g+=imgData.data[idx+1];
+          b+=imgData.data[idx+2];
+          count++;
         }
+      }
 
-        r/=count; g/=count; b/=count;
+      r/=count; g/=count; b/=count;
 
-        for (let yy=0; yy<pixelSize; yy++) {
-          for (let xx=0; xx<pixelSize; xx++) {
-
-            const px = x+xx;
-            const py = y+yy;
-            if (px>=baseCanvas.width || py>=baseCanvas.height) continue;
-
-            const idx = (py * baseCanvas.width + px) * 4;
+      for (let yy=0; yy<pixelSize; yy++) {
+        for (let xx=0; xx<pixelSize; xx++) {
+          const px = x+xx;
+          const py = y+yy;
+          if (px>=baseCanvas.width || py>=baseCanvas.height) continue;
+          const idx = (py * baseCanvas.width + px) * 4;
+          if (maskData.data[idx+3] > 0) {
             imgData.data[idx]=r;
             imgData.data[idx+1]=g;
             imgData.data[idx+2]=b;
@@ -284,14 +267,10 @@ applyBtn.onclick = () => {
 };
 
 /* =========================
-   RESTORE
+   RESTORE / EXPORT / SHARE
 ========================= */
 
 restoreBtn.onclick = () => location.reload();
-
-/* =========================
-   EXPORT
-========================= */
 
 exportBtn.onclick = () => {
   const link = document.createElement("a");
@@ -299,10 +278,6 @@ exportBtn.onclick = () => {
   link.href = baseCanvas.toDataURL();
   link.click();
 };
-
-/* =========================
-   SHARE
-========================= */
 
 shareBtn.onclick = async () => {
   if (navigator.share) {
@@ -314,3 +289,12 @@ shareBtn.onclick = async () => {
     alert("Sharing not supported on this device.");
   }
 };
+
+/* =========================
+   CONTROL TOGGLE
+========================= */
+
+function toggleControls(enabled) {
+  [drawBtn, moveBtn, undoBtn, applyBtn, restoreBtn, exportBtn, shareBtn]
+    .forEach(btn => btn.disabled = !enabled);
+}
