@@ -14,20 +14,20 @@ body {
   justify-content: center;
   align-items: flex-start;
   padding: 30px 0;
+  color: white;
 }
 
 /* ================================
-   APP CONTAINER (75% SCALE)
+   APP CONTAINER (75% SIZE)
 ================================ */
 
 .app {
-  width: 750px; /* Previously ~1000px */
+  width: 750px;
   background: rgba(20, 20, 20, 0.85);
   backdrop-filter: blur(6px);
   border-radius: 18px;
   padding: 24px;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
-  color: white;
 }
 
 /* ================================
@@ -73,7 +73,7 @@ body {
 
 .banner-spinner img {
   width: 22px;
-  opacity: 0.8;
+  opacity: 0.85;
 }
 
 .spend-btn {
@@ -170,13 +170,9 @@ input[type="range"] {
   background: rgba(255, 255, 255, 0.08);
   color: white;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: background 0.15s ease;
 }
 
 .button-row button:hover {
   background: rgba(255, 255, 255, 0.15);
-}
-
-.button-row button:active {
-  transform: translateY(1px);
 }
