@@ -1,5 +1,5 @@
 /* =========================
-   Base + Pixel Background
+   Base Pixel Background
 ========================= */
 
 * {
@@ -12,23 +12,27 @@ html, body {
   font-family: system-ui, -apple-system, sans-serif;
   min-height: 100vh;
 
-  /* Pixelated gradient background */
-  background-image:
-    linear-gradient(135deg, #1a1530 25%, transparent 25%),
-    linear-gradient(225deg, #1a1530 25%, transparent 25%),
-    linear-gradient(45deg, #1a1530 25%, transparent 25%),
-    linear-gradient(315deg, #1a1530 25%, #0f0d1a 25%);
-  background-position:
-    20px 0,
-    20px 0,
-    0 0,
-    0 0;
-  background-size: 40px 40px;
-  background-repeat: repeat;
+  /* Pixel-inspired layered background */
+  background:
+    linear-gradient(135deg, rgba(46,33,84,0.85), rgba(20,18,45,0.9)),
+    repeating-linear-gradient(
+      0deg,
+      rgba(120,90,255,0.06) 0px,
+      rgba(120,90,255,0.06) 40px,
+      rgba(40,30,70,0.08) 40px,
+      rgba(40,30,70,0.08) 80px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(90,140,255,0.05) 0px,
+      rgba(90,140,255,0.05) 40px,
+      rgba(30,24,60,0.07) 40px,
+      rgba(30,24,60,0.07) 80px
+    );
 
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start; /* allow top padding */
 }
 
 /* =========================
@@ -38,6 +42,10 @@ html, body {
 .app {
   width: 100%;
   max-width: 800px;
+
+  margin-top: 20px; /* 20px space above app */
+  margin-bottom: 40px;
+
   padding: 40px 24px 60px;
 
   background: linear-gradient(180deg, #0f0d1a, #151225);
@@ -154,15 +162,9 @@ html, body {
 
 @media (max-width: 768px) {
 
-  html, body {
-    align-items: flex-start;
-  }
-
   .app {
-    border-radius: 0;
-    border-left: none;
-    border-right: none;
-    border-top: none;
+    border-radius: 18px;
+    padding: 28px 18px 50px;
   }
 
   .app-title {
