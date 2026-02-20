@@ -61,34 +61,50 @@ body {
    BANNER
 ================================ */
 
+
+
 .banner {
   background: linear-gradient(135deg, #5c3b9c, #2e1c55);
   border-radius: 18px;
-  padding: 22px 24px;
+  padding: 22px 28px;
   margin-bottom: 28px;
 
-  border: 2px solid #c0c0c0;
+  border: 3px solid #c0c0c0;
 
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
+
+
+
+
 .banner-left {
   display: flex;
-  flex-direction: column;
+  align-items: center;   /* vertical centering */
+  gap: 16px;
 }
 
+
+
+
+
 .banner h2 {
-  margin: 0 0 10px 0;
+  margin: 0;
   font-size: 18px;
   font-weight: 600;
 }
 
 .banner-spinner img {
-  width: 55px;
-  margin-top: 6px;
+  width: 42px;
+  display: block;
 }
+
+
+
+
+
 
 .spend-btn {
   padding: 10px 20px;
