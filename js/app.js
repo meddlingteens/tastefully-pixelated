@@ -66,9 +66,10 @@ let pixelSize = parseInt(pixelSlider.value);
 let zoom = 1;
 let isDragging = false;
 let originalImageData = null;
+let imageLoaded = false;
 
 /* =============================
-   BRUSH CURSOR
+   CURSOR + BRUSH PREVIEW
 ============================= */
 
 const brushCursor = document.createElement("div");
@@ -90,9 +91,25 @@ function updateBrushCursor(x, y) {
   brushCursor.style.top  = (y - size/2) + "px";
 }
 
+function updateCursor() {
+
+  if (!imageLoaded) {
+    container.style.cursor = "pointer";
+    brushCursor.style.display = "none";
+    return;
+  }
+
+  if (mode === "draw") {
+    container.style.cursor = "none";
+  } else {
+    container.style.cursor = "grab";
+    brushCursor.style.display = "none";
+  }
+}
+
 container.addEventListener("mousemove", function (e) {
 
-  if (mode !== "draw") {
+  if (!imageLoaded || mode !== "draw") {
     brushCursor.style.display = "none";
     return;
   }
@@ -109,15 +126,12 @@ container.addEventListener("mousemove", function (e) {
 
 container.addEventListener("mouseleave", function () {
   brushCursor.style.display = "none";
+  container.style.cursor = "pointer";
 });
 
 /* =============================
-   MODE + CURSOR
+   MODE SWITCHING
 ============================= */
-
-function updateCursor() {
-  container.style.cursor = (mode === "draw") ? "none" : "grab";
-}
 
 drawBtn.addEventListener("click", function () {
   mode = "draw";
@@ -136,7 +150,7 @@ updateCursor();
 ============================= */
 
 maskCanvas.addEventListener("mousedown", function () {
-  if (mode !== "position") return;
+  if (!imageLoaded || mode !== "position") return;
   isDragging = true;
   container.style.cursor = "grabbing";
 });
@@ -229,6 +243,9 @@ photoInput.addEventListener("change", function () {
       maskCanvas.style.left = left + "px";
       maskCanvas.style.top  = top + "px";
 
+      imageLoaded = true;
+      updateCursor();
+
       overlay.classList.add("hidden");
     };
 
@@ -251,7 +268,7 @@ function paintMask(x,y){
 
 maskCanvas.addEventListener("mousemove", function (e) {
 
-  if (mode !== "draw" || e.buttons !== 1) return;
+  if (!imageLoaded || mode !== "draw" || e.buttons !== 1) return;
 
   const rect = maskCanvas.getBoundingClientRect();
 
