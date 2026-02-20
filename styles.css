@@ -16,11 +16,21 @@ body {
   font-family: system-ui, -apple-system, sans-serif;
   color: #ffffff;
 
-  background-image: url("./images/backgroundPixelsLarge.png");
-  background-size: cover;
-  background-position: center;
+  /* WebP background */
+  background-image: url("./images/backgroundPixelsLarge.webp");
+  background-size: 110%; /* Slight scale for parallax depth */
+  background-position: center 0px;
   background-repeat: no-repeat;
-  background-attachment: fixed;
+  background-attachment: scroll;
+
+  /* Premium fade-in */
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+/* Fade active */
+body.loaded {
+  opacity: 1;
 }
 
 /* Dark overlay */
@@ -57,9 +67,9 @@ body::before {
   border: 3px solid rgba(255,255,255,0.9);
   border-radius: 22px;
 
+  /* Reduced GPU-heavy shadow */
   box-shadow:
-    0 25px 70px rgba(0,0,0,0.6),
-    0 0 0 1px rgba(255,255,255,0.05) inset;
+    0 10px 30px rgba(0,0,0,0.35);
 }
 
 /* =========================
@@ -138,12 +148,10 @@ body::before {
   inset: 0;
   width: 100%;
   height: 100%;
-
-  /* 🔥 FIX: Prevent zoom drift */
   transform-origin: top left;
 }
 
-/* Overlay button */
+/* Overlay */
 
 .canvas-overlay {
   position: absolute;
@@ -169,7 +177,7 @@ body::before {
   background: linear-gradient(135deg,#6c5cff,#5e42ff);
   color: white;
 
-  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
   transition: transform 0.2s ease;
 }
 
@@ -214,27 +222,25 @@ body::before {
   color: white;
   cursor: pointer;
   transition: transform 0.2s ease;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
 }
 
 .button-row button:hover {
   transform: translateY(-2px);
 }
 
-/* Active tool highlight */
 .button-row button.active {
   outline: 2px solid white;
   transform: translateY(-2px);
 }
 
-/* Disabled state */
 button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   transform: none !important;
 }
 
-/* Color Treatments */
+/* Button Colors */
 
 #drawBtn { background: linear-gradient(135deg,#2f6df6,#1d4ed8); }
 #moveBtn { background: linear-gradient(135deg,#16c6d3,#0e7490); }
@@ -251,7 +257,7 @@ button:disabled {
 @media (max-width: 820px) {
 
   body {
-    background-attachment: scroll;
+    background-size: 130%;
   }
 
   .app {
@@ -260,9 +266,7 @@ button:disabled {
     max-width: 100%;
     margin: 0;
     border-radius: 0;
-    border-left: none;
-    border-right: none;
-    border-top: none;
+    border: none;
   }
 
   .canvas-container {
