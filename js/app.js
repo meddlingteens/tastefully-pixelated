@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
 
 /* =====================================================
-   ELEMENTS (UNCHANGED)
+   ELEMENTS
 ===================================================== */
 
 const baseCanvas = document.getElementById("baseCanvas");
@@ -36,13 +36,13 @@ const blurCtx = blurCanvas.getContext("2d");
 let mode = "draw";
 let brushSize = parseInt(brushSlider.value);
 let pixelSize = parseInt(pixelSlider.value);
-let zoom = parseFloat(zoomSlider.value);
+let zoom = 1;
 let isDragging = false;
 let undoStack = [];
 let originalImageData = null;
 
 /* =====================================================
-   RANDOM COPY (UNCHANGED)
+   RANDOM COPY (UNCHANGED UX)
 ===================================================== */
 
 const subheads = [
@@ -97,6 +97,8 @@ photoInput.addEventListener("change", () => {
       const cw = container.clientWidth;
       const ch = container.clientHeight;
 
+      /* ---- Blur Cover ---- */
+
       blurCanvas.width = cw;
       blurCanvas.height = ch;
 
@@ -113,6 +115,8 @@ photoInput.addEventListener("change", () => {
         coverH
       );
 
+      /* ---- Fit Main ---- */
+
       const fitScale = Math.min(cw/img.width, ch/img.height, 1);
       const w = Math.floor(img.width * fitScale);
       const h = Math.floor(img.height * fitScale);
@@ -128,6 +132,10 @@ photoInput.addEventListener("change", () => {
       baseCanvas.style.left = ((cw-w)/2)+"px";
       baseCanvas.style.top  = ((ch-h)/2)+"px";
 
+      baseCanvas.style.transformOrigin = "center center";
+      baseCanvas.style.transform = "scale(1)";
+      zoom = 1;
+
       overlay.classList.add("hidden");
     };
 
@@ -138,7 +146,7 @@ photoInput.addEventListener("change", () => {
 });
 
 /* =====================================================
-   DRAWING LOGIC
+   PIXELATE FUNCTION
 ===================================================== */
 
 function pixelate(x,y){
@@ -171,18 +179,19 @@ function pixelate(x,y){
   }
 }
 
+/* =====================================================
+   DRAW MODE
+===================================================== */
+
 baseCanvas.addEventListener("mousedown", e=>{
   if(mode!=="draw") return;
 
   undoStack.push(
-    baseCtx.getImageData(
-      0,0,
-      baseCanvas.width,
-      baseCanvas.height
-    )
+    baseCtx.getImageData(0,0,baseCanvas.width,baseCanvas.height)
   );
 
   const rect = baseCanvas.getBoundingClientRect();
+
   pixelate(
     (e.clientX-rect.left)/zoom,
     (e.clientY-rect.top)/zoom
@@ -193,6 +202,7 @@ baseCanvas.addEventListener("mousemove", e=>{
   if(e.buttons!==1 || mode!=="draw") return;
 
   const rect = baseCanvas.getBoundingClientRect();
+
   pixelate(
     (e.clientX-rect.left)/zoom,
     (e.clientY-rect.top)/zoom
@@ -230,9 +240,7 @@ moveBtn.addEventListener("click", ()=> mode="position");
 
 undoBtn.addEventListener("click", ()=>{
   if(!undoStack.length) return;
-  baseCtx.putImageData(
-    undoStack.pop(),0,0
-  );
+  baseCtx.putImageData(undoStack.pop(),0,0);
 });
 
 applyBtn.addEventListener("click", ()=>{
@@ -241,9 +249,7 @@ applyBtn.addEventListener("click", ()=>{
 
 restoreBtn.addEventListener("click", ()=>{
   if(originalImageData)
-    baseCtx.putImageData(
-      originalImageData,0,0
-    );
+    baseCtx.putImageData(originalImageData,0,0);
 });
 
 exportBtn.addEventListener("click", ()=>{
@@ -254,19 +260,19 @@ exportBtn.addEventListener("click", ()=>{
 });
 
 shareBtn.addEventListener("click", async ()=>{
-  if(navigator.share){
-    const blob = await (await fetch(
-      baseCanvas.toDataURL()
-    )).blob();
-    const file=new File(
-      [blob],
-      "pixelated.png",
-      {type:"image/png"}
-    );
-    navigator.share({
-      files:[file]
-    });
-  }
+  if(!navigator.share) return;
+
+  const blob = await (await fetch(
+    baseCanvas.toDataURL()
+  )).blob();
+
+  const file=new File(
+    [blob],
+    "pixelated.png",
+    {type:"image/png"}
+  );
+
+  navigator.share({ files:[file] });
 });
 
 /* =====================================================
@@ -280,9 +286,12 @@ pixelSlider.addEventListener("input",
   e=>pixelSize=parseInt(e.target.value));
 
 zoomSlider.addEventListener("input", e=>{
+
   zoom=parseFloat(e.target.value);
-  baseCanvas.style.transform=
-    `scale(${zoom})`;
+
+  baseCanvas.style.transformOrigin="center center";
+  baseCanvas.style.transform=`scale(${zoom})`;
+
 });
 
 });
