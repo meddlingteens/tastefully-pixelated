@@ -53,7 +53,6 @@ body.loaded {
   margin: 0 0 4px 0;
   font-size: 40px;
   font-weight: 700;
-  letter-spacing: -1px;
 }
 
 .subhead {
@@ -137,6 +136,7 @@ body.loaded {
   z-index: 0;
 }
 
+/* Main canvases */
 #baseCanvas,
 #maskCanvas {
   position: absolute;
@@ -144,40 +144,50 @@ body.loaded {
 }
 
 /* =========================
-   SLIDERS
+   CANVAS OVERLAY
 ========================= */
 
-.slider-group {
-  margin-bottom: 16px;
+.canvas-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 4;
 }
 
-.slider-group label {
-  display: block;
-  margin-bottom: 6px;
-  font-size: 14px;
-}
-
-input[type="range"] {
-  width: 100%;
-  height: 6px;
-  border-radius: 6px;
-  background: linear-gradient(90deg,#2f6df6,#3fa2ff);
-  appearance: none;
-  outline: none;
-}
-
-input[type="range"]::-webkit-slider-thumb {
-  appearance: none;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: white;
-  border: 2px solid #2f6df6;
-  cursor: pointer;
+.canvas-overlay.hidden {
+  display: none;
 }
 
 /* =========================
-   BUTTONS
+   PRIMARY BUTTON
+========================= */
+
+.primary-btn {
+  background: linear-gradient(135deg,#2f6df6,#1d4ed8);
+  color: #fff;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 18px;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 8px 22px rgba(0,0,0,0.35);
+  transition: all 0.2s ease;
+}
+
+.primary-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.45);
+}
+
+.primary-btn:active {
+  transform: translateY(0px);
+}
+
+/* =========================
+   BUTTON ROWS
 ========================= */
 
 .button-row {
@@ -196,16 +206,6 @@ input[type="range"]::-webkit-slider-thumb {
   transition: all 0.2s ease;
   color: #fff;
 }
-
-/* Gradients */
-
-#drawBtn { background: linear-gradient(135deg,#2f6df6,#1d4ed8); }
-#moveBtn { background: linear-gradient(135deg,#16c6d3,#0e7490); }
-#undoBtn { background: linear-gradient(135deg,#ffb547,#f59e0b); }
-#applyBtn { background: linear-gradient(135deg,#7c5cff,#5b3df0); }
-#restoreBtn { background: linear-gradient(135deg,#ff4d6d,#d90429); }
-#exportBtn { background: linear-gradient(135deg,#8b5cf6,#6d28d9); }
-#shareBtn { background: linear-gradient(135deg,#14b8a6,#0f766e); }
 
 .button-row button:hover {
   transform: translateY(-2px);
