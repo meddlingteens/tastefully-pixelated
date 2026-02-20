@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
 
   /* ================================
-     TEXT ROTATION (Subhead + Banner)
+     TEXT ROTATION
   ================================= */
 
   const subhead = document.getElementById("subhead");
@@ -19,8 +19,15 @@ document.addEventListener("DOMContentLoaded", function () {
     "What the world really needs is more advertising"
   ];
 
-  subhead.textContent = subheadLines[Math.floor(Math.random()*subheadLines.length)];
-  bannerHeadline.textContent = bannerLines[Math.floor(Math.random()*bannerLines.length)];
+  if (subhead) {
+    subhead.textContent =
+      subheadLines[Math.floor(Math.random() * subheadLines.length)];
+  }
+
+  if (bannerHeadline) {
+    bannerHeadline.textContent =
+      bannerLines[Math.floor(Math.random() * bannerLines.length)];
+  }
 
   /* ================================
      CANVAS SETUP
@@ -64,7 +71,7 @@ document.addEventListener("DOMContentLoaded", function () {
   let startX, startY;
 
   /* ================================
-     CANVAS RESIZE
+     RESIZE
   ================================= */
 
   function resizeCanvas() {
@@ -101,7 +108,8 @@ document.addEventListener("DOMContentLoaded", function () {
         zoomLevel = 1;
         zoomSlider.value = 1;
         drawImage();
-        originalImageData = baseCtx.getImageData(0,0,baseCanvas.width,baseCanvas.height);
+        originalImageData =
+          baseCtx.getImageData(0, 0, baseCanvas.width, baseCanvas.height);
       };
       image.src = evt.target.result;
     };
@@ -109,7 +117,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   function drawImage() {
-    baseCtx.clearRect(0,0,baseCanvas.width,baseCanvas.height);
+    baseCtx.clearRect(0, 0, baseCanvas.width, baseCanvas.height);
 
     const imgRatio = image.width / image.height;
     const canvasRatio = baseCanvas.width / baseCanvas.height;
@@ -124,40 +132,46 @@ document.addEventListener("DOMContentLoaded", function () {
       drawWidth = drawHeight * imgRatio;
     }
 
-    const x = (baseCanvas.width - drawWidth)/2 + offsetX;
-    const y = (baseCanvas.height - drawHeight)/2 + offsetY;
+    const x = (baseCanvas.width - drawWidth) / 2 + offsetX;
+    const y = (baseCanvas.height - drawHeight) / 2 + offsetY;
 
     baseCtx.drawImage(image, x, y, drawWidth, drawHeight);
   }
 
   /* ================================
-     BRUSH PREVIEW
+     BRUSH PREVIEW + DRAW
   ================================= */
 
-  maskCanvas.addEventListener("mousemove", function(e){
+  maskCanvas.addEventListener("mousemove", function(e) {
     if (!image) return;
 
     const rect = maskCanvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    maskCtx.clearRect(0,0,maskCanvas.width,maskCanvas.height);
+    maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
 
     maskCtx.beginPath();
-    maskCtx.arc(x, y, brushSize/2, 0, Math.PI*2);
+    maskCtx.arc(x, y, brushSize / 2, 0, Math.PI * 2);
     maskCtx.strokeStyle = "rgba(255,255,255,0.5)";
     maskCtx.lineWidth = 1;
     maskCtx.stroke();
 
     if (isDrawing && mode === "draw") {
       maskCtx.beginPath();
-      maskCtx.arc(x, y, brushSize/2, 0, Math.PI*2);
+      maskCtx.arc(x, y, brushSize / 2, 0, Math.PI * 2);
       maskCtx.fillStyle = "white";
       maskCtx.fill();
     }
+
+    if (isDrawing && mode === "move") {
+      offsetX = e.clientX - startX;
+      offsetY = e.clientY - startY;
+      drawImage();
+    }
   });
 
-  maskCanvas.addEventListener("mousedown", function(e){
+  maskCanvas.addEventListener("mousedown", function(e) {
     if (!image) return;
 
     if (mode === "draw") {
@@ -170,88 +184,89 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  maskCanvas.addEventListener("mouseup", function(){
+  maskCanvas.addEventListener("mouseup", function() {
     isDrawing = false;
     if (mode === "move") maskCanvas.style.cursor = "grab";
   });
 
-  maskCanvas.addEventListener("mouseleave", function(){
+  maskCanvas.addEventListener("mouseleave", function() {
     isDrawing = false;
-    maskCtx.clearRect(0,0,maskCanvas.width,maskCanvas.height);
-  });
-
-  maskCanvas.addEventListener("mousemove", function(e){
-    if (!image) return;
-    if (!isDrawing || mode !== "move") return;
-
-    offsetX = e.clientX - startX;
-    offsetY = e.clientY - startY;
-    drawImage();
+    maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
   });
 
   /* ================================
      APPLY PIXELATION
   ================================= */
 
-  applyBtn.addEventListener("click", function(){
+  applyBtn.addEventListener("click", function() {
     if (!image) return;
 
-    const maskData = maskCtx.getImageData(0,0,maskCanvas.width,maskCanvas.height);
-    const baseData = baseCtx.getImageData(0,0,baseCanvas.width,baseCanvas.height);
+    const maskData =
+      maskCtx.getImageData(0, 0, maskCanvas.width, maskCanvas.height);
+    const baseData =
+      baseCtx.getImageData(0, 0, baseCanvas.width, baseCanvas.height);
 
-    for (let y=0; y<baseCanvas.height; y+=pixelSize) {
-      for (let x=0; x<baseCanvas.width; x+=pixelSize) {
+    for (let y = 0; y < baseCanvas.height; y += pixelSize) {
+      for (let x = 0; x < baseCanvas.width; x += pixelSize) {
 
-        const i = (y*baseCanvas.width + x) * 4;
+        const i = (y * baseCanvas.width + x) * 4;
 
-        if (maskData.data[i+3] > 0) {
+        if (maskData.data[i + 3] > 0) {
 
-          let r=0,g=0,b=0,count=0;
+          let r = 0, g = 0, b = 0, count = 0;
 
-          for (let yy=0; yy<pixelSize; yy++){
-            for (let xx=0; xx<pixelSize; xx++){
-              const px = ((y+yy)*baseCanvas.width + (x+xx)) * 4;
+          for (let yy = 0; yy < pixelSize; yy++) {
+            for (let xx = 0; xx < pixelSize; xx++) {
+              const px = ((y + yy) * baseCanvas.width + (x + xx)) * 4;
               r += baseData.data[px];
-              g += baseData.data[px+1];
-              b += baseData.data[px+2];
+              g += baseData.data[px + 1];
+              b += baseData.data[px + 2];
               count++;
             }
           }
 
-          r/=count; g/=count; b/=count;
+          r /= count;
+          g /= count;
+          b /= count;
 
-          for (let yy=0; yy<pixelSize; yy++){
-            for (let xx=0; xx<pixelSize; xx++){
-              const px = ((y+yy)*baseCanvas.width + (x+xx)) * 4;
+          for (let yy = 0; yy < pixelSize; yy++) {
+            for (let xx = 0; xx < pixelSize; xx++) {
+              const px = ((y + yy) * baseCanvas.width + (x + xx)) * 4;
               baseData.data[px] = r;
-              baseData.data[px+1] = g;
-              baseData.data[px+2] = b;
+              baseData.data[px + 1] = g;
+              baseData.data[px + 2] = b;
             }
           }
         }
       }
     }
 
-    baseCtx.putImageData(baseData,0,0);
-    maskCtx.clearRect(0,0,maskCanvas.width,maskCanvas.height);
+    baseCtx.putImageData(baseData, 0, 0);
+    maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
   });
 
   /* ================================
-     REVERT BUTTON
+     REVERT BUTTON (UPDATED + SAFE)
   ================================= */
 
-  revertBtn.addEventListener("click", function(){
-    if (!originalImageData) return;
+  if (revertBtn) {
 
-    revertBtn.classList.add("active");
+    revertBtn.addEventListener("click", function() {
 
-    baseCtx.putImageData(originalImageData,0,0);
-    maskCtx.clearRect(0,0,maskCanvas.width,maskCanvas.height);
+      if (!originalImageData) return;
 
-    setTimeout(() => {
-      revertBtn.classList.remove("active");
-    }, 300);
-  });
+      revertBtn.classList.add("active");
+
+      baseCtx.putImageData(originalImageData, 0, 0);
+      maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+
+      setTimeout(() => {
+        revertBtn.classList.remove("active");
+      }, 300);
+
+    });
+
+  }
 
   /* ================================
      SLIDERS
@@ -274,12 +289,12 @@ document.addEventListener("DOMContentLoaded", function () {
      MODE BUTTONS
   ================================= */
 
-  drawBtn.addEventListener("click", function(){
+  drawBtn.addEventListener("click", function() {
     mode = "draw";
     maskCanvas.style.cursor = image ? "crosshair" : "default";
   });
 
-  moveBtn.addEventListener("click", function(){
+  moveBtn.addEventListener("click", function() {
     mode = "move";
     maskCanvas.style.cursor = image ? "grab" : "default";
   });
