@@ -1,76 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Tastefully Pixelated</title>
-<link rel="stylesheet" href="./styles.css?v=10" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tastefully Pixelated</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
-
 <body>
 
-<main class="app">
+<div class="app">
 
-  <div class="header">
-    <h1 class="app-title">Tastefully Pixelated</h1>
-    <p id="subhead" class="subhead"></p>
-  </div>
+  <h1 class="app-title">Tastefully Pixelated</h1>
+  <div id="subhead" class="subhead"></div>
 
   <!-- Banner -->
   <div class="banner">
-    <h2 id="bannerHeading">Buy something you really don't need</h2>
+    <h2 id="bannerHeadline"></h2>
     <div class="banner-spinner">
-      <img src="./images/spinner.png" alt="Spinner">
+      <img src="./images/spinner.png" alt="Spinner" />
     </div>
     <button class="spend-btn">Spend</button>
   </div>
 
-  <!-- Canvas -->
-  <div id="canvasContainer" class="canvas-container">
-
-    <div id="canvasOverlay" class="canvas-overlay">
-      <button id="canvasSelectBtn" class="primary-btn">
-        Select Photo
-      </button>
-    </div>
-
-    <input id="photoInput" type="file" hidden accept="image/*">
+  <!-- Workspace -->
+  <section class="canvas-container" id="canvasContainer">
 
     <canvas id="baseCanvas"></canvas>
     <canvas id="maskCanvas"></canvas>
 
+    <div id="canvasOverlay" class="canvas-overlay">
+      <button id="canvasSelectBtn" class="primary-btn">
+        Select photo
+      </button>
+    </div>
+
+    <input type="file" id="photoInput" accept="image/*" hidden />
+  </section>
+
+  <!-- Sliders -->
+  <div class="slider-group">
+    <label>Brush Size</label>
+    <input type="range" id="brushSlider" min="5" max="80" value="25" />
+  </div>
+
+  <div class="slider-group">
+    <label>Zoom</label>
+    <input type="range" id="zoomSlider" min="1" max="3" step="0.1" value="1" />
   </div>
 
   <!-- Controls -->
-  <div class="controls">
-
-    <div class="slider-group">
-      <label>Brush Size</label>
-      <input type="range" id="brushSize" min="5" max="100" value="30">
-    </div>
-
-    <div class="slider-group">
-      <label>Zoom</label>
-      <input type="range" id="zoomSlider" min="0.5" max="3" step="0.1" value="1">
-    </div>
-
-    <div class="button-row">
-      <button id="drawBtn">Draw</button>
-      <button id="moveBtn">Position</button>
-      <button id="undoBtn">Undo</button>
-    </div>
-
-    <div class="button-row">
-      <button id="applyBtn">Apply</button>
-      <button id="restoreBtn">Restore</button>
-      <button id="exportBtn">Export</button>
-      <button id="shareBtn">Share</button>
-    </div>
-
+  <div class="button-row">
+    <button id="drawBtn">Draw</button>
+    <button id="moveBtn">Position</button>
+    <button id="undoBtn">Undo</button>
   </div>
 
-</main>
+  <div class="button-row">
+    <button id="applyBtn">Apply</button>
+    <button id="restoreBtn">Restore</button>
+    <button id="exportBtn">Export</button>
+    <button id="shareBtn">Share</button>
+  </div>
 
-<script type="module" src="./js/app.js?v=10"></script>
+</div>
+
+<script src="app.js"></script>
 </body>
 </html>
