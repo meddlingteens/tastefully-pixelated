@@ -17,7 +17,6 @@ const bannerHeadlineEl = document.getElementById("bannerHeadline");
 
 const drawBtn = document.getElementById("drawBtn");
 const moveBtn = document.getElementById("moveBtn");
-const undoBtn = document.getElementById("undoBtn");
 const applyBtn = document.getElementById("applyBtn");
 const restoreBtn = document.getElementById("restoreBtn");
 const exportBtn = document.getElementById("exportBtn");
@@ -69,10 +68,9 @@ let pixelSize = parseInt(pixelSlider.value);
 let zoom = 1;
 let isDragging = false;
 let originalImageData = null;
-let maskUndoStack = [];
 
 /* =====================================================
-   BRUSH CURSOR PREVIEW
+   BRUSH CURSOR
 ===================================================== */
 
 const brushCursor = document.createElement("div");
@@ -81,7 +79,6 @@ brushCursor.style.pointerEvents = "none";
 brushCursor.style.border = "1px solid rgba(255,255,255,0.9)";
 brushCursor.style.background = "rgba(255,255,255,0.08)";
 brushCursor.style.borderRadius = "50%";
-brushCursor.style.boxShadow = "0 0 6px rgba(0,0,0,0.6)";
 brushCursor.style.zIndex = "20";
 brushCursor.style.display = "none";
 
@@ -117,14 +114,13 @@ container.addEventListener("mouseleave", () => {
 });
 
 /* =====================================================
-   MODE SWITCHING + CURSOR
+   MODE + CURSOR
 ===================================================== */
 
 function updateCursor() {
-
   if (mode === "draw") {
     container.style.cursor = "none";
-  } else if (mode === "position") {
+  } else {
     container.style.cursor = "grab";
   }
 }
@@ -154,7 +150,6 @@ maskCanvas.addEventListener("mousedown", () => {
 
 window.addEventListener("mouseup", () => {
   if (!isDragging) return;
-
   isDragging = false;
   if (mode === "position")
     container.style.cursor = "grab";
@@ -185,7 +180,7 @@ selectBtn.addEventListener("click", () => {
 });
 
 /* =====================================================
-   IMAGE LOAD (unchanged)
+   IMAGE LOAD
 ===================================================== */
 
 photoInput.addEventListener("change", () => {
@@ -251,8 +246,90 @@ photoInput.addEventListener("change", () => {
 });
 
 /* =====================================================
+   MASK PAINT
+===================================================== */
+
+function paintMask(x,y){
+  maskCtx.fillStyle = "rgba(255,0,0,0.4)";
+  maskCtx.beginPath();
+  maskCtx.arc(x,y,brushSize/2,0,Math.PI*2);
+  maskCtx.fill();
+}
+
+maskCanvas.addEventListener("mousemove", e=>{
+  if(e.buttons!==1 || mode!=="draw") return;
+
+  const rect = maskCanvas.getBoundingClientRect();
+
+  paintMask(
+    (e.clientX-rect.left)/zoom,
+    (e.clientY-rect.top)/zoom
+  );
+});
+
+/* =====================================================
+   APPLY
+===================================================== */
+
+applyBtn.addEventListener("click", ()=>{
+
+  const maskData =
+    maskCtx.getImageData(0,0,maskCanvas.width,maskCanvas.height);
+
+  const imgData =
+    baseCtx.getImageData(0,0,baseCanvas.width,baseCanvas.height);
+
+  for(let y=0; y<baseCanvas.height; y+=pixelSize){
+    for(let x=0; x<baseCanvas.width; x+=pixelSize){
+
+      const index = ((y*baseCanvas.width)+x)*4;
+
+      if(maskData.data[index+3] > 0){
+
+        const r = imgData.data[index];
+        const g = imgData.data[index+1];
+        const b = imgData.data[index+2];
+
+        baseCtx.fillStyle = `rgb(${r},${g},${b})`;
+        baseCtx.fillRect(x,y,pixelSize,pixelSize);
+      }
+    }
+  }
+
+  maskCtx.clearRect(0,0,maskCanvas.width,maskCanvas.height);
+});
+
+/* =====================================================
+   RESTORE
+===================================================== */
+
+restoreBtn.addEventListener("click", ()=>{
+  if(originalImageData)
+    baseCtx.putImageData(originalImageData,0,0);
+
+  maskCtx.clearRect(0,0,maskCanvas.width,maskCanvas.height);
+});
+
+/* =====================================================
+   EXPORT
+===================================================== */
+
+exportBtn.addEventListener("click", ()=>{
+  const link=document.createElement("a");
+  link.download="pixelated.png";
+  link.href=baseCanvas.toDataURL();
+  link.click();
+});
+
+/* =====================================================
    ZOOM
 ===================================================== */
+
+brushSlider.addEventListener("input",
+  e=>brushSize=parseInt(e.target.value));
+
+pixelSlider.addEventListener("input",
+  e=>pixelSize=parseInt(e.target.value));
 
 zoomSlider.addEventListener("input", e=>{
   zoom=parseFloat(e.target.value);
