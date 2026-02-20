@@ -13,7 +13,6 @@ html, body {
   min-height: 100vh;
   color: #ffffff;
 
-  /* Pixelated grid background */
   background:
     linear-gradient(135deg, #1b1538 0%, #120f25 100%),
     repeating-linear-gradient(
@@ -37,14 +36,12 @@ html, body {
 }
 
 /* =========================
-   APP CARD (HARD CONSTRAINED)
+   APP CARD
 ========================= */
 
 .app {
   width: 100%;
   max-width: 800px;
-  min-width: 0;
-
   margin: 20px auto 40px;
   padding: 40px 24px 60px;
 
@@ -73,13 +70,12 @@ html, body {
 }
 
 /* =========================
-   BANNER (WRAP SAFE)
+   BANNER
 ========================= */
 
 .banner {
   border: 2px solid rgba(255,255,255,0.6);
   border-radius: 16px;
-
   padding: 18px 24px;
   margin: 24px 0 30px;
 
@@ -88,11 +84,9 @@ html, body {
   gap: 24px;
 
   width: 100%;
-  max-width: 100%;
   overflow: hidden;
 }
 
-/* CRITICAL: prevent width expansion */
 .banner h2 {
   flex: 1 1 auto;
   min-width: 0;
@@ -107,17 +101,11 @@ html, body {
   overflow-wrap: break-word;
 }
 
-.banner-spinner {
-  flex: 0 0 auto;
-}
-
 .banner-spinner img {
   width: 70px;
 }
 
 .spend-btn {
-  flex: 0 0 auto;
-
   background: #ffffff;
   color: #241c48;
   border: none;
@@ -140,8 +128,40 @@ html, body {
   margin-bottom: 30px;
 }
 
+/* IMPORTANT FIX: FULL OVERLAY CENTERING */
+
+.canvas-overlay {
+  position: absolute;
+  inset: 0;                 /* ensures full coverage */
+  display: flex;
+  justify-content: center;  /* horizontal center */
+  align-items: center;      /* vertical center */
+  z-index: 10;
+}
+
+/* Hide overlay when image is loaded */
+.canvas-overlay.hidden {
+  display: none;
+}
+
+.primary-btn {
+  padding: 14px 28px;
+  border-radius: 16px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  background: linear-gradient(135deg,#6c5cff,#5e42ff);
+  color: white;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+  transition: transform 0.2s ease;
+}
+
+.primary-btn:hover {
+  transform: translateY(-2px);
+}
+
 /* =========================
-   BUTTON ROW (BEFORE STYLE)
+   BUTTON ROW
 ========================= */
 
 .button-row {
@@ -153,8 +173,6 @@ html, body {
 
 .button-row button {
   flex: 1 1 120px;
-  min-width: 0;
-
   padding: 12px 0;
   border-radius: 16px;
   border: none;
