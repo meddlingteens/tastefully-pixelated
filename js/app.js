@@ -1,8 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-/* =====================================================
+/* ================================
    ELEMENTS
-===================================================== */
+================================ */
 
 const baseCanvas = document.getElementById("baseCanvas");
 const maskCanvas = document.getElementById("maskCanvas");
@@ -20,7 +20,6 @@ const moveBtn = document.getElementById("moveBtn");
 const applyBtn = document.getElementById("applyBtn");
 const restoreBtn = document.getElementById("restoreBtn");
 const exportBtn = document.getElementById("exportBtn");
-const shareBtn = document.getElementById("shareBtn");
 
 const brushSlider = document.getElementById("brushSlider");
 const pixelSlider = document.getElementById("pixelSlider");
@@ -30,9 +29,9 @@ const baseCtx = baseCanvas.getContext("2d");
 const maskCtx = maskCanvas.getContext("2d");
 const blurCtx = blurCanvas.getContext("2d");
 
-/* =====================================================
+/* ================================
    RANDOM COPY
-===================================================== */
+================================ */
 
 const subheads = [
   "Just, eeuuuuu.",
@@ -58,9 +57,9 @@ if (bannerHeadlineEl)
   bannerHeadlineEl.textContent =
     bannerHeadlines[Math.floor(Math.random() * bannerHeadlines.length)];
 
-/* =====================================================
+/* ================================
    STATE
-===================================================== */
+================================ */
 
 let mode = "draw";
 let brushSize = parseInt(brushSlider.value);
@@ -69,9 +68,9 @@ let zoom = 1;
 let isDragging = false;
 let originalImageData = null;
 
-/* =====================================================
-   BRUSH CURSOR PREVIEW
-===================================================== */
+/* ================================
+   BRUSH CURSOR
+================================ */
 
 const brushCursor = document.createElement("div");
 brushCursor.style.position = "absolute";
@@ -79,7 +78,6 @@ brushCursor.style.pointerEvents = "none";
 brushCursor.style.border = "1px solid rgba(255,255,255,0.9)";
 brushCursor.style.background = "rgba(255,255,255,0.08)";
 brushCursor.style.borderRadius = "50%";
-brushCursor.style.boxShadow = "0 0 6px rgba(0,0,0,0.6)";
 brushCursor.style.zIndex = "20";
 brushCursor.style.display = "none";
 
@@ -103,7 +101,6 @@ container.addEventListener("mousemove", e => {
   brushCursor.style.display = "block";
 
   const rect = container.getBoundingClientRect();
-
   updateBrushCursor(
     e.clientX - rect.left,
     e.clientY - rect.top
@@ -114,16 +111,13 @@ container.addEventListener("mouseleave", () => {
   brushCursor.style.display = "none";
 });
 
-/* =====================================================
+/* ================================
    MODE + CURSOR
-===================================================== */
+================================ */
 
 function updateCursor() {
-  if (mode === "draw") {
-    container.style.cursor = "none";
-  } else {
-    container.style.cursor = "grab";
-  }
+  container.style.cursor =
+    mode === "draw" ? "none" : "grab";
 }
 
 drawBtn.addEventListener("click", () => {
@@ -138,9 +132,9 @@ moveBtn.addEventListener("click", () => {
 
 updateCursor();
 
-/* =====================================================
+/* ================================
    MOVE MODE
-===================================================== */
+================================ */
 
 maskCanvas.addEventListener("mousedown", () => {
   if (mode !== "position") return;
@@ -171,17 +165,17 @@ window.addEventListener("mousemove", e => {
     (parseFloat(maskCanvas.style.top) + e.movementY) + "px";
 });
 
-/* =====================================================
-   SELECT BUTTON
-===================================================== */
+/* ================================
+   SELECT PHOTO
+================================ */
 
 selectBtn.addEventListener("click", () => {
   photoInput.click();
 });
 
-/* =====================================================
+/* ================================
    IMAGE LOAD
-===================================================== */
+================================ */
 
 photoInput.addEventListener("change", () => {
 
@@ -245,9 +239,74 @@ photoInput.addEventListener("change", () => {
   reader.readAsDataURL(photoInput.files[0]);
 });
 
-/* =====================================================
-   ZOOM
-===================================================== */
+/* ================================
+   MASK PAINT
+================================ */
+
+function paintMask(x,y){
+  maskCtx.fillStyle = "rgba(255,0,0,0.4)";
+  maskCtx.beginPath();
+  maskCtx.arc(x,y,brushSize/2,0,Math.PI*2);
+  maskCtx.fill();
+}
+
+maskCanvas.addEventListener("mousemove", e=>{
+  if(e.buttons!==1 || mode!=="draw") return;
+
+  const rect = maskCanvas.getBoundingClientRect();
+
+  paintMask(
+    (e.clientX-rect.left)/zoom,
+    (e.clientY-rect.top)/zoom
+  );
+});
+
+/* ================================
+   APPLY PIXELATION
+================================ */
+
+applyBtn.addEventListener("click", ()=>{
+
+  const maskData =
+    maskCtx.getImageData(0,0,maskCanvas.width,maskCanvas.height);
+
+  const imgData =
+    baseCtx.getImageData(0,0,baseCanvas.width,baseCanvas.height);
+
+  for(let y=0; y<baseCanvas.height; y+=pixelSize){
+    for(let x=0; x<baseCanvas.width; x+=pixelSize){
+
+      const index = ((y*baseCanvas.width)+x)*4;
+
+      if(maskData.data[index+3] > 0){
+
+        const r = imgData.data[index];
+        const g = imgData.data[index+1];
+        const b = imgData.data[index+2];
+
+        baseCtx.fillStyle = `rgb(${r},${g},${b})`;
+        baseCtx.fillRect(x,y,pixelSize,pixelSize);
+      }
+    }
+  }
+
+  maskCtx.clearRect(0,0,maskCanvas.width,maskCanvas.height);
+});
+
+/* ================================
+   RESTORE
+================================ */
+
+restoreBtn.addEventListener("click", ()=>{
+  if(originalImageData)
+    baseCtx.putImageData(originalImageData,0,0);
+
+  maskCtx.clearRect(0,0,maskCanvas.width,maskCanvas.height);
+});
+
+/* ================================
+   SLIDERS
+================================ */
 
 brushSlider.addEventListener("input",
   e=>brushSize=parseInt(e.target.value));
