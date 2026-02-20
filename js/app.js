@@ -5,14 +5,12 @@ document.addEventListener("DOMContentLoaded", () => {
 ===================================================== */
 
 const baseCanvas = document.getElementById("baseCanvas");
+const maskCanvas = document.getElementById("maskCanvas");
 const blurCanvas = document.getElementById("blurCanvas");
 const container = document.getElementById("canvasContainer");
 const overlay = document.getElementById("canvasOverlay");
 const photoInput = document.getElementById("photoInput");
 const selectBtn = document.getElementById("canvasSelectBtn");
-
-const subheadEl = document.getElementById("subhead");
-const bannerHeadlineEl = document.getElementById("bannerHeadline");
 
 const drawBtn = document.getElementById("drawBtn");
 const moveBtn = document.getElementById("moveBtn");
@@ -20,13 +18,13 @@ const undoBtn = document.getElementById("undoBtn");
 const applyBtn = document.getElementById("applyBtn");
 const restoreBtn = document.getElementById("restoreBtn");
 const exportBtn = document.getElementById("exportBtn");
-const shareBtn = document.getElementById("shareBtn");
 
 const brushSlider = document.getElementById("brushSlider");
 const pixelSlider = document.getElementById("pixelSlider");
 const zoomSlider = document.getElementById("zoomSlider");
 
 const baseCtx = baseCanvas.getContext("2d");
+const maskCtx = maskCanvas.getContext("2d");
 const blurCtx = blurCanvas.getContext("2d");
 
 /* =====================================================
@@ -38,45 +36,16 @@ let brushSize = parseInt(brushSlider.value);
 let pixelSize = parseInt(pixelSlider.value);
 let zoom = 1;
 let isDragging = false;
-let undoStack = [];
 let originalImageData = null;
-
-/* =====================================================
-   RANDOM COPY (UNCHANGED UX)
-===================================================== */
-
-const subheads = [
-  "Just, eeuuuuu.",
-  "Ain't no one wanna see that.",
-  "Hide your shame.",
-  "Seriously, that's gross.",
-  "I can't unsee that.",
-  "Don't be fickle, apply a pixel."
-];
-
-const bannerHeadlines = [
-  "Buy something you really don't need",
-  "Shop mofo. Buy, buy, buy",
-  "This is where you can advertise your useless crap",
-  "What the world really needs is more advertising"
-];
-
-if (subheadEl)
-  subheadEl.textContent =
-    subheads[Math.floor(Math.random() * subheads.length)];
-
-if (bannerHeadlineEl)
-  bannerHeadlineEl.textContent =
-    bannerHeadlines[Math.floor(Math.random() * bannerHeadlines.length)];
+let maskUndoStack = [];
 
 /* =====================================================
    SELECT BUTTON
 ===================================================== */
 
-if (selectBtn)
-  selectBtn.addEventListener("click", () => {
-    photoInput.click();
-  });
+selectBtn.addEventListener("click", () => {
+  photoInput.click();
+});
 
 /* =====================================================
    IMAGE LOAD
@@ -97,7 +66,7 @@ photoInput.addEventListener("change", () => {
       const cw = container.clientWidth;
       const ch = container.clientHeight;
 
-      /* ---- Blur Cover ---- */
+      /* ---- Blur ---- */
 
       blurCanvas.width = cw;
       blurCanvas.height = ch;
@@ -106,7 +75,6 @@ photoInput.addEventListener("change", () => {
       const coverW = img.width * coverScale;
       const coverH = img.height * coverScale;
 
-      blurCtx.clearRect(0,0,cw,ch);
       blurCtx.drawImage(
         img,
         (cw-coverW)/2,
@@ -115,7 +83,7 @@ photoInput.addEventListener("change", () => {
         coverH
       );
 
-      /* ---- Fit Main ---- */
+      /* ---- Fit ---- */
 
       const fitScale = Math.min(cw/img.width, ch/img.height, 1);
       const w = Math.floor(img.width * fitScale);
@@ -123,18 +91,21 @@ photoInput.addEventListener("change", () => {
 
       baseCanvas.width = w;
       baseCanvas.height = h;
+      maskCanvas.width = w;
+      maskCanvas.height = h;
 
       baseCtx.drawImage(img,0,0,w,h);
 
       originalImageData =
         baseCtx.getImageData(0,0,w,h);
 
-      baseCanvas.style.left = ((cw-w)/2)+"px";
-      baseCanvas.style.top  = ((ch-h)/2)+"px";
+      const left = (cw-w)/2;
+      const top = (ch-h)/2;
 
-      baseCanvas.style.transformOrigin = "center center";
-      baseCanvas.style.transform = "scale(1)";
-      zoom = 1;
+      baseCanvas.style.left = left+"px";
+      baseCanvas.style.top  = top+"px";
+      maskCanvas.style.left = left+"px";
+      maskCanvas.style.top  = top+"px";
 
       overlay.classList.add("hidden");
     };
@@ -146,152 +117,139 @@ photoInput.addEventListener("change", () => {
 });
 
 /* =====================================================
-   PIXELATE FUNCTION
+   MASK PAINTING
 ===================================================== */
 
-function pixelate(x,y){
+function paintMask(x,y){
 
-  const size = brushSize;
-  const px = pixelSize;
-
-  const startX = x - size/2;
-  const startY = y - size/2;
-
-  const imgData =
-    baseCtx.getImageData(startX,startY,size,size);
-
-  for(let yy=0; yy<size; yy+=px){
-    for(let xx=0; xx<size; xx+=px){
-
-      const i = ((yy*size)+xx)*4;
-      const r = imgData.data[i];
-      const g = imgData.data[i+1];
-      const b = imgData.data[i+2];
-
-      baseCtx.fillStyle = `rgb(${r},${g},${b})`;
-      baseCtx.fillRect(
-        startX+xx,
-        startY+yy,
-        px,
-        px
-      );
-    }
-  }
+  maskCtx.fillStyle = "rgba(255,0,0,0.4)";
+  maskCtx.beginPath();
+  maskCtx.arc(x,y,brushSize/2,0,Math.PI*2);
+  maskCtx.fill();
 }
 
-/* =====================================================
-   DRAW MODE
-===================================================== */
-
-baseCanvas.addEventListener("mousedown", e=>{
+maskCanvas.addEventListener("mousedown", e=>{
   if(mode!=="draw") return;
 
-  undoStack.push(
-    baseCtx.getImageData(0,0,baseCanvas.width,baseCanvas.height)
+  maskUndoStack.push(
+    maskCtx.getImageData(0,0,maskCanvas.width,maskCanvas.height)
   );
 
-  const rect = baseCanvas.getBoundingClientRect();
+  const rect = maskCanvas.getBoundingClientRect();
 
-  pixelate(
+  paintMask(
     (e.clientX-rect.left)/zoom,
     (e.clientY-rect.top)/zoom
   );
 });
 
-baseCanvas.addEventListener("mousemove", e=>{
+maskCanvas.addEventListener("mousemove", e=>{
   if(e.buttons!==1 || mode!=="draw") return;
 
-  const rect = baseCanvas.getBoundingClientRect();
+  const rect = maskCanvas.getBoundingClientRect();
 
-  pixelate(
+  paintMask(
     (e.clientX-rect.left)/zoom,
     (e.clientY-rect.top)/zoom
   );
 });
 
 /* =====================================================
-   POSITION MODE
+   APPLY PIXELATION
 ===================================================== */
 
-baseCanvas.addEventListener("mousedown", ()=>{
-  if(mode==="position") isDragging=true;
-});
+applyBtn.addEventListener("click", ()=>{
 
-window.addEventListener("mouseup", ()=>{
-  isDragging=false;
-});
+  const maskData =
+    maskCtx.getImageData(
+      0,0,
+      maskCanvas.width,
+      maskCanvas.height
+    );
 
-window.addEventListener("mousemove", e=>{
-  if(!isDragging) return;
+  const imgData =
+    baseCtx.getImageData(
+      0,0,
+      baseCanvas.width,
+      baseCanvas.height
+    );
 
-  baseCanvas.style.left =
-    (parseFloat(baseCanvas.style.left)+e.movementX)+"px";
+  for(let y=0; y<baseCanvas.height; y+=pixelSize){
+    for(let x=0; x<baseCanvas.width; x+=pixelSize){
 
-  baseCanvas.style.top =
-    (parseFloat(baseCanvas.style.top)+e.movementY)+"px";
+      const index =
+        ((y*baseCanvas.width)+x)*4;
+
+      if(maskData.data[index+3] > 0){
+
+        const r = imgData.data[index];
+        const g = imgData.data[index+1];
+        const b = imgData.data[index+2];
+
+        baseCtx.fillStyle =
+          `rgb(${r},${g},${b})`;
+
+        baseCtx.fillRect(
+          x,y,
+          pixelSize,pixelSize
+        );
+      }
+    }
+  }
+
+  maskCtx.clearRect(
+    0,0,
+    maskCanvas.width,
+    maskCanvas.height
+  );
 });
 
 /* =====================================================
-   BUTTONS
+   RESTORE
 ===================================================== */
-
-drawBtn.addEventListener("click", ()=> mode="draw");
-moveBtn.addEventListener("click", ()=> mode="position");
-
-undoBtn.addEventListener("click", ()=>{
-  if(!undoStack.length) return;
-  baseCtx.putImageData(undoStack.pop(),0,0);
-});
-
-applyBtn.addEventListener("click", ()=>{
-  undoStack=[];
-});
 
 restoreBtn.addEventListener("click", ()=>{
   if(originalImageData)
-    baseCtx.putImageData(originalImageData,0,0);
-});
+    baseCtx.putImageData(
+      originalImageData,0,0
+    );
 
-exportBtn.addEventListener("click", ()=>{
-  const link=document.createElement("a");
-  link.download="pixelated.png";
-  link.href=baseCanvas.toDataURL();
-  link.click();
-});
-
-shareBtn.addEventListener("click", async ()=>{
-  if(!navigator.share) return;
-
-  const blob = await (await fetch(
-    baseCanvas.toDataURL()
-  )).blob();
-
-  const file=new File(
-    [blob],
-    "pixelated.png",
-    {type:"image/png"}
+  maskCtx.clearRect(
+    0,0,
+    maskCanvas.width,
+    maskCanvas.height
   );
-
-  navigator.share({ files:[file] });
 });
 
 /* =====================================================
-   SLIDERS
+   UNDO (MASK ONLY)
 ===================================================== */
 
-brushSlider.addEventListener("input",
-  e=>brushSize=parseInt(e.target.value));
+undoBtn.addEventListener("click", ()=>{
+  if(!maskUndoStack.length) return;
+  maskCtx.putImageData(
+    maskUndoStack.pop(),
+    0,0
+  );
+});
 
-pixelSlider.addEventListener("input",
-  e=>pixelSize=parseInt(e.target.value));
+/* =====================================================
+   MODE
+===================================================== */
+
+drawBtn.addEventListener("click", ()=>mode="draw");
+moveBtn.addEventListener("click", ()=>mode="position");
+
+/* =====================================================
+   ZOOM
+===================================================== */
 
 zoomSlider.addEventListener("input", e=>{
-
   zoom=parseFloat(e.target.value);
-
-  baseCanvas.style.transformOrigin="center center";
-  baseCanvas.style.transform=`scale(${zoom})`;
-
+  baseCanvas.style.transform =
+    `scale(${zoom})`;
+  maskCanvas.style.transform =
+    `scale(${zoom})`;
 });
 
 });
