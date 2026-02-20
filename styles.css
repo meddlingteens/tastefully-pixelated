@@ -1,43 +1,84 @@
-* { box-sizing: border-box; }
+/* =========================
+   Base + Pixel Background
+========================= */
+
+* {
+  box-sizing: border-box;
+}
 
 html, body {
   margin: 0;
   padding: 0;
   font-family: system-ui, -apple-system, sans-serif;
-  background: linear-gradient(180deg, #0f0d1a, #151225);
-  color: #f2f1f7;
+  min-height: 100vh;
+
+  /* Pixelated gradient background */
+  background-image:
+    linear-gradient(135deg, #1a1530 25%, transparent 25%),
+    linear-gradient(225deg, #1a1530 25%, transparent 25%),
+    linear-gradient(45deg, #1a1530 25%, transparent 25%),
+    linear-gradient(315deg, #1a1530 25%, #0f0d1a 25%);
+  background-position:
+    20px 0,
+    20px 0,
+    0 0,
+    0 0;
+  background-size: 40px 40px;
+  background-repeat: repeat;
+
   display: flex;
   justify-content: center;
+  align-items: center;
 }
+
+/* =========================
+   App Container Card
+========================= */
 
 .app {
   width: 100%;
   max-width: 800px;
-  padding: 40px 20px 60px;
+  padding: 40px 24px 60px;
+
+  background: linear-gradient(180deg, #0f0d1a, #151225);
+  border: 3px solid rgba(255,255,255,0.85);
+  border-radius: 22px;
+
+  box-shadow:
+    0 20px 60px rgba(0,0,0,0.6),
+    0 0 0 1px rgba(255,255,255,0.05) inset;
 }
 
-/* Header */
+/* =========================
+   Header
+========================= */
 
 .app-title {
-  font-size: 40px;
   margin: 0;
+  font-size: 40px;
+  font-weight: 700;
 }
 
 .subhead {
-  opacity: 0.8;
   margin-top: 6px;
+  font-size: 14px;
+  opacity: 0.8;
 }
 
-/* Banner */
+/* =========================
+   Banner
+========================= */
 
 .banner {
-  border: 2px solid rgba(255,255,255,0.5);
+  border: 2px solid rgba(255,255,255,0.6);
   border-radius: 16px;
   padding: 18px 24px;
   margin: 24px 0 30px;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 24px;
 }
 
 .banner h2 {
@@ -57,9 +98,12 @@ html, body {
   padding: 8px 18px;
   border-radius: 12px;
   font-weight: 600;
+  cursor: pointer;
 }
 
-/* Canvas */
+/* =========================
+   Canvas
+========================= */
 
 .canvas-container {
   position: relative;
@@ -70,38 +114,9 @@ html, body {
   margin-bottom: 30px;
 }
 
-.canvas-overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(10,8,20,0.6);
-}
-
-.primary-btn {
-  padding: 14px 28px;
-  border-radius: 14px;
-  border: none;
-  font-weight: 600;
-  cursor: pointer;
-  background: linear-gradient(135deg,#6c5cff,#5e42ff);
-  color: white;
-}
-
-/* Sliders */
-
-.slider-group {
-  margin-bottom: 18px;
-}
-
-.slider-group label {
-  display: block;
-  margin-bottom: 6px;
-  font-size: 14px;
-}
-
-/* BEFORE STYLE BUTTONS */
+/* =========================
+   Buttons (Before Style)
+========================= */
 
 .button-row {
   display: flex;
@@ -132,3 +147,44 @@ html, body {
 #restoreBtn { background: linear-gradient(135deg,#ff4d6d,#d90429); }
 #exportBtn { background: linear-gradient(135deg,#8b5cf6,#6d28d9); }
 #shareBtn { background: linear-gradient(135deg,#14b8a6,#0f766e); }
+
+/* =========================
+   Mobile
+========================= */
+
+@media (max-width: 768px) {
+
+  html, body {
+    align-items: flex-start;
+  }
+
+  .app {
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+  }
+
+  .app-title {
+    font-size: 30px;
+  }
+
+  .banner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .banner-spinner {
+    align-self: center;
+  }
+
+  .banner-spinner img {
+    width: 50px;
+  }
+
+  .button-row {
+    flex-direction: column;
+  }
+
+}
