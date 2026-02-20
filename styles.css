@@ -14,20 +14,20 @@ body {
   justify-content: center;
   align-items: flex-start;
   padding: 30px 0;
+  color: white;
 }
 
 /* ================================
-   APP CONTAINER (75% SCALE)
+   APP CONTAINER (75% SIZE)
 ================================ */
 
 .app {
-  width: 750px; /* Previously ~1000px */
+  width: 750px; /* ~75% previous size */
   background: rgba(20, 20, 20, 0.85);
   backdrop-filter: blur(6px);
   border-radius: 18px;
   padding: 24px;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
-  color: white;
 }
 
 /* ================================
@@ -73,7 +73,7 @@ body {
 
 .banner-spinner img {
   width: 22px;
-  opacity: 0.8;
+  opacity: 0.85;
 }
 
 .spend-btn {
@@ -150,6 +150,7 @@ canvas {
 
 input[type="range"] {
   width: 100%;
+  cursor: pointer;
 }
 
 /* ================================
@@ -170,13 +171,43 @@ input[type="range"] {
   background: rgba(255, 255, 255, 0.08);
   color: white;
   cursor: pointer;
-  transition: all 0.15s ease;
 }
 
-.button-row button:hover {
-  background: rgba(255, 255, 255, 0.15);
+/* ================================
+   BUTTON INTERACTIONS
+================================ */
+
+.button-row button,
+.primary-btn,
+.spend-btn {
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease,
+    filter 0.2s ease;
+
+  will-change: transform;
 }
 
-.button-row button:active {
+.button-row button:hover,
+.primary-btn:hover,
+.spend-btn:hover {
+
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 6px 18px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(255, 255, 255, 0.05),
+    0 0 12px rgba(255, 255, 255, 0.15);
+
+  filter: brightness(1.08);
+}
+
+.button-row button:active,
+.primary-btn:active,
+.spend-btn:active {
+
   transform: translateY(1px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
 }
