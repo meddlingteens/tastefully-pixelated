@@ -1,11 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-/* STATE */
-
-const state = {
-  imageLoaded: false
-};
-
 /* ELEMENTS */
 
 const baseCanvas = document.getElementById("baseCanvas");
@@ -17,10 +11,41 @@ const overlay = document.getElementById("canvasOverlay");
 const photoInput = document.getElementById("photoInput");
 const selectBtn = document.getElementById("canvasSelectBtn");
 
+const subheadEl = document.getElementById("subhead");
+const bannerHeadlineEl = document.getElementById("bannerHeadline");
+
 const baseCtx = baseCanvas.getContext("2d");
 const blurCtx = blurCanvas.getContext("2d");
 
-/* SELECT BUTTON FIX */
+/* RANDOM COPY */
+
+const subheads = [
+  "Just, eeuuuuu.",
+  "Ain't no one wanna see that.",
+  "Hide your shame.",
+  "Seriously, that's gross.",
+  "I can't unsee that.",
+  "Don't be fickle, apply a pixel."
+];
+
+const bannerHeadlines = [
+  "Buy something you really don't need",
+  "Shop mofo. Buy, buy, buy",
+  "This is where you can advertise your useless crap",
+  "What the world really needs is more advertising"
+];
+
+if (subheadEl) {
+  subheadEl.textContent =
+    subheads[Math.floor(Math.random() * subheads.length)];
+}
+
+if (bannerHeadlineEl) {
+  bannerHeadlineEl.textContent =
+    bannerHeadlines[Math.floor(Math.random() * bannerHeadlines.length)];
+}
+
+/* SELECT BUTTON */
 
 if (selectBtn) {
   selectBtn.addEventListener("click", () => {
@@ -28,13 +53,7 @@ if (selectBtn) {
   });
 }
 
-/* FADE IN */
-
-window.addEventListener("load", () => {
-  document.body.classList.add("loaded");
-});
-
-/* IMAGE LOADING */
+/* IMAGE LOAD */
 
 photoInput.addEventListener("change", () => {
 
@@ -50,8 +69,6 @@ photoInput.addEventListener("change", () => {
 
       const cw = container.clientWidth;
       const ch = container.clientHeight;
-
-      /* Blur background */
 
       blurCanvas.width = cw;
       blurCanvas.height = ch;
@@ -69,23 +86,19 @@ photoInput.addEventListener("change", () => {
         coverH
       );
 
-      /* Fit main */
-
       const fitScale = Math.min(cw/img.width, ch/img.height, 1);
-      const w = Math.floor(img.width * fitScale);
-      const h = Math.floor(img.height * fitScale);
+      const w = img.width * fitScale;
+      const h = img.height * fitScale;
 
       baseCanvas.width = w;
       baseCanvas.height = h;
 
-      baseCtx.clearRect(0,0,w,h);
       baseCtx.drawImage(img,0,0,w,h);
 
       baseCanvas.style.left = ((cw-w)/2)+"px";
       baseCanvas.style.top  = ((ch-h)/2)+"px";
 
       overlay.classList.add("hidden");
-      state.imageLoaded = true;
     };
 
     img.src = e.target.result;
