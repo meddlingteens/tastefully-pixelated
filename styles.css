@@ -15,7 +15,7 @@ body {
 }
 
 /* =========================
-   APP
+   APP CONTAINER
 ========================= */
 
 .app {
@@ -159,7 +159,7 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 /* =========================
-   BUTTON ROWS
+   BUTTONS (RESTORED)
 ========================= */
 
 .button-row {
@@ -177,7 +177,7 @@ input[type="range"]::-webkit-slider-thumb {
   color: #fff;
 }
 
-/* RESTORED GRADIENTS */
+/* Gradient button colors restored */
 
 #drawBtn { background: linear-gradient(135deg,#2f6df6,#1d4ed8); }
 #moveBtn { background: linear-gradient(135deg,#16c6d3,#0e7490); }
