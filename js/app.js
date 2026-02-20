@@ -32,7 +32,7 @@ const maskCtx = maskCanvas.getContext("2d");
 const blurCtx = blurCanvas.getContext("2d");
 
 /* =====================================================
-   RANDOM COPY (RESTORED)
+   RANDOM COPY
 ===================================================== */
 
 const subheads = [
@@ -51,15 +51,13 @@ const bannerHeadlines = [
   "What the world really needs is more advertising"
 ];
 
-if (subheadEl) {
+if (subheadEl)
   subheadEl.textContent =
     subheads[Math.floor(Math.random() * subheads.length)];
-}
 
-if (bannerHeadlineEl) {
+if (bannerHeadlineEl)
   bannerHeadlineEl.textContent =
     bannerHeadlines[Math.floor(Math.random() * bannerHeadlines.length)];
-}
 
 /* =====================================================
    STATE
@@ -119,6 +117,66 @@ container.addEventListener("mouseleave", () => {
 });
 
 /* =====================================================
+   MODE SWITCHING + CURSOR
+===================================================== */
+
+function updateCursor() {
+
+  if (mode === "draw") {
+    container.style.cursor = "none";
+  } else if (mode === "position") {
+    container.style.cursor = "grab";
+  }
+}
+
+drawBtn.addEventListener("click", () => {
+  mode = "draw";
+  updateCursor();
+});
+
+moveBtn.addEventListener("click", () => {
+  mode = "position";
+  updateCursor();
+});
+
+updateCursor();
+
+/* =====================================================
+   MOVE MODE
+===================================================== */
+
+maskCanvas.addEventListener("mousedown", () => {
+  if (mode !== "position") return;
+
+  isDragging = true;
+  container.style.cursor = "grabbing";
+});
+
+window.addEventListener("mouseup", () => {
+  if (!isDragging) return;
+
+  isDragging = false;
+  if (mode === "position")
+    container.style.cursor = "grab";
+});
+
+window.addEventListener("mousemove", e => {
+  if (!isDragging) return;
+
+  baseCanvas.style.left =
+    (parseFloat(baseCanvas.style.left) + e.movementX) + "px";
+
+  maskCanvas.style.left =
+    (parseFloat(maskCanvas.style.left) + e.movementX) + "px";
+
+  baseCanvas.style.top =
+    (parseFloat(baseCanvas.style.top) + e.movementY) + "px";
+
+  maskCanvas.style.top =
+    (parseFloat(maskCanvas.style.top) + e.movementY) + "px";
+});
+
+/* =====================================================
    SELECT BUTTON
 ===================================================== */
 
@@ -127,7 +185,7 @@ selectBtn.addEventListener("click", () => {
 });
 
 /* =====================================================
-   IMAGE LOAD
+   IMAGE LOAD (unchanged)
 ===================================================== */
 
 photoInput.addEventListener("change", () => {
@@ -183,10 +241,6 @@ photoInput.addEventListener("change", () => {
       maskCanvas.style.left = left+"px";
       maskCanvas.style.top  = top+"px";
 
-      zoom = 1;
-      baseCanvas.style.transform = "scale(1)";
-      maskCanvas.style.transform = "scale(1)";
-
       overlay.classList.add("hidden");
     };
 
@@ -195,102 +249,6 @@ photoInput.addEventListener("change", () => {
 
   reader.readAsDataURL(photoInput.files[0]);
 });
-
-/* =====================================================
-   MASK PAINTING
-===================================================== */
-
-function paintMask(x,y){
-  maskCtx.fillStyle = "rgba(255,0,0,0.4)";
-  maskCtx.beginPath();
-  maskCtx.arc(x,y,brushSize/2,0,Math.PI*2);
-  maskCtx.fill();
-}
-
-maskCanvas.addEventListener("mousedown", e=>{
-  if(mode!=="draw") return;
-
-  maskUndoStack.push(
-    maskCtx.getImageData(0,0,maskCanvas.width,maskCanvas.height)
-  );
-
-  const rect = maskCanvas.getBoundingClientRect();
-
-  paintMask(
-    (e.clientX-rect.left)/zoom,
-    (e.clientY-rect.top)/zoom
-  );
-});
-
-maskCanvas.addEventListener("mousemove", e=>{
-  if(e.buttons!==1 || mode!=="draw") return;
-
-  const rect = maskCanvas.getBoundingClientRect();
-
-  paintMask(
-    (e.clientX-rect.left)/zoom,
-    (e.clientY-rect.top)/zoom
-  );
-});
-
-/* =====================================================
-   APPLY PIXELATION
-===================================================== */
-
-applyBtn.addEventListener("click", ()=>{
-
-  const maskData =
-    maskCtx.getImageData(0,0,maskCanvas.width,maskCanvas.height);
-
-  const imgData =
-    baseCtx.getImageData(0,0,baseCanvas.width,baseCanvas.height);
-
-  for(let y=0; y<baseCanvas.height; y+=pixelSize){
-    for(let x=0; x<baseCanvas.width; x+=pixelSize){
-
-      const index = ((y*baseCanvas.width)+x)*4;
-
-      if(maskData.data[index+3] > 0){
-
-        const r = imgData.data[index];
-        const g = imgData.data[index+1];
-        const b = imgData.data[index+2];
-
-        baseCtx.fillStyle = `rgb(${r},${g},${b})`;
-        baseCtx.fillRect(x,y,pixelSize,pixelSize);
-      }
-    }
-  }
-
-  maskCtx.clearRect(0,0,maskCanvas.width,maskCanvas.height);
-});
-
-/* =====================================================
-   RESTORE
-===================================================== */
-
-restoreBtn.addEventListener("click", ()=>{
-  if(originalImageData)
-    baseCtx.putImageData(originalImageData,0,0);
-
-  maskCtx.clearRect(0,0,maskCanvas.width,maskCanvas.height);
-});
-
-/* =====================================================
-   UNDO
-===================================================== */
-
-undoBtn.addEventListener("click", ()=>{
-  if(!maskUndoStack.length) return;
-  maskCtx.putImageData(maskUndoStack.pop(),0,0);
-});
-
-/* =====================================================
-   MODE
-===================================================== */
-
-drawBtn.addEventListener("click", ()=>mode="draw");
-moveBtn.addEventListener("click", ()=>mode="position");
 
 /* =====================================================
    ZOOM
