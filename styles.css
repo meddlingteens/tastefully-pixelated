@@ -1,188 +1,182 @@
-/* =========================
+/* ================================
    GLOBAL
-========================= */
+================================ */
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, sans-serif;
-  color: #fff;
-  background-image: url("./images/backgroundPixelsLarge.webp");
-  background-size: 110%;
-  background-position: center 0;
-  background-repeat: no-repeat;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: url("images/backgroundPixelsLarge.webp") center center / cover no-repeat fixed;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 30px 0;
 }
 
-/* =========================
-   APP CONTAINER
-========================= */
+/* ================================
+   APP CONTAINER (75% SCALE)
+================================ */
 
 .app {
-  width: 800px;
-  margin: 30px auto;
-  padding: 16px 24px 20px;
-  background: rgba(10, 9, 20, 0.92);
-  border: 3px solid rgba(255,255,255,0.9);
-  border-radius: 22px;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.45);
+  width: 750px; /* Previously ~1000px */
+  background: rgba(20, 20, 20, 0.85);
+  backdrop-filter: blur(6px);
+  border-radius: 18px;
+  padding: 24px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  color: white;
 }
 
+/* ================================
+   TITLE + SUBHEAD
+================================ */
+
 .app-title {
-  margin: 0 0 4px 0;
-  font-size: 40px;
-  font-weight: 700;
+  text-align: center;
+  margin: 0 0 8px 0;
+  font-size: 26px;
+  font-weight: 600;
 }
 
 .subhead {
-  margin-bottom: 12px;
+  text-align: center;
   font-size: 14px;
-  opacity: 0.85;
+  opacity: 0.8;
+  margin-bottom: 18px;
 }
 
-/* =========================
+/* ================================
    BANNER
-========================= */
+================================ */
 
 .banner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  padding: 16px 20px;
-  margin-bottom: 18px;
-  border-radius: 18px;
-  border: 2px solid rgba(255,255,255,0.5);
-  background: linear-gradient(
-    135deg,
-    rgba(30,25,70,0.8),
-    rgba(20,18,50,0.8)
-  );
+  background: linear-gradient(135deg, #5c3b9c, #2e1c55);
+  border-radius: 12px;
+  padding: 14px;
+  text-align: center;
+  margin-bottom: 20px;
+  position: relative;
 }
 
 .banner h2 {
   margin: 0;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 500;
-  flex: 1;
+}
+
+.banner-spinner {
+  margin-top: 8px;
 }
 
 .banner-spinner img {
-  width: 70px;
+  width: 22px;
+  opacity: 0.8;
 }
 
 .spend-btn {
-  background: #ffffff;
-  color: #241c48;
+  margin-top: 10px;
+  padding: 7px 14px;
+  border-radius: 8px;
   border: none;
-  padding: 10px 20px;
-  border-radius: 16px;
+  background: white;
+  color: #2e1c55;
   font-weight: 600;
+  cursor: pointer;
 }
 
-/* =========================
-   CANVAS
-========================= */
+/* ================================
+   CANVAS CONTAINER
+================================ */
 
 .canvas-container {
   position: relative;
-  height: 480px;
-  background: #090813;
-  border-radius: 18px;
+  width: 100%;
+  height: 420px;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 12px;
   overflow: hidden;
-  margin-bottom: 18px;
+  margin-bottom: 20px;
 }
 
-#blurCanvas {
+canvas {
   position: absolute;
   top: 0;
   left: 0;
-  filter: blur(30px);
-  transform: scale(1.1);
-  z-index: 0;
 }
 
-#baseCanvas,
-#maskCanvas {
-  position: absolute;
-  z-index: 1;
-}
-
-/* =========================
+/* ================================
    OVERLAY
-========================= */
+================================ */
 
 .canvas-overlay {
   position: absolute;
   inset: 0;
   display: flex;
-  align-items: center;
   justify-content: center;
-  z-index: 4;
+  align-items: center;
 }
 
-.canvas-overlay.hidden { display: none; }
+.canvas-overlay.hidden {
+  display: none;
+}
 
 .primary-btn {
-  background: linear-gradient(135deg,#2f6df6,#1d4ed8);
-  color: #fff;
+  padding: 10px 18px;
+  border-radius: 10px;
   border: none;
-  padding: 14px 28px;
-  border-radius: 18px;
   font-weight: 600;
-  font-size: 16px;
+  background: white;
+  color: black;
+  cursor: pointer;
 }
 
-/* =========================
+/* ================================
    SLIDERS
-========================= */
+================================ */
 
-.slider-group { margin-bottom: 14px; }
+.slider-group {
+  margin-bottom: 14px;
+}
 
-.slider-group label { display: block; margin-bottom: 4px; }
+.slider-group label {
+  display: block;
+  font-size: 12px;
+  margin-bottom: 6px;
+  opacity: 0.8;
+}
 
 input[type="range"] {
   width: 100%;
-  height: 6px;
-  border-radius: 6px;
-  background: linear-gradient(90deg,#2f6df6,#3fa2ff);
-  appearance: none;
 }
 
-input[type="range"]::-webkit-slider-thumb {
-  appearance: none;
-  width: 16px;
-  height: 16px;
-  background: white;
-  border-radius: 50%;
-  border: 2px solid #2f6df6;
-}
-
-/* =========================
-   BUTTONS (RESTORED)
-========================= */
+/* ================================
+   BUTTON ROWS
+================================ */
 
 .button-row {
   display: flex;
-  gap: 14px;
-  margin-bottom: 14px;
+  gap: 10px;
+  margin-bottom: 12px;
 }
 
 .button-row button {
   flex: 1;
-  padding: 14px 0;
-  border-radius: 18px;
+  padding: 9px 0;
+  border-radius: 10px;
   border: none;
-  font-weight: 600;
-  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+  cursor: pointer;
+  transition: all 0.15s ease;
 }
 
-/* Gradient button colors restored */
+.button-row button:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
 
-#drawBtn { background: linear-gradient(135deg,#2f6df6,#1d4ed8); }
-#moveBtn { background: linear-gradient(135deg,#16c6d3,#0e7490); }
-#undoBtn { background: linear-gradient(135deg,#ffb547,#f59e0b); }
-#applyBtn { background: linear-gradient(135deg,#7c5cff,#5b3df0); }
-#restoreBtn { background: linear-gradient(135deg,#ff4d6d,#d90429); }
-#exportBtn { background: linear-gradient(135deg,#8b5cf6,#6d28d9); }
-#shareBtn { background: linear-gradient(135deg,#14b8a6,#0f766e); }
+.button-row button:active {
+  transform: translateY(1px);
+}
