@@ -12,6 +12,9 @@ const overlay = document.getElementById("canvasOverlay");
 const photoInput = document.getElementById("photoInput");
 const selectBtn = document.getElementById("canvasSelectBtn");
 
+const subheadEl = document.getElementById("subhead");
+const bannerHeadlineEl = document.getElementById("bannerHeadline");
+
 const drawBtn = document.getElementById("drawBtn");
 const moveBtn = document.getElementById("moveBtn");
 const undoBtn = document.getElementById("undoBtn");
@@ -27,6 +30,36 @@ const zoomSlider = document.getElementById("zoomSlider");
 const baseCtx = baseCanvas.getContext("2d");
 const maskCtx = maskCanvas.getContext("2d");
 const blurCtx = blurCanvas.getContext("2d");
+
+/* =====================================================
+   RANDOM COPY (RESTORED)
+===================================================== */
+
+const subheads = [
+  "Just, eeuuuuu.",
+  "Ain't no one wanna see that.",
+  "Hide your shame.",
+  "Seriously, that's gross.",
+  "I can't unsee that.",
+  "Don't be fickle, apply a pixel."
+];
+
+const bannerHeadlines = [
+  "Buy something you really don't need",
+  "Shop mofo. Buy, buy, buy",
+  "This is where you can advertise your useless crap",
+  "What the world really needs is more advertising"
+];
+
+if (subheadEl) {
+  subheadEl.textContent =
+    subheads[Math.floor(Math.random() * subheads.length)];
+}
+
+if (bannerHeadlineEl) {
+  bannerHeadlineEl.textContent =
+    bannerHeadlines[Math.floor(Math.random() * bannerHeadlines.length)];
+}
 
 /* =====================================================
    STATE
@@ -63,8 +96,6 @@ function updateBrushCursor(x, y) {
   brushCursor.style.left = (x - size/2) + "px";
   brushCursor.style.top  = (y - size/2) + "px";
 }
-
-/* Cursor Tracking */
 
 container.addEventListener("mousemove", e => {
 
@@ -114,8 +145,6 @@ photoInput.addEventListener("change", () => {
       const cw = container.clientWidth;
       const ch = container.clientHeight;
 
-      /* Blur Background */
-
       blurCanvas.width = cw;
       blurCanvas.height = ch;
 
@@ -131,8 +160,6 @@ photoInput.addEventListener("change", () => {
         coverW,
         coverH
       );
-
-      /* Fit Main */
 
       const fitScale = Math.min(cw/img.width, ch/img.height, 1);
       const w = Math.floor(img.width * fitScale);
@@ -156,9 +183,6 @@ photoInput.addEventListener("change", () => {
       maskCanvas.style.left = left+"px";
       maskCanvas.style.top  = top+"px";
 
-      baseCanvas.style.transformOrigin = "center center";
-      maskCanvas.style.transformOrigin = "center center";
-
       zoom = 1;
       baseCanvas.style.transform = "scale(1)";
       maskCanvas.style.transform = "scale(1)";
@@ -177,7 +201,6 @@ photoInput.addEventListener("change", () => {
 ===================================================== */
 
 function paintMask(x,y){
-
   maskCtx.fillStyle = "rgba(255,0,0,0.4)";
   maskCtx.beginPath();
   maskCtx.arc(x,y,brushSize/2,0,Math.PI*2);
@@ -254,7 +277,7 @@ restoreBtn.addEventListener("click", ()=>{
 });
 
 /* =====================================================
-   UNDO (MASK ONLY)
+   UNDO
 ===================================================== */
 
 undoBtn.addEventListener("click", ()=>{
@@ -270,42 +293,8 @@ drawBtn.addEventListener("click", ()=>mode="draw");
 moveBtn.addEventListener("click", ()=>mode="position");
 
 /* =====================================================
-   POSITION MODE
+   ZOOM
 ===================================================== */
-
-maskCanvas.addEventListener("mousedown", ()=>{
-  if(mode==="position") isDragging=true;
-});
-
-window.addEventListener("mouseup", ()=>{
-  isDragging=false;
-});
-
-window.addEventListener("mousemove", e=>{
-  if(!isDragging) return;
-
-  baseCanvas.style.left =
-    (parseFloat(baseCanvas.style.left)+e.movementX)+"px";
-
-  maskCanvas.style.left =
-    (parseFloat(maskCanvas.style.left)+e.movementX)+"px";
-
-  baseCanvas.style.top =
-    (parseFloat(baseCanvas.style.top)+e.movementY)+"px";
-
-  maskCanvas.style.top =
-    (parseFloat(maskCanvas.style.top)+e.movementY)+"px";
-});
-
-/* =====================================================
-   SLIDERS
-===================================================== */
-
-brushSlider.addEventListener("input",
-  e=>brushSize=parseInt(e.target.value));
-
-pixelSlider.addEventListener("input",
-  e=>pixelSize=parseInt(e.target.value));
 
 zoomSlider.addEventListener("input", e=>{
   zoom=parseFloat(e.target.value);
