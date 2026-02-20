@@ -1,4 +1,8 @@
-document.addEventListener("DOMContentLoaded", () => {
+/* ==========================================
+   Tastefully Pixelated
+   Stable Build
+   Subheads + Banner + Core Functionality
+========================================== */
 
 /* =========================
    STATE
@@ -57,8 +61,11 @@ const subheads = [
   "Don't be fickle, apply a pixel."
 ];
 
-document.getElementById("subhead").textContent =
-  subheads[Math.floor(Math.random() * subheads.length)];
+const subheadEl = document.getElementById("subhead");
+if (subheadEl) {
+  subheadEl.textContent =
+    subheads[Math.floor(Math.random() * subheads.length)];
+}
 
 /* =========================
    RANDOM BANNER HEADLINES
@@ -73,8 +80,11 @@ const bannerHeadlines = [
   "Sell stuff here, bitches"
 ];
 
-document.getElementById("bannerHeadline").textContent =
-  bannerHeadlines[Math.floor(Math.random() * bannerHeadlines.length)];
+const bannerHeadlineEl = document.getElementById("bannerHeadline");
+if (bannerHeadlineEl) {
+  bannerHeadlineEl.textContent =
+    bannerHeadlines[Math.floor(Math.random() * bannerHeadlines.length)];
+}
 
 /* =========================
    CANVAS SETUP
@@ -137,14 +147,22 @@ photoInput.addEventListener("change", () => {
 });
 
 /* =========================
+   BRUSH SIZE
+========================= */
+
+brushSlider.addEventListener("input", () => {
+  state.brushSize = parseInt(brushSlider.value);
+});
+
+/* =========================
    DRAWING
 ========================= */
+
+let drawing = false;
 
 maskCanvas.addEventListener("mousedown", startDraw);
 maskCanvas.addEventListener("mousemove", draw);
 window.addEventListener("mouseup", stopDraw);
-
-let drawing = false;
 
 function startDraw(e) {
   if (state.mode !== "draw") return;
@@ -213,6 +231,7 @@ undoBtn.onclick = () => {
 
 applyBtn.onclick = () => {
   const pixelSize = 12;
+
   const imgData = baseCtx.getImageData(0,0,baseCanvas.width,baseCanvas.height);
   const maskData = maskCtx.getImageData(0,0,maskCanvas.width,maskCanvas.height);
 
@@ -295,5 +314,3 @@ shareBtn.onclick = async () => {
     alert("Sharing not supported on this device.");
   }
 };
-
-});
