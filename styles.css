@@ -180,3 +180,40 @@ input[type="range"] {
 .button-row button:active {
   transform: translateY(1px);
 }
+
+/* ================================
+   ENHANCED BUTTON POLISH
+================================ */
+
+.button-row button,
+.primary-btn,
+.spend-btn {
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease,
+    filter 0.2s ease;
+}
+
+/* Hover lift */
+.button-row button:hover,
+.primary-btn:hover,
+.spend-btn:hover {
+
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 6px 16px rgba(0,0,0,0.35),
+    0 0 12px rgba(255,255,255,0.08);
+
+  filter: brightness(1.08);
+}
+
+/* Press feedback */
+.button-row button:active,
+.primary-btn:active,
+.spend-btn:active {
+
+  transform: translateY(1px);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.4);
+}
