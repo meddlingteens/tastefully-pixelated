@@ -41,10 +41,55 @@ const exportBtn = document.getElementById("exportBtn");
 const shareBtn = document.getElementById("shareBtn");
 
 /* =========================
+   RANDOM SUBHEADS
+========================= */
+
+const subheads = [
+  "Just, eeuuuuu.",
+  "Ain't no one wanna see that.",
+  "Hide your shame.",
+  "Seriously, that's gross.",
+  "I can't unsee that.",
+  "WTF?",
+  "Place a pixel where the good lord split yea.",
+  "Leave everything for your imagination.",
+  "Uh, really?",
+  "Yeah, nah, yeah, nah, nah, nah.",
+  "I think I just puked a little in my mouth.",
+  "Don't be fickle, apply a pixel."
+];
+
+const subheadEl = document.getElementById("subhead");
+if (subheadEl) {
+  subheadEl.textContent =
+    subheads[Math.floor(Math.random() * subheads.length)];
+}
+
+/* =========================
+   RANDOM BANNER HEADLINES
+========================= */
+
+const bannerHeadlines = [
+  "Buy something you really don't need",
+  "Shop mofo. Buy, buy, buy",
+  "This is where you can advertise your useless crap",
+  "What the world really needs is more advertising",
+  "Wanna buy one of those endlessly spinning top things?",
+  "Sell stuff here, bitches"
+];
+
+const bannerHeadlineEl = document.getElementById("bannerHeadline");
+if (bannerHeadlineEl) {
+  bannerHeadlineEl.textContent =
+    bannerHeadlines[Math.floor(Math.random() * bannerHeadlines.length)];
+}
+
+/* =========================
    INITIAL STATE
 ========================= */
 
 toggleControls(false);
+setActiveMode("draw");
 
 /* =========================
    TRANSFORM
@@ -80,10 +125,10 @@ photoInput.addEventListener("change", () => {
       baseCanvas.width = maskCanvas.width = img.width;
       baseCanvas.height = maskCanvas.height = img.height;
 
-      baseCtx.clearRect(0,0,img.width,img.height);
+      baseCtx.clearRect(0, 0, img.width, img.height);
       baseCtx.drawImage(img, 0, 0);
 
-      maskCtx.clearRect(0,0,img.width,img.height);
+      maskCtx.clearRect(0, 0, img.width, img.height);
 
       canvasOverlay.classList.add("hidden");
 
@@ -108,9 +153,11 @@ zoomSlider.addEventListener("input", () => {
   applyTransform();
 });
 
-pixelSlider.addEventListener("input", () => {
-  state.pixelSize = parseInt(pixelSlider.value);
-});
+if (pixelSlider) {
+  pixelSlider.addEventListener("input", () => {
+    state.pixelSize = parseInt(pixelSlider.value);
+  });
+}
 
 /* =========================
    MODE SWITCH
@@ -197,14 +244,14 @@ window.addEventListener("mouseup", () => {
 
 function saveHistory() {
   state.history.push(
-    maskCtx.getImageData(0,0,maskCanvas.width,maskCanvas.height)
+    maskCtx.getImageData(0, 0, maskCanvas.width, maskCanvas.height)
   );
   if (state.history.length > 30) state.history.shift();
 }
 
 undoBtn.onclick = () => {
   if (!state.history.length) return;
-  maskCtx.putImageData(state.history.pop(),0,0);
+  maskCtx.putImageData(state.history.pop(), 0, 0);
 };
 
 /* =========================
@@ -213,57 +260,63 @@ undoBtn.onclick = () => {
 
 applyBtn.onclick = () => {
 
-  const maskData = maskCtx.getImageData(0,0,maskCanvas.width,maskCanvas.height);
-  const hasMask = maskData.data.some((v,i)=> i%4===3 && v>0);
+  const maskData = maskCtx.getImageData(0, 0, maskCanvas.width, maskCanvas.height);
+  const hasMask = maskData.data.some((v, i) => i % 4 === 3 && v > 0);
   if (!hasMask) return;
 
   baseCtx.imageSmoothingEnabled = false;
 
   const pixelSize = state.pixelSize;
-
-  const imgData = baseCtx.getImageData(0,0,baseCanvas.width,baseCanvas.height);
+  const imgData = baseCtx.getImageData(0, 0, baseCanvas.width, baseCanvas.height);
 
   for (let y = 0; y < baseCanvas.height; y += pixelSize) {
     for (let x = 0; x < baseCanvas.width; x += pixelSize) {
 
-      const i = (y * baseCanvas.width + x) * 4;
-      if (maskData.data[i+3] === 0) continue;
+      let masked = false;
 
-      let r=0,g=0,b=0,count=0;
+      for (let yy = y; yy < y + pixelSize && yy < baseCanvas.height; yy++) {
+        for (let xx = x; xx < x + pixelSize && xx < baseCanvas.width; xx++) {
+          if (maskData.data[(yy * baseCanvas.width + xx) * 4 + 3] > 0) {
+            masked = true;
+            break;
+          }
+        }
+        if (masked) break;
+      }
 
-      for (let yy=0; yy<pixelSize; yy++) {
-        for (let xx=0; xx<pixelSize; xx++) {
-          const px = x+xx;
-          const py = y+yy;
-          if (px>=baseCanvas.width || py>=baseCanvas.height) continue;
-          const idx = (py * baseCanvas.width + px) * 4;
-          r+=imgData.data[idx];
-          g+=imgData.data[idx+1];
-          b+=imgData.data[idx+2];
+      if (!masked) continue;
+
+      let r = 0, g = 0, b = 0, count = 0;
+
+      for (let yy = y; yy < y + pixelSize && yy < baseCanvas.height; yy++) {
+        for (let xx = x; xx < x + pixelSize && xx < baseCanvas.width; xx++) {
+          const i = (yy * baseCanvas.width + xx) * 4;
+          r += imgData.data[i];
+          g += imgData.data[i + 1];
+          b += imgData.data[i + 2];
           count++;
         }
       }
 
-      r/=count; g/=count; b/=count;
+      r /= count;
+      g /= count;
+      b /= count;
 
-      for (let yy=0; yy<pixelSize; yy++) {
-        for (let xx=0; xx<pixelSize; xx++) {
-          const px = x+xx;
-          const py = y+yy;
-          if (px>=baseCanvas.width || py>=baseCanvas.height) continue;
-          const idx = (py * baseCanvas.width + px) * 4;
-          if (maskData.data[idx+3] > 0) {
-            imgData.data[idx]=r;
-            imgData.data[idx+1]=g;
-            imgData.data[idx+2]=b;
+      for (let yy = y; yy < y + pixelSize && yy < baseCanvas.height; yy++) {
+        for (let xx = x; xx < x + pixelSize && xx < baseCanvas.width; xx++) {
+          const i = (yy * baseCanvas.width + xx) * 4;
+          if (maskData.data[i + 3] > 0) {
+            imgData.data[i] = r;
+            imgData.data[i + 1] = g;
+            imgData.data[i + 2] = b;
           }
         }
       }
     }
   }
 
-  baseCtx.putImageData(imgData,0,0);
-  maskCtx.clearRect(0,0,maskCanvas.width,maskCanvas.height);
+  baseCtx.putImageData(imgData, 0, 0);
+  maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
 };
 
 /* =========================
