@@ -11,6 +11,7 @@ body {
   font-family: system-ui, -apple-system, sans-serif;
   color: #ffffff;
 
+  /* Full brightness background */
   background-image: url("./images/backgroundPixelsLarge.webp");
   background-size: 110%;
   background-position: center 0px;
@@ -37,19 +38,6 @@ body.loaded {
   box-shadow: 0 10px 30px rgba(0,0,0,0.35);
 }
 
-/* Banner */
-
-.banner {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  padding: 18px 24px;
-  margin-bottom: 20px;
-  border-radius: 16px;
-  border: 2px solid rgba(255,255,255,0.6);
-  background: rgba(0,0,0,0.35);
-}
-
 /* Workspace */
 
 .canvas-container {
@@ -61,8 +49,7 @@ body.loaded {
   margin-bottom: 12px;
 }
 
-/* Blurred fill */
-
+/* 🔥 Blurred fill — opacity removed */
 #blurCanvas {
   position: absolute;
   inset: 0;
@@ -70,7 +57,7 @@ body.loaded {
   height: 100%;
   filter: blur(40px);
   transform: scale(1.2);
-  opacity: 0.6;
+  opacity: 1;            /* FULL brightness */
   pointer-events: none;
 }
 
@@ -83,7 +70,7 @@ body.loaded {
   transform: translate(-50%, -50%);
 }
 
-/* Buttons & sliders styling preserved */
+/* Controls */
 
 .button-row {
   display: flex;

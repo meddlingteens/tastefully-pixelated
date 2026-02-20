@@ -13,7 +13,6 @@
   <h1 class="app-title">Tastefully Pixelated</h1>
   <div id="subhead" class="subhead"></div>
 
-  <!-- Banner -->
   <div class="banner">
     <h2 id="bannerHeadline"></h2>
     <div class="banner-spinner">
@@ -22,13 +21,9 @@
     <button class="spend-btn">Spend</button>
   </div>
 
-  <!-- Workspace -->
   <section class="canvas-container" id="canvasContainer">
 
-    <!-- Blurred background -->
     <canvas id="blurCanvas"></canvas>
-
-    <!-- Main canvases -->
     <canvas id="baseCanvas" class="main-canvas"></canvas>
     <canvas id="maskCanvas" class="main-canvas"></canvas>
 
@@ -41,7 +36,6 @@
     <input type="file" id="photoInput" accept="image/*" hidden />
   </section>
 
-  <!-- Sliders -->
   <div class="slider-group">
     <label>Brush Size</label>
     <input type="range" id="brushSlider" min="5" max="80" value="25" />
@@ -57,7 +51,6 @@
     <input type="range" id="zoomSlider" min="1" max="3" step="0.1" value="1" />
   </div>
 
-  <!-- Controls -->
   <div class="button-row">
     <button id="drawBtn">Draw</button>
     <button id="moveBtn">Position</button>
