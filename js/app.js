@@ -94,7 +94,7 @@ function updateBrushCursor(x, y) {
 function updateCursor() {
 
   if (!imageLoaded) {
-    container.style.cursor = "pointer";
+    container.style.cursor = "default";   // ← arrow now
     brushCursor.style.display = "none";
     return;
   }
@@ -126,7 +126,7 @@ container.addEventListener("mousemove", function (e) {
 
 container.addEventListener("mouseleave", function () {
   brushCursor.style.display = "none";
-  container.style.cursor = "pointer";
+  container.style.cursor = "default";   // arrow outside canvas
 });
 
 /* =============================
@@ -160,22 +160,6 @@ window.addEventListener("mouseup", function () {
   isDragging = false;
   if (mode === "position")
     container.style.cursor = "grab";
-});
-
-window.addEventListener("mousemove", function (e) {
-  if (!isDragging) return;
-
-  baseCanvas.style.left =
-    (parseFloat(baseCanvas.style.left) + e.movementX) + "px";
-
-  maskCanvas.style.left =
-    (parseFloat(maskCanvas.style.left) + e.movementX) + "px";
-
-  baseCanvas.style.top =
-    (parseFloat(baseCanvas.style.top) + e.movementY) + "px";
-
-  maskCanvas.style.top =
-    (parseFloat(maskCanvas.style.top) + e.movementY) + "px";
 });
 
 /* =============================
