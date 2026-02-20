@@ -1,5 +1,5 @@
 /* =========================
-   Base Pixel Background
+   Base
 ========================= */
 
 * {
@@ -11,8 +11,8 @@ html, body {
   padding: 0;
   font-family: system-ui, -apple-system, sans-serif;
   min-height: 100vh;
+  color: #ffffff; /* ALL TEXT WHITE */
 
-  /* Pixel-inspired layered background */
   background:
     linear-gradient(135deg, rgba(46,33,84,0.85), rgba(20,18,45,0.9)),
     repeating-linear-gradient(
@@ -32,20 +32,18 @@ html, body {
 
   display: flex;
   justify-content: center;
-  align-items: flex-start; /* allow top padding */
+  align-items: flex-start;
 }
 
 /* =========================
-   App Container Card
+   App Container
 ========================= */
 
 .app {
   width: 100%;
   max-width: 800px;
-
-  margin-top: 20px; /* 20px space above app */
+  margin-top: 20px;
   margin-bottom: 40px;
-
   padding: 40px 24px 60px;
 
   background: linear-gradient(180deg, #0f0d1a, #151225);
@@ -65,12 +63,13 @@ html, body {
   margin: 0;
   font-size: 40px;
   font-weight: 700;
+  color: #ffffff;
 }
 
 .subhead {
   margin-top: 6px;
   font-size: 14px;
-  opacity: 0.8;
+  color: #ffffff; /* FULL WHITE */
 }
 
 /* =========================
@@ -93,6 +92,7 @@ html, body {
   margin: 0;
   flex: 1;
   font-weight: 500;
+  color: #ffffff;
 }
 
 .banner-spinner img {
@@ -100,7 +100,7 @@ html, body {
 }
 
 .spend-btn {
-  background: #fff;
+  background: #ffffff;
   color: #241c48;
   border: none;
   padding: 8px 18px;
@@ -123,7 +123,7 @@ html, body {
 }
 
 /* =========================
-   Buttons (Before Style)
+   Buttons
 ========================= */
 
 .button-row {
@@ -163,7 +163,6 @@ html, body {
 @media (max-width: 768px) {
 
   .app {
-    border-radius: 18px;
     padding: 28px 18px 50px;
   }
 
