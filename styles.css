@@ -161,22 +161,26 @@ input[type="range"] {
   padding: 0;
 }
 
-.revert-btn svg {
-  width: 42px;
-  height: 42px;
-  transition: stroke .25s ease, fill .25s ease, transform .3s ease;
+
+
+
+
+.revert-btn img {
+  width: 32px;
+  height: 32px;
+  display: block;
+  transition: filter .25s ease, transform .25s ease;
 }
 
-.revert-btn.active svg path,
-.revert-btn.active svg circle {
-  stroke: #84d9e1;
-  fill: #84d9e1;
+.revert-btn.active img {
+  filter: brightness(0) saturate(100%) invert(79%) sepia(32%)
+          saturate(398%) hue-rotate(151deg)
+          brightness(96%) contrast(90%);
 }
 
-.revert-btn:active svg {
-  transform: rotate(-25deg);
+.revert-btn:active img {
+  transform: rotate(-20deg);
 }
-
 
 
 
