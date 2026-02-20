@@ -1,3 +1,7 @@
+/* =========================
+   GLOBAL RESET
+========================= */
+
 * {
   box-sizing: border-box;
 }
@@ -11,6 +15,7 @@ body {
   font-family: system-ui, -apple-system, sans-serif;
   color: #ffffff;
 
+  /* Full brightness background */
   background-image: url("./images/backgroundPixelsLarge.webp");
   background-size: 110%;
   background-position: center 0px;
@@ -24,6 +29,10 @@ body.loaded {
   opacity: 1;
 }
 
+/* =========================
+   APP CONTAINER
+========================= */
+
 .app {
   width: 800px;
   max-width: 800px;
@@ -35,7 +44,9 @@ body.loaded {
   box-shadow: 0 10px 30px rgba(0,0,0,0.35);
 }
 
-/* ===== Canvas Area ===== */
+/* =========================
+   WORKSPACE
+========================= */
 
 .canvas-container {
   position: relative;
@@ -46,26 +57,37 @@ body.loaded {
   margin-bottom: 12px;
 }
 
-/* Blur background layer */
+/* ----- BLUR LAYER (BACKGROUND) ----- */
+
 #blurCanvas {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
-  filter: blur(35px);
-  transform: scale(1.15);
+
+  filter: blur(30px);
+  transform: scale(1.1);
+
   pointer-events: none;
   z-index: 0;
 }
 
-/* Main canvases */
+/* ----- MAIN IMAGE CANVASES ----- */
+
 #baseCanvas,
 #maskCanvas {
   position: absolute;
   z-index: 1;
 }
 
-/* Controls */
+/* =========================
+   CONTROLS
+========================= */
+
+.slider-group {
+  margin-bottom: 12px;
+}
 
 .button-row {
   display: flex;
