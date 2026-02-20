@@ -3,9 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
 /* ELEMENTS */
 
 const baseCanvas = document.getElementById("baseCanvas");
-const maskCanvas = document.getElementById("maskCanvas");
 const blurCanvas = document.getElementById("blurCanvas");
-
 const container = document.getElementById("canvasContainer");
 const overlay = document.getElementById("canvasOverlay");
 const photoInput = document.getElementById("photoInput");
@@ -35,23 +33,20 @@ const bannerHeadlines = [
   "What the world really needs is more advertising"
 ];
 
-if (subheadEl) {
+if (subheadEl)
   subheadEl.textContent =
     subheads[Math.floor(Math.random() * subheads.length)];
-}
 
-if (bannerHeadlineEl) {
+if (bannerHeadlineEl)
   bannerHeadlineEl.textContent =
     bannerHeadlines[Math.floor(Math.random() * bannerHeadlines.length)];
-}
 
 /* SELECT BUTTON */
 
-if (selectBtn) {
+if (selectBtn)
   selectBtn.addEventListener("click", () => {
     photoInput.click();
   });
-}
 
 /* IMAGE LOAD */
 
