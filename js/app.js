@@ -170,12 +170,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
   maskCanvas.addEventListener("mousemove", function (e) {
 
-    if (!image) return;
+  if (!image) return;
 
-    const rect = maskCanvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+  const rect = maskCanvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
 
+  // Only clear preview when NOT drawing
+  if (!isDrawing) {
     maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
 
     maskCtx.beginPath();
@@ -183,20 +185,24 @@ document.addEventListener("DOMContentLoaded", function () {
     maskCtx.strokeStyle = "rgba(255,255,255,0.5)";
     maskCtx.lineWidth = 1;
     maskCtx.stroke();
+  }
 
-    if (isDrawing && mode === "draw") {
-      maskCtx.beginPath();
-      maskCtx.arc(x, y, brushSize / 2, 0, Math.PI * 2);
-      maskCtx.fillStyle = "white";
-      maskCtx.fill();
-    }
+  // When drawing, permanently paint white mask
+  if (isDrawing && mode === "draw") {
+    maskCtx.beginPath();
+    maskCtx.arc(x, y, brushSize / 2, 0, Math.PI * 2);
+    maskCtx.fillStyle = "white";
+    maskCtx.fill();
+  }
 
-    if (isDrawing && mode === "move") {
-      offsetX = e.clientX - startX;
-      offsetY = e.clientY - startY;
-      drawImage();
-    }
-  });
+  if (isDrawing && mode === "move") {
+    offsetX = e.clientX - startX;
+    offsetY = e.clientY - startY;
+    drawImage();
+  }
+});
+
+
 
   maskCanvas.addEventListener("mousedown", function (e) {
 
