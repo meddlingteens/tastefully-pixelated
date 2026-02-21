@@ -158,12 +158,19 @@ canvas {
   margin-bottom: 6px;
 }
 
+
+
 .slider-group label {
-  font-size: 14px;
-  opacity: .8;
+  font-size: 15px;
+  font-weight: 600; /* match button weight */
+  color: white;     /* match button text */
+  letter-spacing: 0.2px;
   display: block;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
+
+
+
 
 input[type="range"] {
   width: 100%; /* was 50% */
@@ -222,7 +229,7 @@ input[type="range"] {
   flex: 1;
   padding: 14px 0;
   border-radius: 18px;
-  border: none;
+  border: 2px solid #c0c0c0; /* NEW */
   font-weight: 600;
   color: white;
   cursor: pointer;
