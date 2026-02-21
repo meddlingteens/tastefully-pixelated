@@ -229,6 +229,8 @@ input[type="range"] {
   transition: .2s;
 }
 
+
+
 #drawBtn { background: linear-gradient(135deg,#3b82f6,#2563eb); }
 #moveBtn { background: linear-gradient(135deg,#14b8a6,#0f766e); }
 #applyBtn { background: linear-gradient(135deg,#8b5cf6,#6d28d9); }
