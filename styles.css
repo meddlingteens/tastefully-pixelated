@@ -232,6 +232,8 @@ input[type="range"] {
   width: 32px;
   height: 32px;
   display: block;
+
+  filter: brightness(0) invert(1);
 }
 
 /* active state (glow instead of ugly filter) */
