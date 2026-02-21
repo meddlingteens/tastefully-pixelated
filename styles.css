@@ -124,22 +124,19 @@ canvas {
 
 
 
+.canvas-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;      /* vertical center */
+  justify-content: center;  /* horizontal center */
+  z-index: 2;
+  pointer-events: none;     /* allows canvas interaction when hidden */
+}
 
 .canvas-overlay button {
-  padding: 14px 28px;
-  border-radius: 18px;
-  border: 2px solid #c0c0c0; /* NEW */
-  background: linear-gradient(135deg,#3b82f6,#1d4ed8);
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-  transition: .2s;
+  pointer-events: auto;     /* button remains clickable */
 }
-
-.canvas-overlay button:hover {
-  transform: translateY(-2px);
-}
-
 
 
 
