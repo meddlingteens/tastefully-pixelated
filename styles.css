@@ -121,13 +121,29 @@ canvas {
 
 /* OVERLAY */
 
-.canvas-overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+
+
+
+
+.canvas-overlay button {
+  padding: 14px 28px;
+  border-radius: 18px;
+  border: 2px solid #c0c0c0; /* NEW */
+  background: linear-gradient(135deg,#3b82f6,#1d4ed8);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: .2s;
 }
+
+.canvas-overlay button:hover {
+  transform: translateY(-2px);
+}
+
+
+
+
+
 
 .canvas-overlay.hidden { display: none; }
 
