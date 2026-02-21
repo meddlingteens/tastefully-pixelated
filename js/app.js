@@ -51,7 +51,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const drawBtn = document.getElementById("drawBtn");
   const moveBtn = document.getElementById("moveBtn");
   const applyBtn = document.getElementById("applyBtn");
-  const restoreBtn = document.getElementById("restoreBtn");
   const revertBtn = document.getElementById("revertBtn");
 
   let image = null;
@@ -115,14 +114,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
   		overlay.classList.add("hidden");
   		canvasContainer.classList.add("photo-loaded");
-
- 			 offsetX = 0;
- 			 offsetY = 0;
-  				zoomLevel = 1;
-  				zoomSlider.value = 1;
-
-  		originalImage = image;
-
+	 		offsetX = 0;
+ 			offsetY = 0;
+  			zoomLevel = 1;
+  			zoomSlider.value = 1;
+	  		originalImage = image; 
   drawImage();
 };
 
