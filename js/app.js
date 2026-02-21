@@ -452,26 +452,48 @@ applyBtn.addEventListener("click", function () {
 let targetZoom = zoomLevel;
 let zoomAnimating = false;
 
+
+
+
 zoomSlider.addEventListener("input", function (e) {
 
-  const rect = baseCanvas.getBoundingClientRect();
-  const centerX = rect.width / 2;
-  const centerY = rect.height / 2;
+  if (!image) return;
 
   const prevZoom = zoomLevel;
   targetZoom = parseFloat(e.target.value);
 
+  // Compute image dimensions at previous zoom
+  const canvasWidth = baseCanvas.width;
+  const canvasHeight = baseCanvas.height;
+
+  const imageAspect = image.width / image.height;
+  const canvasAspect = canvasWidth / canvasHeight;
+
+  let drawWidth, drawHeight;
+
+  if (imageAspect > canvasAspect) {
+    drawWidth = canvasWidth * prevZoom;
+    drawHeight = (canvasWidth / imageAspect) * prevZoom;
+  } else {
+    drawHeight = canvasHeight * prevZoom;
+    drawWidth = (canvasHeight * imageAspect) * prevZoom;
+  }
+
+  // Image center in canvas space
+  const imageCenterX = offsetX + drawWidth / 2;
+  const imageCenterY = offsetY + drawHeight / 2;
+
   const scaleChange = targetZoom / prevZoom;
 
-  offsetX = (offsetX - centerX) * scaleChange + centerX;
-  offsetY = (offsetY - centerY) * scaleChange + centerY;
+  // Adjust offsets so image center remains fixed
+  offsetX = imageCenterX - (drawWidth * scaleChange) / 2;
+  offsetY = imageCenterY - (drawHeight * scaleChange) / 2;
 
   if (!zoomAnimating) {
     zoomAnimating = true;
     requestAnimationFrame(animateZoom);
   }
 });
-
 
 function animateZoom() {
   const diff = targetZoom - zoomLevel;
