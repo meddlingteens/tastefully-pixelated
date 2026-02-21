@@ -126,6 +126,18 @@ canvas {
   left: 0;
 }
 
+
+
+.canvas-container.photo-loaded {
+  filter: blur(2.5px);
+}
+
+
+
+
+
+
+
 /* OVERLAY */
 
 
@@ -145,10 +157,6 @@ canvas {
   pointer-events: auto;     /* button remains clickable */
 }
 
-
-
-
-
 .canvas-overlay.hidden { display: none; }
 
 .primary-btn {
@@ -165,6 +173,10 @@ canvas {
   transform: translateY(-2px);
   box-shadow: 0 12px 28px rgba(0,0,0,.35);
 }
+
+
+
+
 
 
 /* SLIDERS + REVERT */
