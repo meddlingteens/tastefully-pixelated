@@ -140,24 +140,6 @@ body::before {
 
 
 
-canvas {
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
-
-
-.canvas-container.photo-loaded {
-  filter: blur(2.5px);
-}
-
-
-
-
-
-
-
 /* OVERLAY */
 
 
