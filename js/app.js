@@ -88,6 +88,12 @@ document.addEventListener("DOMContentLoaded", function () {
   resizeCanvas();
   window.addEventListener("resize", resizeCanvas);
 
+
+
+
+
+
+
   /* ================================
      IMAGE LOAD
   ================================= */
@@ -107,17 +113,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
       image.onload = function () {
 
-        overlay.classList.add("hidden");
+  		overlay.classList.add("hidden");
+  		canvasContainer.classList.add("photo-loaded");
 
-        offsetX = 0;
-        offsetY = 0;
-        zoomLevel = 1;
-        zoomSlider.value = 1;
+ 			 offsetX = 0;
+ 			 offsetY = 0;
+  				zoomLevel = 1;
+  				zoomSlider.value = 1;
 
-        originalImage = image;
+  		originalImage = image;
 
-        drawImage();
-      };
+  drawImage();
+};
+
+
+
+
+
 
       image.src = evt.target.result;
     };
@@ -147,6 +159,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
     baseCtx.drawImage(image, x, y, drawWidth, drawHeight);
   }
+
+
+
+
+
+
+
+
 
   /* ================================
      DRAW / MOVE
