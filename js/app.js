@@ -313,10 +313,41 @@ document.addEventListener("DOMContentLoaded", function () {
     pixelSize = parseInt(e.target.value);
   });
 
-  zoomSlider.addEventListener("input", e => {
-    zoomLevel = parseFloat(e.target.value);
-    if (image) drawImage();
-  });
+
+
+
+
+let targetZoom = zoomLevel;
+let zoomAnimating = false;
+
+zoomSlider.addEventListener("input", e => {
+  targetZoom = parseFloat(e.target.value);
+
+  if (!zoomAnimating) {
+    zoomAnimating = true;
+    requestAnimationFrame(animateZoom);
+  }
+});
+
+function animateZoom() {
+  const diff = targetZoom - zoomLevel;
+
+  if (Math.abs(diff) < 0.001) {
+    zoomLevel = targetZoom;
+    zoomAnimating = false;
+    drawImage();
+    return;
+  }
+
+  zoomLevel += diff * 0.15; // smoothing factor
+  drawImage();
+  requestAnimationFrame(animateZoom);
+}
+
+
+
+
+
 
   /* ================================
      MODE
