@@ -243,6 +243,48 @@ image.onload = function () {
    DRAW / MOVE
 ================================ */
 
+maskCanvas.addEventListener("mousedown", function (e) {
+
+  if (!image) return;
+
+  isDrawing = true;
+
+  if (mode === "move") {
+    startX = e.clientX - offsetX;
+    startY = e.clientY - offsetY;
+    maskCanvas.style.cursor = "grabbing";
+  }
+
+  if (mode === "draw") {
+    lastX = null;
+    lastY = null;
+  }
+});
+
+
+maskCanvas.addEventListener("mouseup", function () {
+
+  isDrawing = false;
+  lastX = null;
+  lastY = null;
+
+  if (mode === "move") {
+    maskCanvas.style.cursor = "grab";
+  }
+});
+
+
+maskCanvas.addEventListener("mouseenter", function () {
+  if (mode === "move" && image) {
+    maskCanvas.style.cursor = "grab";
+  }
+});
+
+
+
+
+
+
 maskCanvas.addEventListener("mousemove", function (e) {
 
   if (!image) return;
@@ -508,13 +550,24 @@ function animateZoom() {
   maskCanvas.style.cursor = image ? "crosshair" : "default";
 });
 
+
+
+
 moveBtn.addEventListener("click", function () {
+
   mode = "move";
 
   moveBtn.classList.add("active");
   drawBtn.classList.remove("active");
 
-  maskCanvas.style.cursor = image ? "grab" : "default";
+  if (image) {
+    maskCanvas.style.cursor = "grab";
+  } else {
+    maskCanvas.style.cursor = "default";
+  }
 });
+
+
+
 
 });
