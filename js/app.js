@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const previewCanvas = document.getElementById("previewCanvas");
 
   const baseCtx = baseCanvas.getContext("2d");
+  const maskCtx = maskCanvas.getContext("2d");
   const previewCtx = previewCanvas.getContext("2d");
 
   const applyBtn = document.getElementById("applyBtn");
@@ -19,6 +20,52 @@ document.addEventListener("DOMContentLoaded", function () {
   const drawBtn = document.getElementById("drawBtn");
   const moveBtn = document.getElementById("moveBtn");
   const eraseBtn = document.getElementById("eraseBtn");
+
+  
+
+
+function renderMaskPreview() {
+
+  if (dirtyMinX === Infinity) return;
+
+  const width = dirtyMaxX - dirtyMinX + 1;
+  const height = dirtyMaxY - dirtyMinY + 1;
+
+  const imageData = maskCtx.createImageData(width, height);
+  const data = imageData.data;
+
+  for (let y = 0; y < height; y++) {
+
+    const srcY = dirtyMinY + y;
+
+    for (let x = 0; x < width; x++) {
+
+      const srcX = dirtyMinX + x;
+      const srcIndex = srcY * maskWidth + srcX;
+      const dstIndex = (y * width + x) * 4;
+
+      const alpha = maskBuffer[srcIndex];
+
+      data[dstIndex]     = 255;
+      data[dstIndex + 1] = 255;
+      data[dstIndex + 2] = 255;
+      data[dstIndex + 3] = alpha;
+    }
+  }
+
+  maskCtx.putImageData(imageData, dirtyMinX, dirtyMinY);
+}
+
+
+
+
+
+
+
+
+
+
+
 
   // ======================================================
   // STATE
@@ -67,7 +114,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 pixelWorker.onmessage = function (e) {
-
+	maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
   const { buffer } = e.data;
 
   const imageData = new ImageData(
@@ -141,7 +188,7 @@ function resizeCanvas() {
 
     kernelDX = new Int16Array(count);
     kernelDY = new Int16Array(count);
-    kernelIntensity = new Float32Array(count);
+    kernelIntensity = new Uint8Array(count);
     kernelSize = count;
 
     let i = 0;
@@ -153,13 +200,19 @@ function resizeCanvas() {
         if (distSq > radiusSq) continue;
 
         const falloff = 1 - (distSq / radiusSq);
-        const intensity =
-          brushOpacity *
-          (falloff * (1 - k) + falloff * falloff * k);
+        
+
+
+const intensity =
+  brushOpacity *
+  (falloff * (1 - k) + falloff * falloff * k);
+
+kernelIntensity[i] = Math.floor(intensity * 255);
+
+
 
         kernelDX[i] = xx;
         kernelDY[i] = yy;
-        kernelIntensity[i] = intensity;
         i++;
       }
     }
@@ -274,10 +327,13 @@ maskCanvas.addEventListener("mousemove", function (e) {
         lastY = y;
       }
 
-      const dx = x - lastX;
-      const dy = y - lastY;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      const steps = Math.max(1, Math.floor(dist / (brushSize / 4)));
+const dx = x - lastX;
+const dy = y - lastY;
+
+// Chebyshev distance (no sqrt)
+const dist = Math.max(Math.abs(dx), Math.abs(dy));
+
+const steps = Math.max(1, Math.floor(dist / (brushSize / 4)));
 
       const imgRatio = image.width / image.height;
       const canvasRatio = baseCanvas.width / baseCanvas.height;
@@ -295,45 +351,55 @@ maskCanvas.addEventListener("mousemove", function (e) {
       const imageDrawX = (baseCanvas.width - drawWidth) / 2 + offsetX;
       const imageDrawY = (baseCanvas.height - drawHeight) / 2 + offsetY;
 
-      for (let s = 0; s <= steps; s++) {
 
-        const t = s / steps;
-        const ix = lastX + dx * t;
-        const iy = lastY + dy * t;
 
-        for (let i = 0; i < kernelSize; i++) {
 
-          const px = Math.floor(ix + kernelDX[i] - imageDrawX);
-          const py = Math.floor(iy + kernelDY[i] - imageDrawY);
 
-          if (px < 0 || py < 0 || px >= maskWidth || py >= maskHeight)
-            continue;
+for (let s = 0; s <= steps; s++) {
 
-          dirtyMinX = Math.min(dirtyMinX, px);
-          dirtyMinY = Math.min(dirtyMinY, py);
-          dirtyMaxX = Math.max(dirtyMaxX, px);
-          dirtyMaxY = Math.max(dirtyMaxY, py);
+  const t = s / steps;
+  const ix = lastX + dx * t;
+  const iy = lastY + dy * t;
 
-          const index = py * maskWidth + px;
+  for (let i = 0; i < kernelSize; i++) {
+
+    const px = Math.floor(ix + kernelDX[i] - imageDrawX);
+    const py = Math.floor(iy + kernelDY[i] - imageDrawY);
+
+    if (px < 0 || py < 0 || px >= maskWidth || py >= maskHeight)
+      continue;
+
+
+dirtyMinX = Math.min(dirtyMinX, px);
+dirtyMinY = Math.min(dirtyMinY, py);
+dirtyMaxX = Math.max(dirtyMaxX, px);
+dirtyMaxY = Math.max(dirtyMaxY, py);
+
+
+
+    const index = py * maskWidth + px;
+
+const value = kernelIntensity[i];
 
 if (mode === "erase") {
   maskBuffer[index] =
-    Math.max(
-      0,
-      maskBuffer[index] - Math.floor(kernelIntensity[i] * 255)
-    );
+    Math.max(0, maskBuffer[index] - value);
 } else {
   maskBuffer[index] =
-    Math.min(
-      255,
-      maskBuffer[index] + Math.floor(kernelIntensity[i] * 255)
-    );
+    Math.min(255, maskBuffer[index] + value);
 }
-        }
-      }
 
-      lastX = x;
-      lastY = y;
+  }
+}
+
+// 👇 ADD THIS
+renderMaskPreview();
+
+
+
+lastX = x;
+lastY = y;
+
     }
   });
 
