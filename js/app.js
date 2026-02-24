@@ -100,16 +100,16 @@ function renderMaskPreview() {
 const subhead = document.getElementById("subhead");
 
 const subheadMessages = [
-  "For when subtle just isn’t enough.",
-  "Tasteful. But make it pixel.",
+  "Eeeuuu, hide that.",
+  "Hide your shame.",
   "Blur responsibly.",
-  "Because privacy is sexy.",
-  "Redact like a professional.",
-  "Censorship, but chic.",
-  "Hide the chaos. Keep the vibe.",
-  "Pixelate first. Regret nothing.",
-  "Now you see it. Now you don’t.",
-  "A little mystery never hurt."
+  "Uh, no. Just no.",
+  "That's a hard no.",
+  "Pix out where the sun don't shine.",
+  "Ain't nobody wanna see that.",
+  "For god's sake, pixelate.",
+  "For the love of god, hide that shit.",
+  "Spare us all."
 ];
 
 function setRandomSubhead() {
@@ -128,16 +128,16 @@ setRandomSubhead();
 const bannerHeadline = document.getElementById("bannerHeadline");
 
 const bannerMessages = [
-  "Pixelate Like You Mean It",
-  "Blur the Line Between Taste & Chaos",
-  "Redact. Relax. Repeat.",
-  "Privacy, But Make It Aesthetic.",
-  "Hide What Matters Most.",
-  "Censor With Confidence.",
-  "Discretion, Digitized.",
-  "Obscure the Ordinary.",
-  "Make It Mysterious.",
-  "Tastefully Done."
+  "This is where you can advertise your useless crap",
+  "Buy, buy, buy!",
+  "Sell stuff no one needs.",
+  "Buy this shiny thing.",
+  "Consumers of the world, unite!",
+  "A thing to buy goes here.",
+  "More stuff, that's what you need!",
+  "Buy!",
+  "Uh, spend money here",
+  "Spend!"
 ];
 
 function setRandomBanner() {
