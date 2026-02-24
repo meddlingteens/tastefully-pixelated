@@ -22,7 +22,11 @@ document.addEventListener("DOMContentLoaded", function () {
   const eraseBtn = document.getElementById("eraseBtn");
 
   
+const canvasSelectBtn = document.getElementById("canvasSelectBtn");
 
+canvasSelectBtn.addEventListener("click", function () {
+  uploadInput.click();
+});
 
 
 
