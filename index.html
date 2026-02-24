@@ -4,6 +4,10 @@
   <meta charset="UTF-8" />
   <title>Tastefully Pixelated</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Prevent favicon 404 -->
+  <link rel="icon" href="data:,">
+
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -25,7 +29,7 @@
       </div>
     </div>
 
-    <!-- Canvas -->
+    <!-- Canvas Area -->
     <div class="canvas-container" id="canvasContainer">
       <canvas id="baseCanvas"></canvas>
       <canvas id="maskCanvas"></canvas>
@@ -36,6 +40,7 @@
       </div>
     </div>
 
+    <!-- Hidden File Input -->
     <input type="file" id="uploadInput" hidden accept="image/*">
 
     <!-- Sliders -->
@@ -60,7 +65,7 @@
       </div>
     </div>
 
-    <!-- Buttons -->
+    <!-- Mode Buttons -->
     <div class="button-row">
       <button id="drawBtn">Draw</button>
       <button id="moveBtn">Move</button>
