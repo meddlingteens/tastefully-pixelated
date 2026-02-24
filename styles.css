@@ -1,60 +1,34 @@
-* { box-sizing: border-box; }
+/* ======================================================
+   BASE LAYOUT
+   ====================================================== */
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  display: flex;
-  justify-content: center;
-  padding: 40px 0;
-  color: white;
-  position: relative;
-  z-index: 0;
-  overflow-x: hidden;
+  font-family: sans-serif;
+  background: #111;
+  color: #fff;
 }
-
-/* Blurred website background */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background: url("images/backgroundPixelsLarge.webp") center / cover no-repeat;
-  filter: blur(10px);
-  transform: scale(1.05); /* prevents edge clipping from blur */
-  z-index: -1;
-}
-
-
-
-
 
 .app {
-  width: 56%;
-  max-width: 675px;
-  background: rgba(20,20,20,0.85);
-  backdrop-filter: blur(6px);
-  border-radius: 18px;
-  padding: 21px;
-  border: 3px solid #c0c0c0;
-  box-shadow: 0 6px 14px rgba(0,0,0,.22);
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 0 20px;
 }
 
 .app-title {
-  font-size: 32px;
-  margin: 0 0 6px 0;
-  text-align: left;
+  margin-bottom: 4px;
 }
 
 .subhead {
-  font-size: 15px;
-  opacity: 0.7;
-  margin-bottom: 24px;
-  text-align: left;
+  margin-top: 0;
+  margin-bottom: 20px;
+  opacity: 0.8;
 }
 
 
-
-/* BANNER */
-
+/* ======================================================
+   BANNER
+   ====================================================== */
 
 .banner {
   background: linear-gradient(135deg,#5c3b9c,#2e1c55);
@@ -71,7 +45,7 @@ body::before {
 .banner-cta {
   display: flex;
   align-items: center;
-  gap: 10px; /* ← exactly 10px spacing */
+  gap: 10px;
 }
 
 .banner-spinner img {
@@ -79,296 +53,109 @@ body::before {
   display: block;
 }
 
-.banner-left {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-.banner h2 {
-  margin: 0;
-  font-size: 18px;
-}
-
-
-#bannerHeadline {
+.fade-out {
+  opacity: 0;
   transition: opacity 0.2s ease;
 }
 
-.fade-out {
-  opacity: 0;
-}
 
-
-.banner-img {
-  display: block;
-}
-
-
-
-.spend-btn {
-  padding: 10px 20px;
-  border-radius: 16px;
-  border: 2px solid #c0c0c0;
-  background: white;
-  color: #2e1c55;
-  font-weight: 600;
-  cursor: pointer;
-  transition: .2s;
-}
-
-
-.button-row button.active {
-  box-shadow: 0 0 0 3px rgba(255,255,255,0.25);
-  transform: translateY(-2px);
-}
-
-
-
-/* CANVAS */
-
+/* ======================================================
+   CANVAS CONTAINER
+   ====================================================== */
 
 .canvas-container {
   position: relative;
   width: 100%;
-  height: 375px;
-  border-radius: 18px;
+  height: 500px;
+  margin-bottom: 20px;
+  background: #000;
   overflow: hidden;
-  margin-bottom: 28px;
-  border: 3px solid #c0c0c0;
-
-  /* NEW: background before image load 
-  background: url("images/backgroundPixelsLargeGray.png") center / cover no-repeat;  */
+  z-index: 0; /* anchor stacking context */
 }
-
-.canvas-container::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: url("images/backgroundPixelsLargeGray.png") center / cover no-repeat;
-  z-index: 0;
-
-transition: 
-  filter .45s cubic-bezier(.4,0,.2,1),
-  transform .45s cubic-bezier(.4,0,.2,1),
-  opacity .45s ease;
-}
-
-
-
-
-#baseCanvas {
-  z-index: 1;
-}
-
-#maskCanvas {
-  z-index: 2;
-}
-
-#previewCanvas {
-  z-index: 3;
-}
-
-
-
-
-
-
-
-
-
 
 .canvas-container canvas {
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 1;
 }
 
+/* Explicit canvas layering */
+#baseCanvas { z-index: 1; }
+#maskCanvas { z-index: 2; }
+#previewCanvas { z-index: 3; }
 
-
-.canvas-container.photo-loaded::before {
-  filter: blur(3px);
-  transform: scale(1.06);
-  opacity: .85;
-}
-
-
-.canvas-container.photo-loaded::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,.18);
-  z-index: 0;
-  pointer-events: none;
-}
-
-
-
-
-
-
-
-
-
-/* OVERLAY */
-
-
-
-
+/* Overlay */
 .canvas-overlay {
   position: absolute;
   inset: 0;
   display: flex;
-  align-items: center;      /* vertical center */
-  justify-content: center;  /* horizontal center */
-  z-index: 2;
-  pointer-events: none;     /* allows canvas interaction when hidden */
+  align-items: center;
+  justify-content: center;
+  z-index: 4;
 }
 
-.canvas-overlay button {
-  pointer-events: auto;     /* button remains clickable */
-}
-
-.canvas-overlay.hidden { display: none; }
-
-.primary-btn {
-  padding: 16px 28px;
-  border-radius: 16px;
-  border: 2px solid #c0c0c0;
-  font-weight: 600;
-  background: linear-gradient(135deg,#3b82f6,#2563eb);
-  color: white;
-  cursor: pointer;
+.canvas-overlay.hidden {
+  display: none;
 }
 
 
+/* ======================================================
+   SLIDERS & BUTTONS
+   ====================================================== */
 
-.primary-btn:hover,
-.button-row button:hover,
-.spend-btn:hover,
-.revert-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 14px rgba(0,0,0,.22);
+.slider-row,
+.button-row,
+.revert-btn,
+#applyBtn,
+#shareBtn {
+  position: relative;
+  z-index: 10; /* ensure controls sit above canvas */
 }
-
-
-
-
-
-
-/* SLIDERS + REVERT */
 
 .slider-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 24px;
   margin-bottom: 20px;
 }
 
 .sliders {
-  flex: 1;
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
 }
 
 .slider-group {
-  margin-bottom: 12px;
-}
-
-
-
-.slider-group label {
-  font-size: 15px;
-  font-weight: 600; /* match button weight */
-  color: white;     /* match button text */
-  letter-spacing: 0.2px;
-  display: block;
-  margin-bottom: 6px;
-}
-
-
-
-
-input[type="range"] {
-  width: 100%; /* was 50% */
-}
-
-/* REVERT */
-
-.revert-btn {
-  flex-shrink: 0;
-  width: 48px;
-  height: 48px;
-  background: rgba(255,255,255,0.05);
-  border: 2px solid rgba(255,255,255,0.15);
-  border-radius: 12px;
-  cursor: pointer;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  transition: background .2s ease, box-shadow .2s ease, transform .15s ease;
+  flex-direction: column;
 }
-
-.revert-btn:hover {
-  background: rgba(255,255,255,0.1);
-  box-shadow: 0 6px 14px rgba(0,0,0,.22);
-}
-
-.revert-btn:active {
-  transform: scale(0.95);
-}
-
-.revert-btn img {
-  width: 32px;
-  height: 32px;
-  display: block;
-
-  filter: brightness(0) invert(1);
-}
-
-
-
-
-/* active state (glow instead of ugly filter) */
-.revert-btn.active {
-  box-shadow: 0 6px 14px rgba(0,0,0,.22);
-}
-
-
-
-
-/* BUTTON ROWS */
 
 .button-row {
   display: flex;
-  gap: 16px;
-  margin-bottom: 18px;
+  gap: 10px;
+  margin-bottom: 12px;
 }
 
-.button-row button {
-  flex: 1;
-  padding: 14px 0;
-  border-radius: 16px;
-  border: 2px solid #c0c0c0; /* NEW */
-  font-weight: 600;
-  color: white;
+button {
+  padding: 8px 14px;
+  border: 2px solid #c0c0c0;
+  background: #222;
+  color: #fff;
   cursor: pointer;
-  transition: .2s;
 }
 
-
-.button-row button.active {
+button.active {
   box-shadow: 0 0 0 3px rgba(255,255,255,0.25);
   transform: translateY(-2px);
 }
 
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 
 
+/* ======================================================
+   FILE INPUT (kept hidden safely)
+   ====================================================== */
 
-#drawBtn { background: linear-gradient(135deg,#3b82f6,#2563eb); }
-#moveBtn { background: linear-gradient(135deg,#14b8a6,#0f766e); }
-#applyBtn { background: linear-gradient(135deg,#8b5cf6,#6d28d9); }
-#restoreBtn { background: linear-gradient(135deg,#ef4444,#b91c1c); }
-#exportBtn { background: linear-gradient(135deg,#9333ea,#6b21a8); }
-#shareBtn { background: linear-gradient(135deg,#10b981,#047857); }
-
+#uploadInput {
+  display: none;
+}
