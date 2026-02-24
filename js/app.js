@@ -24,6 +24,8 @@ document.addEventListener("DOMContentLoaded", function () {
   
 
 
+
+
 function renderMaskPreview() {
 
   if (dirtyMinX === Infinity) return;
