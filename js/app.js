@@ -286,11 +286,21 @@ kernelIntensity[i] = Math.floor(intensity * 255);
 	 if (isApplying) return;
     isDrawing = true;
 
-    if (mode === "move") {
-      lastX = e.clientX - offsetX;
-      lastY = e.clientY - offsetY;
-      maskCanvas.style.cursor = "grabbing";
-    } else {
+if (mode === "move") {
+
+  const rect = maskCanvas.getBoundingClientRect();
+
+  const mouseX = e.clientX - rect.left;
+  const mouseY = e.clientY - rect.top;
+
+  lastX = mouseX - offsetX;
+  lastY = mouseY - offsetY;
+
+  maskCanvas.style.cursor = "grabbing";
+}
+
+
+else {
       lastX = null;
       lastY = null;
     }
@@ -315,12 +325,20 @@ maskCanvas.addEventListener("mousemove", function (e) {
       previewCtx.stroke();
     }
 
-    if (isDrawing && mode === "move") {
-      offsetX = e.clientX - lastX;
-      offsetY = e.clientY - lastY;
-      drawImage();
-      return;
-    }
+if (isDrawing && mode === "move") {
+
+  const rect = maskCanvas.getBoundingClientRect();
+
+  const mouseX = e.clientX - rect.left;
+  const mouseY = e.clientY - rect.top;
+
+  offsetX = mouseX - lastX;
+  offsetY = mouseY - lastY;
+
+  drawImage();
+}
+
+
 
     if (isDrawing && (mode === "draw" || mode === "erase")) {
 
