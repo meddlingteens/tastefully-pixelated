@@ -124,6 +124,12 @@
   cursor: pointer;
 }
 
+.primary-btn:hover {
+  background: linear-gradient(135deg, #4c6ef5, #3b5bdb);
+}
+
+
+
 /* Sliders */
 
 
@@ -184,7 +190,7 @@ button {
 }
 
 /* Hover */
-button:hover {
+button:not(.primary-btn):hover {
   background: rgba(255,255,255,0.12);
 }
 
