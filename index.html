@@ -15,18 +15,8 @@
 
     <div class="banner">
       <h2 id="bannerHeadline"></h2>
-
-      <div class="banner-cta">
-        <div class="banner-spinner">
-          <img src="images/spinner.png" alt="spinner">
-        </div>
-        <button class="spend-btn">Spend</button>
-      </div>
+      <button class="spend-btn">Spend</button>
     </div>
-
-    <!-- ========================= -->
-    <!-- CANVAS CONTAINER (FIXED) -->
-    <!-- ========================= -->
 
     <div class="canvas-container" id="canvasContainer">
       <canvas id="baseCanvas"></canvas>
@@ -34,41 +24,33 @@
       <canvas id="previewCanvas"></canvas>
 
       <div class="canvas-overlay" id="canvasOverlay">
-        <button class="primary-btn" id="canvasSelectBtn">Select Photo</button>
+        <button id="canvasSelectBtn">Select Photo</button>
       </div>
     </div>
 
-    <!-- File input OUTSIDE container -->
     <input type="file" id="uploadInput" hidden accept="image/*">
 
-    <!-- ========================= -->
-    <!-- CONTROLS (NOW BELOW CANVAS) -->
-    <!-- ========================= -->
+    <div class="controls">
 
-    <div class="slider-row">
-      <div class="sliders">
-
-        <div class="slider-group">
-          <label for="brushSlider">Brush Size</label>
-          <input type="range" id="brushSlider" min="10" max="200" value="60">
-        </div>
-
-        <div class="slider-group">
-          <label for="zoomSlider">Zoom</label>
-          <input type="range" id="zoomSlider" min="1" max="3" step="0.1" value="1">
-        </div>
-
+      <div class="slider-row">
+        <label>Brush Size</label>
+        <input type="range" id="brushSlider" min="10" max="200" value="60">
       </div>
-    </div>
 
-    <div class="button-row">
-      <button id="drawBtn">Draw</button>
-      <button id="moveBtn">Move</button>
-      <button id="eraseBtn">Erase</button>
-      <button id="applyBtn">Apply</button>
-    </div>
+      <div class="slider-row">
+        <label>Zoom</label>
+        <input type="range" id="zoomSlider" min="1" max="3" step="0.1" value="1">
+      </div>
 
-    <button class="revert-btn" id="undoBtn">Undo</button>
+      <div class="button-row">
+        <button id="drawBtn">Draw</button>
+        <button id="moveBtn">Move</button>
+        <button id="applyBtn">Apply</button>
+      </div>
+
+      <button id="undoBtn">Undo</button>
+
+    </div>
 
   </div>
 
