@@ -539,8 +539,8 @@ for (let s = 0; s <= steps; s++) {
 
   for (let i = 0; i < kernelSize; i++) {
 
-    const px = Math.floor(ix + kernelDX[i] - imageDrawX);
-    const py = Math.floor(iy + kernelDY[i] - imageDrawY);
+    const px = Math.floor(ix + kernelDX[i]);
+const py = Math.floor(iy + kernelDY[i]);
 
     if (px < 0 || py < 0 || px >= maskWidth || py >= maskHeight)
       continue;
