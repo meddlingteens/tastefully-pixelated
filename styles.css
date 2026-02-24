@@ -65,6 +65,14 @@
   cursor: pointer;
 }
 
+
+
+/*canvas*/
+
+#previewCanvas {
+  pointer-events: none;
+}
+
 .canvas-container {
   position: relative;
   width: 100%;
