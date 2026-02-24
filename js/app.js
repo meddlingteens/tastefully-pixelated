@@ -65,12 +65,64 @@ function renderMaskPreview() {
 
 
 
+// ======================================================
+// SUBHEAD ROTATION
+// ======================================================
+
+const subhead = document.getElementById("subhead");
+
+const subheadMessages = [
+  "For when subtle just isn’t enough.",
+  "Tasteful. But make it pixel.",
+  "Blur responsibly.",
+  "Because privacy is sexy.",
+  "Redact like a professional.",
+  "Censorship, but chic.",
+  "Hide the chaos. Keep the vibe.",
+  "Pixelate first. Regret nothing.",
+  "Now you see it. Now you don’t.",
+  "A little mystery never hurt."
+];
+
+function setRandomSubhead() {
+  const randomIndex = Math.floor(Math.random() * subheadMessages.length);
+  subhead.textContent = subheadMessages[randomIndex];
+}
+
+setRandomSubhead();
 
 
 
+// ======================================================
+// BANNER HEADLINE ROTATION
+// ======================================================
 
+const bannerHeadline = document.getElementById("bannerHeadline");
 
+const bannerMessages = [
+  "Pixelate Like You Mean It",
+  "Blur the Line Between Taste & Chaos",
+  "Redact. Relax. Repeat.",
+  "Privacy, But Make It Aesthetic.",
+  "Hide What Matters Most.",
+  "Censor With Confidence.",
+  "Discretion, Digitized.",
+  "Obscure the Ordinary.",
+  "Make It Mysterious.",
+  "Tastefully Done."
+];
 
+function setRandomBanner() {
+  bannerHeadline.classList.add("fade-out");
+
+  setTimeout(() => {
+    const randomIndex = Math.floor(Math.random() * bannerMessages.length);
+    bannerHeadline.textContent = bannerMessages[randomIndex];
+    bannerHeadline.classList.remove("fade-out");
+  }, 150);
+}
+
+setRandomBanner();
 
 
   // ======================================================
@@ -266,14 +318,21 @@ kernelIntensity[i] = Math.floor(intensity * 255);
 
     const reader = new FileReader();
 
-    reader.onload = function (event) {
-      image = new Image();
-      image.onload = function () {
-        zoomLevel = 1;
-        offsetX = 0;
-        offsetY = 0;
-        drawImage();
-      };
+
+
+    image.onload = function () {
+  zoomLevel = 1;
+  offsetX = 0;
+  offsetY = 0;
+  drawImage();
+
+  setRandomSubhead();
+  setRandomBanner(); // 👈 Add this
+};
+
+
+
+
       image.src = event.target.result;
     };
 
