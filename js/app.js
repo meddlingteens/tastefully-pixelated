@@ -37,7 +37,9 @@ const zoomSlider = document.getElementById("zoomSlider");
 const uploadInput = document.getElementById("uploadInput");
 const drawBtn = document.getElementById("drawBtn");
 const moveBtn = document.getElementById("moveBtn");
+const eraseBtn = document.getElementById("eraseBtn");
 const canvasSelectBtn = document.getElementById("canvasSelectBtn");
+
 
 // Safely wire Select Photo
 if (canvasSelectBtn && uploadInput) {
@@ -584,7 +586,6 @@ maskCanvas.addEventListener("mouseleave", function () {
 
 
 // Get erase button first (so setMode can use it)
-const eraseBtn = document.getElementById("eraseBtn");
 
 function setMode(newMode) {
   mode = newMode;
