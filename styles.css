@@ -178,12 +178,17 @@ html, body {
   min-height: 100%;
   font-family: sans-serif;
   color: #fff;
+  background-color: #111;
+}
 
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
   background:
     linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.75)),
-    url("/images/backgroundPixelsLarge.webp"); /* match your real folder */
-
+    url("images/backgroundPixelsLarge.webp");
   background-size: cover;
   background-position: center;
-  background-attachment: fixed;
 }
