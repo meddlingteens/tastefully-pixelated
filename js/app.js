@@ -89,7 +89,13 @@ function renderMaskPreview() {
     }
   }
 
-  maskCtx.putImageData(imageData, dirtyMinX, dirtyMinY);
+ maskCtx.putImageData(
+  imageData,
+  dirtyMinX + imageDrawX,
+  dirtyMinY + imageDrawY
+);
+
+
 }
 
 
@@ -162,6 +168,9 @@ setRandomBanner();
   // ======================================================
 
   let image = null;
+
+let imageDrawX = 0;
+let imageDrawY = 0;
 
   let zoomLevel = 1;
   let targetZoom = 1;
@@ -365,10 +374,11 @@ kernelIntensity[i] = Math.floor(intensity * 255);
       drawWidth = drawHeight * imgRatio;
     }
 
-    const x = (baseCanvas.width - drawWidth) / 2 + offsetX;
-    const y = (baseCanvas.height - drawHeight) / 2 + offsetY;
+imageDrawX = (baseCanvas.width - drawWidth) / 2 + offsetX;
+imageDrawY = (baseCanvas.height - drawHeight) / 2 + offsetY;
 
-    baseCtx.drawImage(image, x, y, drawWidth, drawHeight);
+baseCtx.drawImage(image, imageDrawX, imageDrawY, drawWidth, drawHeight);
+
   }
 
 
@@ -512,8 +522,8 @@ maskCanvas.addEventListener("mousemove", function (e) {
 
       for (let i = 0; i < kernelSize; i++) {
 
-        const px = Math.floor(ix + kernelDX[i]);
-        const py = Math.floor(iy + kernelDY[i]);
+  const px = Math.floor(ix + kernelDX[i] - imageDrawX);
+const py = Math.floor(iy + kernelDY[i] - imageDrawY);
 
         if (px < 0 || py < 0 || px >= maskWidth || py >= maskHeight)
           continue;
