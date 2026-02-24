@@ -2,13 +2,25 @@
 .app {
   max-width: 1000px;
   margin: 40px auto;
-  padding: 32px;
+  padding: 10px 32px 32px 32px; /* 10px from top */
   border-radius: 24px;
-  background: #0f1116;
+  background: #0f1116; /* dark panel */
 }
 
 
 /* Header */
+
+.app h1 {
+  margin: 0; /* remove default browser margin */
+  font-size: 48px;
+  font-weight: 700;
+}
+
+.app p {
+  margin: 6px 0 24px 0;
+  color: #aaa;
+  font-size: 18px;
+}
 
 .app-title {
   margin-bottom: 4px;
