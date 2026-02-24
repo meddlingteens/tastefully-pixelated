@@ -7,11 +7,12 @@ document.addEventListener("DOMContentLoaded", function () {
   const canvasContainer = document.getElementById("canvasContainer");
   const baseCanvas = document.getElementById("baseCanvas");
   const maskCanvas = document.getElementById("maskCanvas");
-  const previewCanvas = document.getElementById("previewCanvas");
 
   const baseCtx = baseCanvas.getContext("2d");
   const maskCtx = maskCanvas.getContext("2d");
-  const previewCtx = previewCanvas.getContext("2d");
+
+const previewCanvas = document.getElementById("previewCanvas");
+const previewCtx = previewCanvas ? previewCanvas.getContext("2d") : null;
 
   const applyBtn = document.getElementById("applyBtn");
   const brushSlider = document.getElementById("brushSlider");
@@ -19,7 +20,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const uploadInput = document.getElementById("uploadInput");
   const drawBtn = document.getElementById("drawBtn");
   const moveBtn = document.getElementById("moveBtn");
-  const eraseBtn = document.getElementById("eraseBtn");
 
   
 const canvasSelectBtn = document.getElementById("canvasSelectBtn");
@@ -388,7 +388,9 @@ maskCanvas.addEventListener("mousemove", function (e) {
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+if (previewCtx) {
+  previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+}
 
     if (!isDrawing && mode !== "move") {
       previewCtx.beginPath();
@@ -502,11 +504,20 @@ lastY = y;
     if (mode === "move") maskCanvas.style.cursor = "grab";
   });
 
-  maskCanvas.addEventListener("mouseleave", function () {
-    isDrawing = false;
-    lastX = lastY = null;
+
+
+
+maskCanvas.addEventListener("mouseleave", function () {
+  isDrawing = false;
+  lastX = lastY = null;
+
+  if (previewCtx) {
     previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
-  });
+  }
+});
+
+
+
 
   // ======================================================
   // MODE BUTTONS
@@ -516,6 +527,8 @@ lastY = y;
     mode = "draw";
     maskCanvas.style.cursor = "crosshair";
   });
+
+const eraseBtn = document.getElementById("eraseBtn");
 
 if (eraseBtn) {
   eraseBtn.addEventListener("click", () => {
