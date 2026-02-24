@@ -129,9 +129,6 @@ function setRandomSubhead() {
 
 const bannerHeadline = document.getElementById("bannerHeadline");
 
-setRandomSubhead();
-setRandomBanner();
-
 const bannerMessages = [
   "This is where you can advertise your useless crap",
   "Buy, buy, buy!",
@@ -155,6 +152,9 @@ function setRandomBanner() {
   }, 150);
 }
 
+
+setRandomSubhead();
+setRandomBanner();
 
 
   // ======================================================
