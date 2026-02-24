@@ -63,15 +63,20 @@ body {
    CANVAS CONTAINER
    ====================================================== */
 
+
 .canvas-container {
   position: relative;
-  width: 100%;
-  height: 500px;
-  margin-bottom: 20px;
+  width: fit-content;      /* 👈 shrink to canvas width */
+  max-width: 100%;
+  height: auto;            /* 👈 let height be controlled by canvas */
+  margin: 0 auto 20px auto; /* center it */
   background: #000;
   overflow: hidden;
-  z-index: 0; /* anchor stacking context */
+  z-index: 0;
 }
+
+
+
 
 .canvas-container canvas {
   position: absolute;
