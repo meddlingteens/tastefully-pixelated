@@ -115,6 +115,7 @@
 }
 
 .primary-btn {
+  background: linear-gradient(135deg, #5c7cfa, #4c6ef5);
   padding: 14px 26px;
   font-size: 18px;
   border-radius: 18px;
@@ -185,8 +186,7 @@ button {
   font-size: remember;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s ease;
-  backdrop-filter: blur(2px);
+transition: background 0.15s ease, transform 0.05s ease, box-shadow 0.15s ease;  backdrop-filter: blur(2px);
 }
 
 /* Hover */
