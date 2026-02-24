@@ -421,171 +421,135 @@ image.onload = function () {
 
 
   // ======================================================
-  // MOUSE EVENTS
-  // ======================================================
+// MOUSE EVENTS
+// ======================================================
 
-  maskCanvas.addEventListener("mousedown", function (e) {
+maskCanvas.addEventListener("mousedown", function (e) {
 
-    if (!image) return;
-	 if (isApplying) return;
-    isDrawing = true;
+  if (!image) return;
+  if (isApplying) return;
 
-if (mode === "move") {
+  isDrawing = true;
 
-  const rect = maskCanvas.getBoundingClientRect();
+  if (mode === "move") {
 
-  const mouseX = e.clientX - rect.left;
-  const mouseY = e.clientY - rect.top;
+    const rect = maskCanvas.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
 
-  lastX = mouseX - offsetX;
-  lastY = mouseY - offsetY;
+    lastX = mouseX - offsetX;
+    lastY = mouseY - offsetY;
 
-  maskCanvas.style.cursor = "grabbing";
-}
+    maskCanvas.style.cursor = "grabbing";
+  } else {
 
+    lastX = null;
+    lastY = null;
 
+    // Clear previous preview so drawing starts clean
+    maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+  }
+});
 
-else {
-  lastX = null;
-  lastY = null;
-
-  // Clear previous preview so drawing starts clean
-  maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
-}
-
-
-
-
-  });
 
 maskCanvas.addEventListener("mousemove", function (e) {
 
   if (!image) return;
   if (isApplying) return;
 
-    const rect = maskCanvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-if (previewCtx) {
-  previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
-}
-
- if (!isDrawing && mode !== "move" && previewCtx) {
-  previewCtx.beginPath();
-  previewCtx.arc(x, y, brushSize / 2, 0, Math.PI * 2);
-  previewCtx.strokeStyle = "rgba(255,255,255,0.6)";
-  previewCtx.lineWidth = 1;
-  previewCtx.stroke();
-}
-
-
-if (isDrawing && mode === "move") {
-
   const rect = maskCanvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
 
-  const mouseX = e.clientX - rect.left;
-  const mouseY = e.clientY - rect.top;
-
-  offsetX = mouseX - lastX;
-  offsetY = mouseY - lastY;
-
-  drawImage();
-  renderMaskPreview(); // 👈 this makes the mask follow the image
-}
-
-
-
-    if (isDrawing && (mode === "draw" || mode === "erase")) {
-
-      if (lastX === null) {
-        lastX = x;
-        lastY = y;
-      }
-
-const dx = x - lastX;
-const dy = y - lastY;
-
-// Chebyshev distance (no sqrt)
-const dist = Math.max(Math.abs(dx), Math.abs(dy));
-
-const steps = Math.max(1, Math.floor(dist / (brushSize / 4)));
-
-      const imgRatio = image.width / image.height;
-      const canvasRatio = baseCanvas.width / baseCanvas.height;
-
-      let drawWidth, drawHeight;
-
-      if (imgRatio > canvasRatio) {
-        drawWidth = baseCanvas.width * zoomLevel;
-        drawHeight = drawWidth / imgRatio;
-      } else {
-        drawHeight = baseCanvas.height * zoomLevel;
-        drawWidth = drawHeight * imgRatio;
-      }
-
-      const imageDrawX = (baseCanvas.width - drawWidth) / 2 + offsetX;
-      const imageDrawY = (baseCanvas.height - drawHeight) / 2 + offsetY;
-
-
-
-
-
-for (let s = 0; s <= steps; s++) {
-
-  const t = s / steps;
-  const ix = lastX + dx * t;
-  const iy = lastY + dy * t;
-
-  for (let i = 0; i < kernelSize; i++) {
-
-const px = Math.floor(ix + kernelDX[i]);
-const py = Math.floor(iy + kernelDY[i]);
-
-    if (px < 0 || py < 0 || px >= maskWidth || py >= maskHeight)
-      continue;
-
-
-dirtyMinX = Math.min(dirtyMinX, px);
-dirtyMinY = Math.min(dirtyMinY, py);
-dirtyMaxX = Math.max(dirtyMaxX, px);
-dirtyMaxY = Math.max(dirtyMaxY, py);
-
-
-
-    const index = py * maskWidth + px;
-
-const value = kernelIntensity[i];
-
-if (mode === "erase") {
-  maskBuffer[index] =
-    Math.max(0, maskBuffer[index] - value);
-} else {
-  maskBuffer[index] =
-    Math.min(255, maskBuffer[index] + value);
-}
-
+  // Clear brush preview
+  if (previewCtx) {
+    previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
   }
-}
 
-// 👇 ADD THIS
-renderMaskPreview();
+  // Draw brush outline when not drawing
+  if (!isDrawing && mode !== "move" && previewCtx) {
+    previewCtx.beginPath();
+    previewCtx.arc(x, y, brushSize / 2, 0, Math.PI * 2);
+    previewCtx.strokeStyle = "rgba(255,255,255,0.6)";
+    previewCtx.lineWidth = 1;
+    previewCtx.stroke();
+  }
 
+  // MOVE MODE
+  if (isDrawing && mode === "move") {
 
+    const mouseX = x;
+    const mouseY = y;
 
-lastX = x;
-lastY = y;
+    offsetX = mouseX - lastX;
+    offsetY = mouseY - lastY;
 
+    drawImage();
+    renderMaskPreview();
+
+    return;
+  }
+
+  // DRAW / ERASE MODE
+  if (isDrawing && (mode === "draw" || mode === "erase")) {
+
+    if (lastX === null) {
+      lastX = x;
+      lastY = y;
     }
-  });
 
-  maskCanvas.addEventListener("mouseup", function () {
-    isDrawing = false;
-    lastX = lastY = null;
-    if (mode === "move") maskCanvas.style.cursor = "grab";
-  });
+    const dx = x - lastX;
+    const dy = y - lastY;
+
+    const dist = Math.max(Math.abs(dx), Math.abs(dy));
+    const steps = Math.max(1, Math.floor(dist / (brushSize / 4)));
+
+    for (let s = 0; s <= steps; s++) {
+
+      const t = s / steps;
+      const ix = lastX + dx * t;
+      const iy = lastY + dy * t;
+
+      for (let i = 0; i < kernelSize; i++) {
+
+        const px = Math.floor(ix + kernelDX[i]);
+        const py = Math.floor(iy + kernelDY[i]);
+
+        if (px < 0 || py < 0 || px >= maskWidth || py >= maskHeight)
+          continue;
+
+        dirtyMinX = Math.min(dirtyMinX, px);
+        dirtyMinY = Math.min(dirtyMinY, py);
+        dirtyMaxX = Math.max(dirtyMaxX, px);
+        dirtyMaxY = Math.max(dirtyMaxY, py);
+
+        const index = py * maskWidth + px;
+        const value = kernelIntensity[i];
+
+        if (mode === "erase") {
+          maskBuffer[index] = Math.max(0, maskBuffer[index] - value);
+        } else {
+          maskBuffer[index] = Math.min(255, maskBuffer[index] + value);
+        }
+      }
+    }
+
+    // 🔥 CRITICAL FIX: Clear before re-render
+    maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+
+    renderMaskPreview();
+
+    lastX = x;
+    lastY = y;
+  }
+});
 
 
+maskCanvas.addEventListener("mouseup", function () {
+  isDrawing = false;
+  lastX = lastY = null;
+  if (mode === "move") maskCanvas.style.cursor = "grab";
+});
 
 
 maskCanvas.addEventListener("mouseleave", function () {
@@ -596,6 +560,9 @@ maskCanvas.addEventListener("mouseleave", function () {
     previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
   }
 });
+
+
+
 
 
 
