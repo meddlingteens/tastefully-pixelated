@@ -1,41 +1,68 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-  // ======================================================
-  // ELEMENTS
-  // ======================================================
+ // ======================================================
+// ELEMENTS
+// ======================================================
 
-  const canvasContainer = document.getElementById("canvasContainer");
-  const baseCanvas = document.getElementById("baseCanvas");
-  const maskCanvas = document.getElementById("maskCanvas");
 
-  const baseCtx = baseCanvas.getContext("2d");
-  const maskCtx = maskCanvas.getContext("2d");
-
+// Canvas Elements
+const canvasContainer = document.getElementById("canvasContainer");
+const baseCanvas = document.getElementById("baseCanvas");
+const maskCanvas = document.getElementById("maskCanvas");
 const previewCanvas = document.getElementById("previewCanvas");
+
+if (!canvasContainer || !baseCanvas || !maskCanvas) {
+  console.error("Critical canvas elements missing.");
+  return;
+}
+
+const baseCtx = baseCanvas.getContext("2d");
+const maskCtx = maskCanvas.getContext("2d");
 const previewCtx = previewCanvas ? previewCanvas.getContext("2d") : null;
 
-  const applyBtn = document.getElementById("applyBtn");
-  const brushSlider = document.getElementById("brushSlider");
-  const zoomSlider = document.getElementById("zoomSlider");
-  const uploadInput = document.getElementById("uploadInput");
-  const drawBtn = document.getElementById("drawBtn");
-  const moveBtn = document.getElementById("moveBtn");
 
-  
-const canvasSelectBtn = document.getElementById("canvasSelectBtn");
 
-canvasSelectBtn.addEventListener("click", function () {
-  uploadInput.click();
+
+
+
+window.addEventListener("error", function (e) {
+  console.error("Runtime error:", e.message);
 });
 
+// UI Elements
+const applyBtn = document.getElementById("applyBtn");
+const brushSlider = document.getElementById("brushSlider");
+const zoomSlider = document.getElementById("zoomSlider");
+const uploadInput = document.getElementById("uploadInput");
+const drawBtn = document.getElementById("drawBtn");
+const moveBtn = document.getElementById("moveBtn");
+const canvasSelectBtn = document.getElementById("canvasSelectBtn");
 
+// Safely wire Select Photo
+if (canvasSelectBtn && uploadInput) {
+  canvasSelectBtn.addEventListener("click", function () {
+    uploadInput.click();
+  });
+} else {
+  console.warn("Select photo elements missing.");
+}
+
+
+
+// ======================================================
+// MASK PREVIEW RENDER
+// ======================================================
 
 function renderMaskPreview() {
 
+  // Guard required dependencies
+  if (!maskCtx || !maskBuffer) return;
   if (dirtyMinX === Infinity) return;
 
   const width = dirtyMaxX - dirtyMinX + 1;
   const height = dirtyMaxY - dirtyMinY + 1;
+
+  if (width <= 0 || height <= 0) return;
 
   const imageData = maskCtx.createImageData(width, height);
   const data = imageData.data;
@@ -61,6 +88,7 @@ function renderMaskPreview() {
 
   maskCtx.putImageData(imageData, dirtyMinX, dirtyMinY);
 }
+
 
 
 
@@ -162,35 +190,55 @@ setRandomBanner();
 
   const MAX_HISTORY = 20;
   let historyStack = [];
+
+
+
+
+
   let redoStack = [];
 
-  // ======================================================
-  // WEB WORKER
-  // ======================================================
-
-  const pixelWorker = new Worker("pixelWorker.js");
 
 
-pixelWorker.onmessage = function (e) {
-	maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
-  const { buffer } = e.data;
 
-  const imageData = new ImageData(
-    new Uint8ClampedArray(buffer),
-    baseCanvas.width,
-    baseCanvas.height
-  );
 
-  baseCtx.putImageData(imageData, 0, 0);
+// ======================================================
+// WEB WORKER
+// ======================================================
 
-maskBuffer = new Uint8Array(maskWidth * maskHeight);
+let pixelWorker = null;
 
-  dirtyMinX = dirtyMinY = Infinity;
-  dirtyMaxX = dirtyMaxY = -Infinity;
+try {
+  pixelWorker = new Worker("pixelWorker.js");
 
-  isApplying = false;
-  applyBtn.disabled = false;  // 👈 RE-ENABLE HERE
-};
+  pixelWorker.onmessage = function (e) {
+    maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+
+    const { buffer } = e.data;
+
+    const imageData = new ImageData(
+      new Uint8ClampedArray(buffer),
+      baseCanvas.width,
+      baseCanvas.height
+    );
+
+    baseCtx.putImageData(imageData, 0, 0);
+
+    maskBuffer = new Uint8Array(maskWidth * maskHeight);
+
+    dirtyMinX = dirtyMinY = Infinity;
+    dirtyMaxX = dirtyMaxY = -Infinity;
+
+    isApplying = false;
+    applyBtn.disabled = false;
+  };
+
+} catch (err) {
+  console.error("Worker failed to initialize:", err);
+}
+
+
+
+
 
 
   // ======================================================
@@ -207,8 +255,10 @@ function resizeCanvas() {
   maskCanvas.width = rect.width;
   maskCanvas.height = rect.height;
 
+if (previewCanvas) {
   previewCanvas.width = rect.width;
   previewCanvas.height = rect.height;
+}
 
   maskWidth = baseCanvas.width;
   maskHeight = baseCanvas.height;
@@ -392,13 +442,14 @@ if (previewCtx) {
   previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
 }
 
-    if (!isDrawing && mode !== "move") {
-      previewCtx.beginPath();
-      previewCtx.arc(x, y, brushSize / 2, 0, Math.PI * 2);
-      previewCtx.strokeStyle = "rgba(255,255,255,0.6)";
-      previewCtx.lineWidth = 1;
-      previewCtx.stroke();
-    }
+ if (!isDrawing && mode !== "move" && previewCtx) {
+  previewCtx.beginPath();
+  previewCtx.arc(x, y, brushSize / 2, 0, Math.PI * 2);
+  previewCtx.strokeStyle = "rgba(255,255,255,0.6)";
+  previewCtx.lineWidth = 1;
+  previewCtx.stroke();
+}
+
 
 if (isDrawing && mode === "move") {
 
@@ -561,19 +612,29 @@ if (eraseBtn) {
   // APPLY
   // ======================================================
 
+
+
+
 applyBtn.addEventListener("click", function () {
+
+  if (!pixelWorker) {
+    console.error("Pixel worker unavailable.");
+    return;
+  }
 
   if (!image) return;
   if (dirtyMinX === Infinity) return;
   if (isApplying) return;
 
-  historyStack.push(
-    baseCtx.getImageData(0, 0, baseCanvas.width, baseCanvas.height)
-  );
 
-  if (historyStack.length > MAX_HISTORY) {
-    historyStack.shift();
-  }
+
+historyStack.push(
+  baseCtx.getImageData(0, 0, baseCanvas.width, baseCanvas.height)
+);
+
+if (historyStack.length > MAX_HISTORY) {
+  historyStack.shift();
+}
 
   redoStack = [];
 
