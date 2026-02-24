@@ -157,7 +157,17 @@ transition:
 
 
 
+#baseCanvas {
+  z-index: 1;
+}
 
+#maskCanvas {
+  z-index: 2;
+}
+
+#previewCanvas {
+  z-index: 3;
+}
 
 
 
