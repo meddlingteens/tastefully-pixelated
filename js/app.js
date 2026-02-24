@@ -607,15 +607,16 @@ maskCanvas.addEventListener("mouseleave", function () {
 
 // Get erase button first (so setMode can use it)
 
+
+
 function setMode(newMode) {
+  console.log("Mode:", newMode);  // ← ADD THIS LINE
   mode = newMode;
 
-  // Remove active from all
   drawBtn.classList.remove("active");
   moveBtn.classList.remove("active");
   if (eraseBtn) eraseBtn.classList.remove("active");
 
-  // Set active on selected
   if (newMode === "draw") {
     drawBtn.classList.add("active");
     maskCanvas.style.cursor = "crosshair";
@@ -631,6 +632,11 @@ function setMode(newMode) {
     maskCanvas.style.cursor = "crosshair";
   }
 }
+
+
+
+
+
 
 // Button listeners now call setMode (no duplicate logic)
 drawBtn.addEventListener("click", () => setMode("draw"));
