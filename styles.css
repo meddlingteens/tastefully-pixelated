@@ -4,9 +4,9 @@
   margin: 40px auto;
   padding: 32px;
   border-radius: 24px;
-
-  background: #0f1116;   /* dark panel */
+  background: #0f1116;
 }
+
 
 /* Header */
 
@@ -56,6 +56,14 @@
 /* Canvas */
 
 .canvas-container {
+  position: relative;
+  width: 100%;
+  height: 500px;
+  border-radius: 18px;
+  border: 3px solid #c0c0c0;
+  margin-bottom: 28px;
+  overflow: hidden;
+
   background-image: url("images/backgroundPixelsLarge.webp");
   background-size: cover;
   background-position: center;
@@ -66,6 +74,7 @@
   position: absolute;
   top: 0;
   left: 0;
+  z-index: 1;
 }
 
 #baseCanvas { z-index: 1; }
