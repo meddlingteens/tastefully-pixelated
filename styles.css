@@ -2,7 +2,7 @@
 .app {
   max-width: 1000px;
   margin: 40px auto;
-  padding: 10px 32px 32px 32px; /* 10px from top */
+  padding: 18px 32px 32px 32px; /* 10px from top */
   border-radius: 24px;
   background: #0f1116; /* dark panel */
 }
