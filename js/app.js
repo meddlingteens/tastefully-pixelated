@@ -120,7 +120,6 @@ function setRandomSubhead() {
   subhead.textContent = subheadMessages[randomIndex];
 }
 
-setRandomSubhead();
 
 
 
@@ -129,6 +128,9 @@ setRandomSubhead();
 // ======================================================
 
 const bannerHeadline = document.getElementById("bannerHeadline");
+
+setRandomSubhead();
+setRandomBanner();
 
 const bannerMessages = [
   "This is where you can advertise your useless crap",
@@ -153,7 +155,6 @@ function setRandomBanner() {
   }, 150);
 }
 
-setRandomBanner();
 
 
   // ======================================================
