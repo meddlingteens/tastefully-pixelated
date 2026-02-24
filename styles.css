@@ -51,7 +51,11 @@ body::before {
   text-align: left;
 }
 
+
+
 /* BANNER */
+
+
 
 .banner {
   background: linear-gradient(135deg,#5c3b9c,#2e1c55);
@@ -78,6 +82,16 @@ body::before {
 .banner-spinner img {
   width: 52px;
 }
+
+
+#bannerHeadline {
+  transition: opacity 0.2s ease;
+}
+
+.fade-out {
+  opacity: 0;
+}
+
 
 .spend-btn {
   padding: 10px 20px;
@@ -312,6 +326,13 @@ input[type="range"] {
   cursor: pointer;
   transition: .2s;
 }
+
+
+.button-row button.active {
+  box-shadow: 0 0 0 3px rgba(255,255,255,0.25);
+  transform: translateY(-2px);
+}
+
 
 
 
