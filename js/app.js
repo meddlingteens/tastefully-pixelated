@@ -25,6 +25,7 @@ const previewCtx = previewCanvas ? previewCanvas.getContext("2d") : null;
 
 
 
+
 window.addEventListener("error", function (e) {
   console.error("Runtime error:", e.message);
 });
@@ -378,15 +379,22 @@ kernelIntensity[i] = Math.floor(intensity * 255);
   reader.onload = function (event) {
     image = new Image();
 
-    image.onload = function () {
-      zoomLevel = 1;
-      offsetX = 0;
-      offsetY = 0;
-      drawImage();
+image.onload = function () {
+  zoomLevel = 1;
+  offsetX = 0;
+  offsetY = 0;
 
-      setRandomSubhead();
-      setRandomBanner();
-    };
+  drawImage();
+
+  setRandomSubhead();
+  setRandomBanner();
+
+  const overlay = document.querySelector(".canvas-overlay");
+  if (overlay) overlay.classList.add("hidden");
+
+  canvasContainer.classList.add("photo-loaded");
+};
+
 
     image.src = event.target.result;
   };
@@ -574,24 +582,51 @@ maskCanvas.addEventListener("mouseleave", function () {
   // MODE BUTTONS
   // ======================================================
 
-  drawBtn.addEventListener("click", () => {
-    mode = "draw";
-    maskCanvas.style.cursor = "crosshair";
-  });
 
+// Get erase button first (so setMode can use it)
 const eraseBtn = document.getElementById("eraseBtn");
 
-if (eraseBtn) {
-  eraseBtn.addEventListener("click", () => {
-    mode = "erase";
+function setMode(newMode) {
+  mode = newMode;
+
+  // Remove active from all
+  drawBtn.classList.remove("active");
+  moveBtn.classList.remove("active");
+  if (eraseBtn) eraseBtn.classList.remove("active");
+
+  // Set active on selected
+  if (newMode === "draw") {
+    drawBtn.classList.add("active");
     maskCanvas.style.cursor = "crosshair";
-  });
+  }
+
+  if (newMode === "move") {
+    moveBtn.classList.add("active");
+    maskCanvas.style.cursor = "grab";
+  }
+
+  if (newMode === "erase" && eraseBtn) {
+    eraseBtn.classList.add("active");
+    maskCanvas.style.cursor = "crosshair";
+  }
 }
 
-  moveBtn.addEventListener("click", () => {
-    mode = "move";
-    maskCanvas.style.cursor = "grab";
-  });
+// Button listeners now call setMode (no duplicate logic)
+drawBtn.addEventListener("click", () => setMode("draw"));
+moveBtn.addEventListener("click", () => setMode("move"));
+
+if (eraseBtn) {
+  eraseBtn.addEventListener("click", () => setMode("erase"));
+}
+
+// Set default mode on load
+setMode("draw");
+
+
+
+
+
+
 
   // ======================================================
   // SLIDERS
