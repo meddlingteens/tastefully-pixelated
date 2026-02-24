@@ -203,7 +203,6 @@ setRandomBanner();
 
 
 
-
 // ======================================================
 // WEB WORKER
 // ======================================================
@@ -211,36 +210,47 @@ setRandomBanner();
 let pixelWorker = null;
 
 try {
+
   pixelWorker = new Worker("pixelWorker.js");
 
   pixelWorker.onmessage = function (e) {
-    maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
 
     const { buffer } = e.data;
 
+    // Rebuild ImageData from worker buffer
     const imageData = new ImageData(
       new Uint8ClampedArray(buffer),
       baseCanvas.width,
       baseCanvas.height
     );
 
+    // Draw processed image
     baseCtx.putImageData(imageData, 0, 0);
 
+    // Clear mask preview layer
+    maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+
+    // Reset mask buffer
     maskBuffer = new Uint8Array(maskWidth * maskHeight);
 
-    dirtyMinX = dirtyMinY = Infinity;
-    dirtyMaxX = dirtyMaxY = -Infinity;
+    // Reset dirty bounds (CRITICAL for stable draw behavior)
+    dirtyMinX = Infinity;
+    dirtyMinY = Infinity;
+    dirtyMaxX = -Infinity;
+    dirtyMaxY = -Infinity;
 
+    // Re-enable Apply button
     isApplying = false;
     applyBtn.disabled = false;
   };
 
 } catch (err) {
+
   console.error("Worker failed to initialize:", err);
+
+  // Fail gracefully — app still runs without Apply
+  pixelWorker = null;
 }
-
-
-
 
 
 
@@ -433,10 +443,18 @@ if (mode === "move") {
 }
 
 
+
 else {
-      lastX = null;
-      lastY = null;
-    }
+  lastX = null;
+  lastY = null;
+
+  // Clear previous preview so drawing starts clean
+  maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+}
+
+
+
+
   });
 
 maskCanvas.addEventListener("mousemove", function (e) {
@@ -472,6 +490,7 @@ if (isDrawing && mode === "move") {
   offsetY = mouseY - lastY;
 
   drawImage();
+  renderMaskPreview(); // 👈 this makes the mask follow the image
 }
 
 
