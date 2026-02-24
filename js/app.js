@@ -307,37 +307,47 @@ kernelIntensity[i] = Math.floor(intensity * 255);
     baseCtx.drawImage(image, x, y, drawWidth, drawHeight);
   }
 
+
+
+
+
   // ======================================================
   // IMAGE UPLOAD
   // ======================================================
 
-  uploadInput.addEventListener("change", function (e) {
-
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
 
 
+
+ uploadInput.addEventListener("change", function (e) {
+
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = function (event) {
+    image = new Image();
 
     image.onload = function () {
-  zoomLevel = 1;
-  offsetX = 0;
-  offsetY = 0;
-  drawImage();
+      zoomLevel = 1;
+      offsetX = 0;
+      offsetY = 0;
+      drawImage();
 
-  setRandomSubhead();
-  setRandomBanner(); // 👈 Add this
-};
-
-
-
-
-      image.src = event.target.result;
+      setRandomSubhead();
+      setRandomBanner();
     };
 
-    reader.readAsDataURL(file);
-  });
+    image.src = event.target.result;
+  };
+
+  reader.readAsDataURL(file);
+});
+
+
+
+
+
 
   // ======================================================
   // MOUSE EVENTS
@@ -507,10 +517,12 @@ lastY = y;
     maskCanvas.style.cursor = "crosshair";
   });
 
+if (eraseBtn) {
   eraseBtn.addEventListener("click", () => {
     mode = "erase";
     maskCanvas.style.cursor = "crosshair";
   });
+}
 
   moveBtn.addEventListener("click", () => {
     mode = "move";
