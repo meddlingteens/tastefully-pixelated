@@ -391,30 +391,32 @@ kernelIntensity[i] = Math.floor(intensity * 255);
   reader.onload = function (event) {
     image = new Image();
 
-    image.onload = function () {
-      zoomLevel = 1;
-      offsetX = 0;
-      offsetY = 0;
+image.onload = function () {
+  zoomLevel = 1;
+  offsetX = 0;
+  offsetY = 0;
 
-      drawImage();
+  drawImage();
 
-      setRandomSubhead();
-      setRandomBanner();
+  setRandomSubhead();
+  setRandomBanner();
 
-      const overlay = document.querySelector(".canvas-overlay");
-      if (overlay) overlay.classList.add("hidden");
+  const overlay = document.querySelector(".canvas-overlay");
+  if (overlay) overlay.classList.add("hidden");
 
-      canvasContainer.classList.add("photo-loaded");
+  canvasContainer.classList.add("photo-loaded");
+};
 
-      // 🔥 CRITICAL FIX
-      uploadInput.value = "";
-    };
 
     image.src = event.target.result;
   };
 
   reader.readAsDataURL(file);
 });
+
+
+
+
 
 
   // ======================================================
