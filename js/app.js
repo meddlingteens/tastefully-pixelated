@@ -85,15 +85,29 @@ function renderMaskPreview() {
 
   tempCtx.putImageData(imageData, 0, 0);
 
+  // IMPORTANT: use SAME transform math as drawImage()
+
+  const imgRatio = image.width / image.height;
+  const canvasRatio = baseCanvas.width / baseCanvas.height;
+
+  let drawWidth, drawHeight;
+
+  if (imgRatio > canvasRatio) {
+    drawWidth = baseCanvas.width * zoomLevel;
+    drawHeight = drawWidth / imgRatio;
+  } else {
+    drawHeight = baseCanvas.height * zoomLevel;
+    drawWidth = drawHeight * imgRatio;
+  }
+
   maskCtx.drawImage(
     tempCanvas,
     imageDrawX,
     imageDrawY,
-    image.width * zoomLevel,
-    image.height * zoomLevel
+    drawWidth,
+    drawHeight
   );
 }
-
 
 
 
