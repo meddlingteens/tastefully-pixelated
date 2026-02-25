@@ -100,13 +100,14 @@ function renderMaskPreview() {
     drawWidth = drawHeight * imgRatio;
   }
 
-  maskCtx.drawImage(
-    tempCanvas,
-    imageDrawX,
-    imageDrawY,
-    drawWidth,
-    drawHeight
-  );
+maskCtx.drawImage(
+  tempCanvas,
+  imageDrawX,
+  imageDrawY,
+  currentDrawWidth,
+  currentDrawHeight
+);
+
 }
 
 
@@ -183,6 +184,9 @@ setRandomBanner();
   // ======================================================
 
   let image = null;
+
+let currentDrawWidth = 0;
+let currentDrawHeight = 0;
 
 let imageDrawX = 0;
 let imageDrawY = 0;
@@ -398,6 +402,9 @@ kernelIntensity[i] = Math.floor(intensity * 255);
       drawWidth = drawHeight * imgRatio;
     }
 
+currentDrawWidth = drawWidth;
+currentDrawHeight = drawHeight;
+
 imageDrawX = (baseCanvas.width - drawWidth) / 2 + offsetX;
 imageDrawY = (baseCanvas.height - drawHeight) / 2 + offsetY;
 
@@ -492,13 +499,12 @@ const scaleY = maskCanvas.height / rect.height;
 const mouseX = (e.clientX - rect.left) * scaleX;
 const mouseY = (e.clientY - rect.top) * scaleY;
 
+lastX = mouseX;
+lastY = mouseY;
 
 
 
 
-
-    lastX = mouseX - offsetX;
-    lastY = mouseY - offsetY;
 
     maskCanvas.style.cursor = "grabbing";
   } else {
