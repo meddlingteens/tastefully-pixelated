@@ -215,34 +215,69 @@ button:not(.primary-btn).active {
   box-shadow: 0 0 0 2px rgba(255,255,255,0.15);
 }
 
-/* TOOL BUTTONS (Draw, Move, Erase, Apply) */
 
-button:not(.primary-btn) {
-  background: linear-gradient(135deg, #ff6b6b, #f06595);
-  border: 2px solid #c0c0c0;
-  color: #fff;
+
+
+
+
+/* =========================
+   EDITING BUTTON COLORS
+   ========================= */
+
+/* DRAW */
+#drawBtn {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
 }
 
-button:not(.primary-btn):hover {
-  background: linear-gradient(135deg, #fa5252, #e64980);
+#drawBtn:hover {
+  box-shadow: 0 0 12px rgba(59,130,246,0.4);
 }
 
-button:not(.primary-btn).active {
-  background: linear-gradient(135deg, #845ef7, #5f3dc4);
-  box-shadow: 0 0 0 2px rgba(255,255,255,0.25);
-}
-
-button:not(.primary-btn):active {
-  transform: translateY(1px);
-}
-
-button:not(.primary-btn):disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+#drawBtn.active {
+  box-shadow: 0 0 0 2px #ffffff, 0 0 14px rgba(59,130,246,0.6);
 }
 
 
+/* MOVE */
+#moveBtn {
+  background: linear-gradient(135deg, #14b8a6, #0d9488);
+}
 
+#moveBtn:hover {
+  box-shadow: 0 0 12px rgba(20,184,166,0.4);
+}
+
+#moveBtn.active {
+  box-shadow: 0 0 0 2px #ffffff, 0 0 14px rgba(20,184,166,0.6);
+}
+
+
+/* ERASE */
+#eraseBtn {
+  background: linear-gradient(135deg, #f97316, #ea580c);
+}
+
+#eraseBtn:hover {
+  box-shadow: 0 0 12px rgba(249,115,22,0.4);
+}
+
+#eraseBtn.active {
+  box-shadow: 0 0 0 2px #ffffff, 0 0 14px rgba(249,115,22,0.6);
+}
+
+
+/* APPLY */
+#applyBtn {
+  background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+}
+
+#applyBtn:hover {
+  box-shadow: 0 0 12px rgba(139,92,246,0.4);
+}
+
+#applyBtn.active {
+  box-shadow: 0 0 0 2px #ffffff, 0 0 14px rgba(139,92,246,0.6);
+}
 
 
 
