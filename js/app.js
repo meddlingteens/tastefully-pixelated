@@ -696,6 +696,11 @@ setMode("draw");
   renderMaskPreview();
 });
 
+
+
+
+
+
   // ======================================================
   // APPLY
   // ======================================================
@@ -726,12 +731,26 @@ if (historyStack.length > MAX_HISTORY) {
 
   redoStack = [];
 
-  const baseData = baseCtx.getImageData(
-    0,
-    0,
-    baseCanvas.width,
-    baseCanvas.height
-  );
+
+
+// Create temp image-space canvas
+const imageCanvas = document.createElement("canvas");
+imageCanvas.width = image.width;
+imageCanvas.height = image.height;
+
+const imageCtx = imageCanvas.getContext("2d");
+
+// Draw original image at 1:1 (no zoom, no offset)
+imageCtx.drawImage(image, 0, 0);
+
+const baseData = imageCtx.getImageData(
+  0,
+  0,
+  image.width,
+  image.height
+);
+
+
 
   applyBtn.disabled = true;   // 👈 RIGHT HERE
   isApplying = true;
