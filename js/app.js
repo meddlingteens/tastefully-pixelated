@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
 // ELEMENTS
 // ======================================================
 
-let DEBUG_DRAW = true;
+let DEBUG_DRAW = false;
 
 
 
@@ -67,7 +67,7 @@ function renderMaskPreview() {
 
   if (!maskCtx || !maskBuffer || !image) return;
 
-// maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
 
   const tempCanvas = document.createElement("canvas");
   tempCanvas.width = maskWidth;
@@ -525,13 +525,7 @@ maskCanvas.addEventListener("mousemove", function (e) {
   const x = (e.clientX - rect.left) * scaleX;
   const y = (e.clientY - rect.top) * scaleY;
 
-  // 🔴 RED DOT (cursor position)
-  if (DEBUG_DRAW) {
-    maskCtx.fillStyle = "red";
-    maskCtx.beginPath();
-    maskCtx.arc(x, y, 4, 0, Math.PI * 2);
-    maskCtx.fill();
-  }
+ 
 
   // Clear preview
   if (previewCtx) {
@@ -580,16 +574,7 @@ maskCanvas.addEventListener("mousemove", function (e) {
         const px = Math.floor(imgX + kernelDX[i]);
         const py = Math.floor(imgY + kernelDY[i]);
 
-        // 🔵 BLUE DOT (where mask is writing)
-        if (DEBUG_DRAW) {
-          const canvasX = imageDrawX + px * zoomLevel;
-          const canvasY = imageDrawY + py * zoomLevel;
-
-          maskCtx.fillStyle = "blue";
-          maskCtx.beginPath();
-          maskCtx.arc(canvasX, canvasY, 3, 0, Math.PI * 2);
-          maskCtx.fill();
-        }
+ 
 
         if (px < 0 || py < 0 || px >= maskWidth || py >= maskHeight)
           continue;
