@@ -282,13 +282,15 @@ function resizeCanvas() {
   maskCanvas.width = rect.width;
   maskCanvas.height = rect.height;
 
-if (previewCanvas) {
-  previewCanvas.width = rect.width;
-  previewCanvas.height = rect.height;
-}
+  if (previewCanvas) {
+    previewCanvas.width = rect.width;
+    previewCanvas.height = rect.height;
+  }
 
-
-  if (image) drawImage();
+  if (image) {
+    drawImage();
+    renderMaskPreview();  // 🔥 THIS WAS MISSING
+  }
 }
 
 
