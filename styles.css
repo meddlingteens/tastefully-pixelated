@@ -215,6 +215,23 @@ button:not(.primary-btn).active {
   box-shadow: 0 0 0 2px rgba(255,255,255,0.15);
 }
 
+/* TOOL BUTTONS (Draw, Move, Erase, Apply) */
+
+button:not(.primary-btn) {
+  background: linear-gradient(135deg, #ff6b6b, #f06595);
+  border: 2px solid #c0c0c0;
+  color: #fff;
+}
+
+button:not(.primary-btn):hover {
+  background: linear-gradient(135deg, #fa5252, #e64980);
+}
+
+button:not(.primary-btn).active {
+  background: linear-gradient(135deg, #845ef7, #5f3dc4);
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.25);
+}
+
 button:not(.primary-btn):active {
   transform: translateY(1px);
 }
