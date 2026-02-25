@@ -482,9 +482,20 @@ maskCanvas.addEventListener("mousedown", function (e) {
 
   if (mode === "move") {
 
-    const rect = maskCanvas.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
+
+
+const rect = maskCanvas.getBoundingClientRect();
+
+const scaleX = maskCanvas.width / rect.width;
+const scaleY = maskCanvas.height / rect.height;
+
+const mouseX = (e.clientX - rect.left) * scaleX;
+const mouseY = (e.clientY - rect.top) * scaleY;
+
+
+
+
+
 
     lastX = mouseX - offsetX;
     lastY = mouseY - offsetY;
@@ -494,6 +505,9 @@ maskCanvas.addEventListener("mousedown", function (e) {
 
     lastX = null;
     lastY = null;
+
+
+
 
     // Clear previous preview so drawing starts clean
     maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
@@ -506,14 +520,21 @@ maskCanvas.addEventListener("mousemove", function (e) {
   if (!image) return;
   if (isApplying) return;
 
-  const rect = maskCanvas.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
+const rect = maskCanvas.getBoundingClientRect();
+
+const scaleX = maskCanvas.width / rect.width;
+const scaleY = maskCanvas.height / rect.height;
+
+const x = (e.clientX - rect.left) * scaleX;
+const y = (e.clientY - rect.top) * scaleY;
 
   // Clear brush preview
   if (previewCtx) {
     previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
   }
+
+
+
 
   // Draw brush outline when not drawing
   if (!isDrawing && mode !== "move" && previewCtx) {
