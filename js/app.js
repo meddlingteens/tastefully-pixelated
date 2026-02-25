@@ -58,47 +58,51 @@ if (canvasSelectBtn && uploadInput) {
 
 function renderMaskPreview() {
 
-  // Guard required dependencies
-  if (!maskCtx || !maskBuffer) return;
-  if (dirtyMinX === Infinity) return;
+  if (!maskCtx || !maskBuffer || !image) return;
 
-  const width = dirtyMaxX - dirtyMinX + 1;
-  const height = dirtyMaxY - dirtyMinY + 1;
+  maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
 
-  if (width <= 0 || height <= 0) return;
+  const offscreen = document.createElement("canvas");
+  offscreen.width = maskWidth;
+  offscreen.height = maskHeight;
 
-  const imageData = maskCtx.createImageData(width, height);
+  const offCtx = offscreen.getContext("2d");
+  const imageData = offCtx.createImageData(maskWidth, maskHeight);
   const data = imageData.data;
 
-  for (let y = 0; y < height; y++) {
-
-    const srcY = dirtyMinY + y;
-
-    for (let x = 0; x < width; x++) {
-
-      const srcX = dirtyMinX + x;
-      const srcIndex = srcY * maskWidth + srcX;
-      const dstIndex = (y * width + x) * 4;
-
-      const alpha = maskBuffer[srcIndex];
-
-      data[dstIndex]     = 255;
-      data[dstIndex + 1] = 255;
-      data[dstIndex + 2] = 255;
-      data[dstIndex + 3] = alpha;
-    }
+  for (let i = 0; i < maskBuffer.length; i++) {
+    const alpha = maskBuffer[i];
+    const idx = i * 4;
+    data[idx] = 255;
+    data[idx + 1] = 255;
+    data[idx + 2] = 255;
+    data[idx + 3] = alpha;
   }
 
- maskCtx.putImageData(
-  imageData,
-  dirtyMinX + imageDrawX,
-  dirtyMinY + imageDrawY
-);
+  offCtx.putImageData(imageData, 0, 0);
 
+  // SAME math as drawImage()
+  const imgRatio = image.width / image.height;
+  const canvasRatio = baseCanvas.width / baseCanvas.height;
 
+  let drawWidth, drawHeight;
+
+  if (imgRatio > canvasRatio) {
+    drawWidth = baseCanvas.width * zoomLevel;
+    drawHeight = drawWidth / imgRatio;
+  } else {
+    drawHeight = baseCanvas.height * zoomLevel;
+    drawWidth = drawHeight * imgRatio;
+  }
+
+  maskCtx.drawImage(
+    offscreen,
+    imageDrawX,
+    imageDrawY,
+    drawWidth,
+    drawHeight
+  );
 }
-
-
 
 
 
@@ -283,11 +287,6 @@ if (previewCanvas) {
   previewCanvas.height = rect.height;
 }
 
-  maskWidth = baseCanvas.width;
-  maskHeight = baseCanvas.height;
-
-  // 🔥 CHANGE HERE
-  maskBuffer = new Uint8Array(maskWidth * maskHeight);
 
   if (image) drawImage();
 }
@@ -402,15 +401,32 @@ baseCtx.drawImage(image, imageDrawX, imageDrawY, drawWidth, drawHeight);
   reader.onload = function (event) {
     image = new Image();
 
+
 image.onload = function () {
+
   zoomLevel = 1;
   offsetX = 0;
   offsetY = 0;
 
+  maskWidth = image.width;
+  maskHeight = image.height;
+  maskBuffer = new Uint8ClampedArray(maskWidth * maskHeight);
+
+  dirtyMinX = Infinity;
+  dirtyMinY = Infinity;
+  dirtyMaxX = -Infinity;
+  dirtyMaxY = -Infinity;
+
   drawImage();
+};
+
+
 
   setRandomSubhead();
   setRandomBanner();
+
+
+
 
   const overlay = document.querySelector(".canvas-overlay");
   if (overlay) overlay.classList.add("hidden");
@@ -500,6 +516,12 @@ maskCanvas.addEventListener("mousemove", function (e) {
     return;
   }
 
+
+
+
+
+
+
   // DRAW / ERASE MODE
   if (isDrawing && (mode === "draw" || mode === "erase")) {
 
@@ -520,13 +542,23 @@ maskCanvas.addEventListener("mousemove", function (e) {
       const ix = lastX + dx * t;
       const iy = lastY + dy * t;
 
-      for (let i = 0; i < kernelSize; i++) {
 
-  const px = Math.floor(ix + kernelDX[i] - imageDrawX);
-const py = Math.floor(iy + kernelDY[i] - imageDrawY);
 
-        if (px < 0 || py < 0 || px >= maskWidth || py >= maskHeight)
-          continue;
+
+
+for (let i = 0; i < kernelSize; i++) {
+
+  const imgX = (ix - imageDrawX) / zoomLevel;
+  const imgY = (iy - imageDrawY) / zoomLevel;
+
+  const px = Math.floor(imgX + kernelDX[i] / zoomLevel);
+  const py = Math.floor(imgY + kernelDY[i] / zoomLevel);
+
+  if (px < 0 || py < 0 || px >= maskWidth || py >= maskHeight)
+    continue;
+
+ 
+
 
         dirtyMinX = Math.min(dirtyMinX, px);
         dirtyMinY = Math.min(dirtyMinY, py);
@@ -630,22 +662,28 @@ setMode("draw");
 
 
 
+// ======================================================
+// SLIDERS
+// ======================================================
+
+brushSlider.addEventListener("input", function (e) {
+  brushSize = parseInt(e.target.value);
+  buildBrushKernel();
+});
+
+zoomSlider.addEventListener("input", function (e) {
+  zoomLevel = parseFloat(e.target.value);
+
+  drawImage();
+
+  if (image && maskBuffer && maskBuffer.length) {
+    renderMaskPreview();
+  }
+});
 
 
-  // ======================================================
-  // SLIDERS
-  // ======================================================
 
-  brushSlider.addEventListener("input", e => {
-    brushSize = parseInt(e.target.value);
-    buildBrushKernel();
-  });
 
-  zoomSlider.addEventListener("input", e => {
-    targetZoom = parseFloat(e.target.value);
-    zoomLevel = targetZoom;
-    drawImage();
-  });
 
   // ======================================================
   // APPLY
@@ -687,18 +725,24 @@ if (historyStack.length > MAX_HISTORY) {
   applyBtn.disabled = true;   // 👈 RIGHT HERE
   isApplying = true;
 
-  pixelWorker.postMessage(
-    {
-      buffer: baseData.data.buffer,
-      maskBuffer: maskBuffer.buffer,
-      width: baseCanvas.width,
-      height: baseCanvas.height,
-      pixelSize: 20,
-      dirtyMinX,
-      dirtyMinY,
-      dirtyMaxX,
-      dirtyMaxY
-    },
+
+
+pixelWorker.postMessage(
+  {
+    buffer: baseData.data.buffer,
+    maskBuffer: maskBuffer.buffer,
+    width: image.width,
+    height: image.height,
+    pixelSize: 20,
+    dirtyMinX,
+    dirtyMinY,
+    dirtyMaxX,
+    dirtyMaxY
+  },
+
+
+
+
     [
       baseData.data.buffer,
       maskBuffer.buffer
