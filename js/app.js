@@ -570,12 +570,11 @@ if (isDrawing && mode === "move") {
 
       for (let i = 0; i < kernelSize; i++) {
 
-        const imgX = (ix - imageDrawX) / zoomLevel;
-        const imgY = (iy - imageDrawY) / zoomLevel;
+        const scaleX = currentDrawWidth / image.width;
+const scaleY = currentDrawHeight / image.height;
 
-        const px = Math.floor(imgX + kernelDX[i]);
-        const py = Math.floor(imgY + kernelDY[i]);
-
+const imgX = (ix - imageDrawX) / scaleX;
+const imgY = (iy - imageDrawY) / scaleY;
  
 
         if (px < 0 || py < 0 || px >= maskWidth || py >= maskHeight)
