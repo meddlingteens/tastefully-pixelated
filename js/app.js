@@ -91,18 +91,7 @@ maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
 
   // IMPORTANT: use SAME transform math as drawImage()
 
-  const imgRatio = image.width / image.height;
-  const canvasRatio = baseCanvas.width / baseCanvas.height;
-
-  let drawWidth, drawHeight;
-
-  if (imgRatio > canvasRatio) {
-    drawWidth = baseCanvas.width * zoomLevel;
-    drawHeight = drawWidth / imgRatio;
-  } else {
-    drawHeight = baseCanvas.height * zoomLevel;
-    drawWidth = drawHeight * imgRatio;
-  }
+  
 
 maskCtx.drawImage(
   tempCanvas,
@@ -188,6 +177,8 @@ setRandomBanner();
   // ======================================================
 
   let image = null;
+
+
 
 let currentDrawWidth = 0;
 let currentDrawHeight = 0;
@@ -387,34 +378,33 @@ kernelIntensity[i] = Math.floor(intensity * 255);
   // DRAW IMAGE
   // ======================================================
 
-  function drawImage() {
+function drawImage() {
 
-    baseCtx.clearRect(0, 0, baseCanvas.width, baseCanvas.height);
+  baseCtx.clearRect(0, 0, baseCanvas.width, baseCanvas.height);
 
-    if (!image) return;
+  if (!image) return;
 
-    const imgRatio = image.width / image.height;
-    const canvasRatio = baseCanvas.width / baseCanvas.height;
+  const imgRatio = image.width / image.height;
+  const canvasRatio = baseCanvas.width / baseCanvas.height;
 
-    let drawWidth, drawHeight;
+  let drawWidth, drawHeight;
 
-    if (imgRatio > canvasRatio) {
-      drawWidth = baseCanvas.width * zoomLevel;
-      drawHeight = drawWidth / imgRatio;
-    } else {
-      drawHeight = baseCanvas.height * zoomLevel;
-      drawWidth = drawHeight * imgRatio;
-    }
-
-currentDrawWidth = drawWidth;
-currentDrawHeight = drawHeight;
-
-imageDrawX = (baseCanvas.width - drawWidth) / 2 + offsetX;
-imageDrawY = (baseCanvas.height - drawHeight) / 2 + offsetY;
-
-baseCtx.drawImage(image, imageDrawX, imageDrawY, drawWidth, drawHeight);
-
+  if (imgRatio > canvasRatio) {
+    drawWidth = baseCanvas.width * zoomLevel;
+    drawHeight = drawWidth / imgRatio;
+  } else {
+    drawHeight = baseCanvas.height * zoomLevel;
+    drawWidth = drawHeight * imgRatio;
   }
+
+  currentDrawWidth = drawWidth;
+  currentDrawHeight = drawHeight;
+
+  imageDrawX = (baseCanvas.width - drawWidth) / 2 + offsetX;
+  imageDrawY = (baseCanvas.height - drawHeight) / 2 + offsetY;
+
+  baseCtx.drawImage(image, imageDrawX, imageDrawY, drawWidth, drawHeight);
+}
 
 
 
@@ -541,15 +531,27 @@ maskCanvas.addEventListener("mousemove", function (e) {
     previewCtx.stroke();
   }
 
+
+
+
+
   // MOVE MODE
-  if (isDrawing && mode === "move") {
-    offsetX = x - lastX;
-    offsetY = y - lastY;
+if (isDrawing && mode === "move") {
+
+    offsetX += x - lastX;
+    offsetY += y - lastY;
+
+    lastX = x;
+    lastY = y;
 
     drawImage();
     renderMaskPreview();
     return;
-  }
+}
+
+
+
+
 
   // DRAW / ERASE MODE
   if (isDrawing && (mode === "draw" || mode === "erase")) {
