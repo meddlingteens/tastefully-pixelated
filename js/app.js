@@ -481,12 +481,14 @@ maskCanvas.addEventListener("mousedown", function (e) {
 
   isDrawing = true;
 
-  const rect = maskCanvas.getBoundingClientRect();
-  const scaleX = maskCanvas.width / rect.width;
-  const scaleY = maskCanvas.height / rect.height;
+const rect = maskCanvas.getBoundingClientRect();
 
-  const mouseX = (e.clientX - rect.left) * scaleX;
-  const mouseY = (e.clientY - rect.top) * scaleY;
+const mouseX = e.clientX - rect.left;
+const mouseY = e.clientY - rect.top;
+
+
+
+
 
   if (mode === "move") {
 
@@ -508,12 +510,10 @@ maskCanvas.addEventListener("mousemove", function (e) {
   if (!image) return;
   if (isApplying) return;
 
-  const rect = maskCanvas.getBoundingClientRect();
-  const scaleX = maskCanvas.width / rect.width;
-  const scaleY = maskCanvas.height / rect.height;
+const rect = maskCanvas.getBoundingClientRect();
 
-  const x = (e.clientX - rect.left) * scaleX;
-  const y = (e.clientY - rect.top) * scaleY;
+const x = e.clientX - rect.left;
+const y = e.clientY - rect.top;
 
  
 
