@@ -513,7 +513,6 @@ maskCanvas.addEventListener("mousedown", function (e) {
   }
 });
 
-
 maskCanvas.addEventListener("mousemove", function (e) {
 
   if (!image) return;
@@ -526,7 +525,7 @@ maskCanvas.addEventListener("mousemove", function (e) {
   const x = (e.clientX - rect.left) * scaleX;
   const y = (e.clientY - rect.top) * scaleY;
 
-  // 🔴 DEBUG RED DOT (cursor position)
+  // 🔴 RED DOT (cursor position)
   if (DEBUG_DRAW) {
     maskCtx.fillStyle = "red";
     maskCtx.beginPath();
@@ -534,7 +533,7 @@ maskCanvas.addEventListener("mousemove", function (e) {
     maskCtx.fill();
   }
 
-  // Clear brush preview
+  // Clear preview
   if (previewCtx) {
     previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
   }
@@ -548,19 +547,17 @@ maskCanvas.addEventListener("mousemove", function (e) {
     previewCtx.stroke();
   }
 
-  // ================= MOVE MODE =================
+  // MOVE MODE
   if (isDrawing && mode === "move") {
-
     offsetX = x - lastX;
     offsetY = y - lastY;
 
     drawImage();
     renderMaskPreview();
-
     return;
   }
 
-  // ================= DRAW / ERASE =================
+  // DRAW / ERASE MODE
   if (isDrawing && (mode === "draw" || mode === "erase")) {
 
     const dx = x - lastX;
@@ -583,24 +580,19 @@ maskCanvas.addEventListener("mousemove", function (e) {
         const px = Math.floor(imgX + kernelDX[i]);
         const py = Math.floor(imgY + kernelDY[i]);
 
-        if (px < 0 || py < 0 || px >= maskWidth || py >= maskHeight)
-          continue;
-
-        // 🔵 DEBUG BLUE DOT (actual mask pixel location)
+        // 🔵 BLUE DOT (where mask is writing)
         if (DEBUG_DRAW) {
           const canvasX = imageDrawX + px * zoomLevel;
           const canvasY = imageDrawY + py * zoomLevel;
 
           maskCtx.fillStyle = "blue";
           maskCtx.beginPath();
-          maskCtx.arc(canvasX, canvasY, 2, 0, Math.PI * 2);
+          maskCtx.arc(canvasX, canvasY, 3, 0, Math.PI * 2);
           maskCtx.fill();
         }
 
-        dirtyMinX = Math.min(dirtyMinX, px);
-        dirtyMinY = Math.min(dirtyMinY, py);
-        dirtyMaxX = Math.max(dirtyMaxX, px);
-        dirtyMaxY = Math.max(dirtyMaxY, py);
+        if (px < 0 || py < 0 || px >= maskWidth || py >= maskHeight)
+          continue;
 
         const index = py * maskWidth + px;
         const value = kernelIntensity[i];
@@ -613,13 +605,18 @@ maskCanvas.addEventListener("mousemove", function (e) {
       }
     }
 
-    maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
     renderMaskPreview();
 
     lastX = x;
     lastY = y;
   }
 });
+
+
+
+
+
+
 
 
 maskCanvas.addEventListener("mouseup", function () {
