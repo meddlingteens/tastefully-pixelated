@@ -56,47 +56,48 @@ if (canvasSelectBtn && uploadInput) {
 // MASK PREVIEW RENDER
 // ======================================================
 
+
+
+
 function renderMaskPreview() {
 
-  // Guard required dependencies
-  if (!maskCtx || !maskBuffer) return;
-  if (dirtyMinX === Infinity) return;
+  if (!maskCtx || !maskBuffer || !image) return;
 
-  const width = dirtyMaxX - dirtyMinX + 1;
-  const height = dirtyMaxY - dirtyMinY + 1;
+  maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
 
-  if (width <= 0 || height <= 0) return;
+  const tempCanvas = document.createElement("canvas");
+  tempCanvas.width = maskWidth;
+  tempCanvas.height = maskHeight;
 
-  const imageData = maskCtx.createImageData(width, height);
+  const tempCtx = tempCanvas.getContext("2d");
+  const imageData = tempCtx.createImageData(maskWidth, maskHeight);
   const data = imageData.data;
 
-  for (let y = 0; y < height; y++) {
+  for (let i = 0; i < maskBuffer.length; i++) {
+    const alpha = maskBuffer[i];
+    const idx = i * 4;
 
-    const srcY = dirtyMinY + y;
-
-    for (let x = 0; x < width; x++) {
-
-      const srcX = dirtyMinX + x;
-      const srcIndex = srcY * maskWidth + srcX;
-      const dstIndex = (y * width + x) * 4;
-
-      const alpha = maskBuffer[srcIndex];
-
-      data[dstIndex]     = 255;
-      data[dstIndex + 1] = 255;
-      data[dstIndex + 2] = 255;
-      data[dstIndex + 3] = alpha;
-    }
+    data[idx]     = 255;
+    data[idx + 1] = 255;
+    data[idx + 2] = 255;
+    data[idx + 3] = alpha;
   }
 
- maskCtx.putImageData(
-  imageData,
-  dirtyMinX + imageDrawX,
-  dirtyMinY + imageDrawY
-);
+  tempCtx.putImageData(imageData, 0, 0);
 
-
+  maskCtx.drawImage(
+    tempCanvas,
+    imageDrawX,
+    imageDrawY,
+    image.width * zoomLevel,
+    image.height * zoomLevel
+  );
 }
+
+
+
+
+
 
 
 
@@ -228,14 +229,26 @@ try {
     const { buffer } = e.data;
 
     // Rebuild ImageData from worker buffer
-    const imageData = new ImageData(
-      new Uint8ClampedArray(buffer),
-      baseCanvas.width,
-      baseCanvas.height
-    );
+const imageData = new ImageData(
+  new Uint8ClampedArray(buffer),
+  image.width,
+  image.height
+);
 
     // Draw processed image
-    baseCtx.putImageData(imageData, 0, 0);
+const tempCanvas = document.createElement("canvas");
+tempCanvas.width = image.width;
+tempCanvas.height = image.height;
+tempCanvas.getContext("2d").putImageData(imageData, 0, 0);
+
+image = new Image();
+image.onload = function () {
+  drawImage();
+};
+image.src = tempCanvas.toDataURL();
+
+
+
 
     // Clear mask preview layer
     maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
@@ -278,24 +291,21 @@ function resizeCanvas() {
   maskCanvas.width = rect.width;
   maskCanvas.height = rect.height;
 
-if (previewCanvas) {
-  previewCanvas.width = rect.width;
-  previewCanvas.height = rect.height;
+  if (previewCanvas) {
+    previewCanvas.width = rect.width;
+    previewCanvas.height = rect.height;
+  }
+
+  if (image) {
+    drawImage();
+    renderMaskPreview();
+  }
 }
 
-  maskWidth = baseCanvas.width;
-  maskHeight = baseCanvas.height;
-
-  // 🔥 CHANGE HERE
-  maskBuffer = new Uint8Array(maskWidth * maskHeight);
-
-  if (image) drawImage();
-}
+resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
 
 
-
-  resizeCanvas();
-  window.addEventListener("resize", resizeCanvas);
 
   // ======================================================
   // BUILD KERNEL
@@ -406,6 +416,21 @@ image.onload = function () {
   zoomLevel = 1;
   offsetX = 0;
   offsetY = 0;
+
+
+maskWidth = image.width;
+maskHeight = image.height;
+maskBuffer = new Uint8Array(maskWidth * maskHeight);
+
+dirtyMinX = Infinity;
+dirtyMinY = Infinity;
+dirtyMaxX = -Infinity;
+dirtyMaxY = -Infinity;
+
+
+
+
+
 
   drawImage();
 
@@ -522,8 +547,18 @@ maskCanvas.addEventListener("mousemove", function (e) {
 
       for (let i = 0; i < kernelSize; i++) {
 
-  const px = Math.floor(ix + kernelDX[i] - imageDrawX);
-const py = Math.floor(iy + kernelDY[i] - imageDrawY);
+
+
+const imgX = (ix - imageDrawX) / zoomLevel;
+const imgY = (iy - imageDrawY) / zoomLevel;
+
+const px = Math.floor(imgX + kernelDX[i]);
+const py = Math.floor(imgY + kernelDY[i]);
+
+
+
+
+
 
         if (px < 0 || py < 0 || px >= maskWidth || py >= maskHeight)
           continue;
@@ -641,11 +676,11 @@ setMode("draw");
     buildBrushKernel();
   });
 
-  zoomSlider.addEventListener("input", e => {
-    targetZoom = parseFloat(e.target.value);
-    zoomLevel = targetZoom;
-    drawImage();
-  });
+ zoomSlider.addEventListener("input", function (e) {
+  zoomLevel = parseFloat(e.target.value);
+  drawImage();
+  renderMaskPreview();
+});
 
   // ======================================================
   // APPLY
@@ -691,8 +726,10 @@ if (historyStack.length > MAX_HISTORY) {
     {
       buffer: baseData.data.buffer,
       maskBuffer: maskBuffer.buffer,
-      width: baseCanvas.width,
-      height: baseCanvas.height,
+
+width: image.width,
+height: image.height,
+
       pixelSize: 20,
       dirtyMinX,
       dirtyMinY,
