@@ -608,21 +608,25 @@ maskCanvas.addEventListener("mousemove", function (e) {
   }
 });
 
-maskCanvas.addEventListener("mouseup", function () {
+function stopDrawing() {
   isDrawing = false;
-  lastX = lastY = null;
-  if (mode === "move") maskCanvas.style.cursor = "grab";
-});
+  lastX = null;
+  lastY = null;
 
-maskCanvas.addEventListener("mouseleave", function () {
-  isDrawing = false;
-  lastX = lastY = null;
+  if (mode === "move") {
+    maskCanvas.style.cursor = "grab";
+  }
 
   if (previewCtx) {
     previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
   }
-});
+}
 
+maskCanvas.addEventListener("mouseup", stopDrawing);
+maskCanvas.addEventListener("mouseleave", stopDrawing);
+
+// 🔥 Critical addition
+document.addEventListener("mouseup", stopDrawing);
 
 
 
@@ -779,10 +783,26 @@ applyBtn.addEventListener("click", function () {
 
       if (historyStack.length === 0) return;
 
-      const previous = historyStack.pop();
-      redoStack.push(
-        baseCtx.getImageData(0, 0, baseCanvas.width, baseCanvas.height)
-      );
+
+
+
+const previous = historyStack.pop();
+
+// Store redo in image-space
+const imageCanvas = document.createElement("canvas");
+imageCanvas.width = image.width;
+imageCanvas.height = image.height;
+
+const imageCtx = imageCanvas.getContext("2d");
+imageCtx.drawImage(image, 0, 0);
+
+redoStack.push(
+  imageCtx.getImageData(0, 0, image.width, image.height)
+);
+
+
+
+
 
 
 const tempCanvas = document.createElement("canvas");
