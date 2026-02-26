@@ -88,7 +88,9 @@ function renderMaskPreview() {
     data[idx]     = 255;
     data[idx + 1] = 255;
     data[idx + 2] = 255;
-    data[idx + 3] = alpha;
+data[idx + 3] = Math.min(255, alpha * 2);
+
+
   }
 
   tempCtx.putImageData(imageData, 0, 0);
