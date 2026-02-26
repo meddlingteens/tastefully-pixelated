@@ -445,7 +445,10 @@ dirtyMaxX = -Infinity;
 dirtyMaxY = -Infinity;
 
 
-
+console.log("IMAGE WIDTH:", image.width);
+console.log("IMAGE HEIGHT:", image.height);
+console.log("CANVAS WIDTH:", baseCanvas.width);
+console.log("CANVAS HEIGHT:", baseCanvas.height);
 
 
 
