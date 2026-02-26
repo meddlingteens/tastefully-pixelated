@@ -73,40 +73,26 @@ function renderMaskPreview() {
 
   maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
 
-  const tempCanvas = document.createElement("canvas");
-  tempCanvas.width = maskWidth;
-  tempCanvas.height = maskHeight;
+  const scaleX = currentDrawWidth / image.width;
+  const scaleY = currentDrawHeight / image.height;
 
-  const tempCtx = tempCanvas.getContext("2d");
-  const imageData = tempCtx.createImageData(maskWidth, maskHeight);
-  const data = imageData.data;
+  maskCtx.fillStyle = "white";
 
-  for (let i = 0; i < maskBuffer.length; i++) {
-    const alpha = maskBuffer[i];
-    const idx = i * 4;
+  for (let y = 0; y < maskHeight; y++) {
+    for (let x = 0; x < maskWidth; x++) {
 
-    data[idx]     = 255;
-    data[idx + 1] = 255;
-    data[idx + 2] = 255;
-data[idx + 3] = alpha > 0 ? 255 : 0;
+      const index = y * maskWidth + x;
 
+      if (maskBuffer[index] > 0) {
+
+        const canvasX = imageDrawX + x * scaleX;
+        const canvasY = imageDrawY + y * scaleY;
+
+        maskCtx.fillRect(canvasX, canvasY, scaleX, scaleY);
+      }
+    }
   }
-
-  tempCtx.putImageData(imageData, 0, 0);
-
- 
-  
-maskCtx.drawImage(
-  tempCanvas,
-  imageDrawX,
-  imageDrawY,
-  currentDrawWidth,
-  currentDrawHeight
-);
-
-
 }
-
 
 
 
