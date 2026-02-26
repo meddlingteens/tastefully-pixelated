@@ -30,7 +30,11 @@
   margin-top: 0;
   margin-bottom: 24px;
   opacity: 0.75;
+  pointer-events: none;
 }
+
+
+
 
 /* Banner */
 
@@ -142,6 +146,13 @@
 .primary-btn:hover {
   background: linear-gradient(135deg, #4c6ef5, #3b5bdb);
 }
+
+
+#previewCanvas,
+#maskCanvas {
+  pointer-events: none;
+}
+
 
 
 /* Sliders */
