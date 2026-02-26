@@ -15,11 +15,16 @@ self.onmessage = function (e) {
   const data = new Uint8ClampedArray(buffer);
   const mask = new Uint8Array(maskBuffer);
 
-  const startY = Math.max(0, dirtyMinY - pixelSize);
-  const endY   = Math.min(height, dirtyMaxY + pixelSize);
 
-  const startX = Math.max(0, dirtyMinX - pixelSize);
-  const endX   = Math.min(width, dirtyMaxX + pixelSize);
+const startY = Math.floor(Math.max(0, dirtyMinY - pixelSize) / pixelSize) * pixelSize;
+const endY   = Math.min(height, dirtyMaxY + pixelSize);
+
+const startX = Math.floor(Math.max(0, dirtyMinX - pixelSize) / pixelSize) * pixelSize;
+const endX   = Math.min(width, dirtyMaxX + pixelSize);
+
+
+
+
 
   for (let y = startY; y < endY; y += pixelSize) {
     for (let x = startX; x < endX; x += pixelSize) {
