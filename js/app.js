@@ -641,28 +641,15 @@ document.addEventListener("mouseup", stopDrawing);
 
 
 function setMode(newMode) {
- 
-
   mode = newMode;
 
   drawBtn.classList.remove("active");
   moveBtn.classList.remove("active");
-  if (eraseBtn) eraseBtn.classList.remove("active");
+  eraseBtn.classList.remove("active");
 
-  if (newMode === "draw") {
-    drawBtn.classList.add("active");
-    maskCanvas.style.cursor = "crosshair";
-  }
-
-  if (newMode === "move") {
-    moveBtn.classList.add("active");
-    maskCanvas.style.cursor = "grab";
-  }
-
-  if (newMode === "erase" && eraseBtn) {
-    eraseBtn.classList.add("active");
-    maskCanvas.style.cursor = "crosshair";
-  }
+  if (newMode === "draw") drawBtn.classList.add("active");
+  if (newMode === "move") moveBtn.classList.add("active");
+  if (newMode === "erase") eraseBtn.classList.add("active");
 }
 
 
