@@ -4,10 +4,6 @@ document.addEventListener("DOMContentLoaded", function () {
 // ELEMENTS
 // ======================================================
 
-let DEBUG_DRAW = false;
-
-
-
 
 // Canvas Elements
 const canvasContainer = document.getElementById("canvasContainer");
@@ -67,7 +63,7 @@ function renderMaskPreview() {
 
   if (!maskCtx || !maskBuffer || !image) return;
 
-maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+  maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
 
   const tempCanvas = document.createElement("canvas");
   tempCanvas.width = maskWidth;
@@ -91,16 +87,26 @@ maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
 
   // IMPORTANT: use SAME transform math as drawImage()
 
-  
+  const imgRatio = image.width / image.height;
+  const canvasRatio = baseCanvas.width / baseCanvas.height;
 
-maskCtx.drawImage(
-  tempCanvas,
-  imageDrawX,
-  imageDrawY,
-  currentDrawWidth,
-  currentDrawHeight
-);
+  let drawWidth, drawHeight;
 
+  if (imgRatio > canvasRatio) {
+    drawWidth = baseCanvas.width * zoomLevel;
+    drawHeight = drawWidth / imgRatio;
+  } else {
+    drawHeight = baseCanvas.height * zoomLevel;
+    drawWidth = drawHeight * imgRatio;
+  }
+
+  maskCtx.drawImage(
+    tempCanvas,
+    imageDrawX,
+    imageDrawY,
+    drawWidth,
+    drawHeight
+  );
 }
 
 
@@ -177,11 +183,6 @@ setRandomBanner();
   // ======================================================
 
   let image = null;
-
-
-
-let currentDrawWidth = 0;
-let currentDrawHeight = 0;
 
 let imageDrawX = 0;
 let imageDrawY = 0;
@@ -378,33 +379,31 @@ kernelIntensity[i] = Math.floor(intensity * 255);
   // DRAW IMAGE
   // ======================================================
 
-function drawImage() {
+  function drawImage() {
 
-  baseCtx.clearRect(0, 0, baseCanvas.width, baseCanvas.height);
+    baseCtx.clearRect(0, 0, baseCanvas.width, baseCanvas.height);
 
-  if (!image) return;
+    if (!image) return;
 
-  const imgRatio = image.width / image.height;
-  const canvasRatio = baseCanvas.width / baseCanvas.height;
+    const imgRatio = image.width / image.height;
+    const canvasRatio = baseCanvas.width / baseCanvas.height;
 
-  let drawWidth, drawHeight;
+    let drawWidth, drawHeight;
 
-  if (imgRatio > canvasRatio) {
-    drawWidth = baseCanvas.width * zoomLevel;
-    drawHeight = drawWidth / imgRatio;
-  } else {
-    drawHeight = baseCanvas.height * zoomLevel;
-    drawWidth = drawHeight * imgRatio;
+    if (imgRatio > canvasRatio) {
+      drawWidth = baseCanvas.width * zoomLevel;
+      drawHeight = drawWidth / imgRatio;
+    } else {
+      drawHeight = baseCanvas.height * zoomLevel;
+      drawWidth = drawHeight * imgRatio;
+    }
+
+imageDrawX = (baseCanvas.width - drawWidth) / 2 + offsetX;
+imageDrawY = (baseCanvas.height - drawHeight) / 2 + offsetY;
+
+baseCtx.drawImage(image, imageDrawX, imageDrawY, drawWidth, drawHeight);
+
   }
-
-  currentDrawWidth = drawWidth;
-  currentDrawHeight = drawHeight;
-
-  imageDrawX = (baseCanvas.width - drawWidth) / 2 + offsetX;
-  imageDrawY = (baseCanvas.height - drawHeight) / 2 + offsetY;
-
-  baseCtx.drawImage(image, imageDrawX, imageDrawY, drawWidth, drawHeight);
-}
 
 
 
@@ -470,7 +469,7 @@ dirtyMaxY = -Infinity;
 
 
 
-// ======================================================
+  // ======================================================
 // MOUSE EVENTS
 // ======================================================
 
@@ -481,48 +480,51 @@ maskCanvas.addEventListener("mousedown", function (e) {
 
   isDrawing = true;
 
-const rect = maskCanvas.getBoundingClientRect();
-
-const mouseX = e.clientX - rect.left;
-const mouseY = e.clientY - rect.top;
-
-
-
-
-
   if (mode === "move") {
 
-    lastX = mouseX;
-    lastY = mouseY;
-    maskCanvas.style.cursor = "grabbing";
 
+
+
+    const rect = maskCanvas.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+
+    lastX = mouseX - offsetX;
+    lastY = mouseY - offsetY;
+
+    maskCanvas.style.cursor = "grabbing";
   } else {
 
-    // Initialize stroke position correctly
-    lastX = mouseX;
-    lastY = mouseY;
+    lastX = null;
+    lastY = null;
 
+
+
+
+    // Clear previous preview so drawing starts clean
+    maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
   }
 });
+
 
 maskCanvas.addEventListener("mousemove", function (e) {
 
   if (!image) return;
   if (isApplying) return;
 
-const rect = maskCanvas.getBoundingClientRect();
+  const rect = maskCanvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
 
-const x = e.clientX - rect.left;
-const y = e.clientY - rect.top;
-
- 
-
-  // Clear preview
+  // Clear brush preview
   if (previewCtx) {
     previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
   }
 
-  // Brush outline preview
+
+
+
+  // Draw brush outline when not drawing
   if (!isDrawing && mode !== "move" && previewCtx) {
     previewCtx.beginPath();
     previewCtx.arc(x, y, brushSize / 2, 0, Math.PI * 2);
@@ -531,30 +533,28 @@ const y = e.clientY - rect.top;
     previewCtx.stroke();
   }
 
-
-
-
-
   // MOVE MODE
-if (isDrawing && mode === "move") {
+  if (isDrawing && mode === "move") {
 
-    offsetX += x - lastX;
-    offsetY += y - lastY;
+    const mouseX = x;
+    const mouseY = y;
 
-    lastX = x;
-    lastY = y;
+    offsetX = mouseX - lastX;
+    offsetY = mouseY - lastY;
 
     drawImage();
     renderMaskPreview();
+
     return;
-}
-
-
-
-
+  }
 
   // DRAW / ERASE MODE
   if (isDrawing && (mode === "draw" || mode === "erase")) {
+
+    if (lastX === null) {
+      lastX = x;
+      lastY = y;
+    }
 
     const dx = x - lastX;
     const dy = y - lastY;
@@ -570,15 +570,26 @@ if (isDrawing && mode === "move") {
 
       for (let i = 0; i < kernelSize; i++) {
 
-        const scaleX = currentDrawWidth / image.width;
-const scaleY = currentDrawHeight / image.height;
 
-const imgX = (ix - imageDrawX) / scaleX;
-const imgY = (iy - imageDrawY) / scaleY;
- 
+
+const imgX = (ix - imageDrawX) / zoomLevel;
+const imgY = (iy - imageDrawY) / zoomLevel;
+
+const px = Math.floor(imgX + kernelDX[i]);
+const py = Math.floor(imgY + kernelDY[i]);
+
+
+
+
+
 
         if (px < 0 || py < 0 || px >= maskWidth || py >= maskHeight)
           continue;
+
+        dirtyMinX = Math.min(dirtyMinX, px);
+        dirtyMinY = Math.min(dirtyMinY, py);
+        dirtyMaxX = Math.max(dirtyMaxX, px);
+        dirtyMaxY = Math.max(dirtyMaxY, py);
 
         const index = py * maskWidth + px;
         const value = kernelIntensity[i];
@@ -591,18 +602,15 @@ const imgY = (iy - imageDrawY) / scaleY;
       }
     }
 
+    // 🔥 CRITICAL FIX: Clear before re-render
+    maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+
     renderMaskPreview();
 
     lastX = x;
     lastY = y;
   }
 });
-
-
-
-
-
-
 
 
 maskCanvas.addEventListener("mouseup", function () {
@@ -620,6 +628,8 @@ maskCanvas.addEventListener("mouseleave", function () {
     previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
   }
 });
+
+
 
 
 
