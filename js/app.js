@@ -563,24 +563,35 @@ console.log("MOUSEMOVE", mode);
 // DRAW / ERASE MODE
 if (isDrawing && (mode === "draw" || mode === "erase")) {
 
+
+let workingImageData = null;
+
+if (mode === "erase") {
+  const tempCanvas = document.createElement("canvas");
+  tempCanvas.width = image.width;
+  tempCanvas.height = image.height;
+
+  const tempCtx = tempCanvas.getContext("2d");
+  tempCtx.drawImage(image, 0, 0);
+
+  workingImageData = tempCtx.getImageData(0, 0, image.width, image.height);
+}
+
+
+
+
+
+
+
+  console.log("DRAW BLOCK RUNNING");
+
   if (!image || currentDrawWidth === 0 || currentDrawHeight === 0) {
+    console.log("Guard exit:",
+      "image:", !!image,
+      "currentDrawWidth:", currentDrawWidth,
+      "currentDrawHeight:", currentDrawHeight
+    );
     return;
-  }
-
-  let workingImageData = null;
-  let workingCanvas = null;
-  let workingCtx = null;
-
-  if (mode === "erase") {
-
-    workingCanvas = document.createElement("canvas");
-    workingCanvas.width = image.width;
-    workingCanvas.height = image.height;
-
-    workingCtx = workingCanvas.getContext("2d");
-    workingCtx.drawImage(image, 0, 0);
-
-    workingImageData = workingCtx.getImageData(0, 0, image.width, image.height);
   }
 
   if (lastX === null) {
@@ -603,23 +614,37 @@ if (isDrawing && (mode === "draw" || mode === "erase")) {
     const ix = lastX + dx * t;
     const iy = lastY + dy * t;
 
-    // ---- Preview (always white brush) ----
-    maskCtx.globalCompositeOperation = (mode === "erase")
-      ? "destination-out"
-      : "source-over";
 
-    maskCtx.fillStyle = "white";
-    maskCtx.beginPath();
-    maskCtx.arc(ix, iy, brushSize / 2, 0, Math.PI * 2);
-    maskCtx.fill();
+if (mode === "draw") {
 
-    maskCtx.globalCompositeOperation = "source-over";
+  maskCtx.globalCompositeOperation = "source-over";
+  maskCtx.fillStyle = "white";
+  maskCtx.beginPath();
+  maskCtx.arc(ix, iy, brushSize / 2, 0, Math.PI * 2);
+  maskCtx.fill();
+
+} else if (mode === "erase") {
+
+  maskCtx.globalCompositeOperation = "destination-out";
+  maskCtx.beginPath();
+  maskCtx.arc(ix, iy, brushSize / 2, 0, Math.PI * 2);
+  maskCtx.fill();
+
+  maskCtx.globalCompositeOperation = "source-over";
+}
+
+
+
+
+
 
     for (let i = 0; i < kernelSize; i++) {
 
+      // Apply kernel offset in canvas space first
       const canvasX = ix + kernelDX[i];
       const canvasY = iy + kernelDY[i];
 
+      // Ignore if outside visible image area on canvas
       if (
         canvasX < imageDrawX ||
         canvasY < imageDrawY ||
@@ -629,6 +654,7 @@ if (isDrawing && (mode === "draw" || mode === "erase")) {
         continue;
       }
 
+      // Convert that exact point to image space
       const imgX = (canvasX - imageDrawX) * scaleX;
       const imgY = (canvasY - imageDrawY) * scaleY;
 
@@ -638,41 +664,60 @@ if (isDrawing && (mode === "draw" || mode === "erase")) {
       if (px < 0 || py < 0 || px >= maskWidth || py >= maskHeight)
         continue;
 
+      dirtyMinX = Math.min(dirtyMinX, px);
+      dirtyMinY = Math.min(dirtyMinY, py);
+      dirtyMaxX = Math.max(dirtyMaxX, px);
+      dirtyMaxY = Math.max(dirtyMaxY, py);
+
       const index = py * maskWidth + px;
+      const value = kernelIntensity[i];
 
-      if (mode === "erase") {
+if (mode === "erase") {
 
-        maskBuffer[index] = 0;
+  // Clear mask data
+  maskBuffer[index] = 0;
 
-        const pixelIndex = (py * image.width + px) * 4;
+  // Restore original pixels immediately
+  const pixelIndex = (py * image.width + px) * 4;
 
-        workingImageData.data[pixelIndex]     = originalImageData.data[pixelIndex];
-        workingImageData.data[pixelIndex + 1] = originalImageData.data[pixelIndex + 1];
-        workingImageData.data[pixelIndex + 2] = originalImageData.data[pixelIndex + 2];
-        workingImageData.data[pixelIndex + 3] = 255;
+  const imageCanvas = document.createElement("canvas");
+  imageCanvas.width = image.width;
+  imageCanvas.height = image.height;
 
-      } else {
+  const imageCtx = imageCanvas.getContext("2d");
+  imageCtx.drawImage(image, 0, 0);
 
-        maskBuffer[index] = 255;
+  const currentData = imageCtx.getImageData(0, 0, image.width, image.height);
 
-        dirtyMinX = Math.min(dirtyMinX, px);
-        dirtyMinY = Math.min(dirtyMinY, py);
-        dirtyMaxX = Math.max(dirtyMaxX, px);
-        dirtyMaxY = Math.max(dirtyMaxY, py);
-      }
+  currentData.data[pixelIndex]     = originalImageData.data[pixelIndex];
+  currentData.data[pixelIndex + 1] = originalImageData.data[pixelIndex + 1];
+  currentData.data[pixelIndex + 2] = originalImageData.data[pixelIndex + 2];
+  currentData.data[pixelIndex + 3] = 255;
+
+  imageCtx.putImageData(currentData, 0, 0);
+
+  image = imageCanvas;
+  drawImage();
+
+} else {
+
+  maskBuffer[index] = 255;
+
+}
+
+
     }
   }
 
-  // Commit erase changes once per stroke
-  if (mode === "erase" && workingImageData) {
-    workingCtx.putImageData(workingImageData, 0, 0);
-    image = workingCanvas;
-    drawImage();
-  }
+  console.log("dirtyMinX:", dirtyMinX);
+
+  renderMaskPreview();
 
   lastX = x;
   lastY = y;
 }
+
+
 
 
 });
