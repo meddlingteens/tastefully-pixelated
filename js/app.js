@@ -245,14 +245,14 @@ const imageData = new ImageData(
 const tempCanvas = document.createElement("canvas");
 tempCanvas.width = image.width;
 tempCanvas.height = image.height;
-tempCanvas.getContext("2d").putImageData(imageData, 0, 0);
 
-image = new Image();
-image.onload = function () {
-  drawImage();
-};
-image.src = tempCanvas.toDataURL();
+const tempCtx = tempCanvas.getContext("2d");
+tempCtx.putImageData(imageData, 0, 0);
 
+// Instead of replacing image object,
+// draw directly into base canvas and preserve state
+image = tempCanvas;
+drawImage();
 
 
 
