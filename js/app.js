@@ -610,8 +610,21 @@ if (isDrawing && (mode === "draw" || mode === "erase")) {
 
     for (let i = 0; i < kernelSize; i++) {
 
-      const px = Math.floor(ix + kernelDX[i]);
-      const py = Math.floor(iy + kernelDY[i]);
+      // Convert canvas space → image space
+const scaleX = image.width / currentDrawWidth;
+const scaleY = image.height / currentDrawHeight;
+
+const imgX = (ix - imageDrawX) * scaleX;
+const imgY = (iy - imageDrawY) * scaleY;
+
+const baseX = Math.floor(imgX);
+const baseY = Math.floor(imgY);
+
+const px = baseX + kernelDX[i];
+const py = baseY + kernelDY[i];
+
+
+
 
       if (px < 0 || py < 0 || px >= maskWidth || py >= maskHeight)
         continue;
