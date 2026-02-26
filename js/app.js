@@ -236,7 +236,7 @@ let pixelWorker = null;
 
 try {
 
-  pixelWorker = new Worker("pixelWorker.js");
+  pixelWorker = new Worker("js/pixelWorker.js");
 
   pixelWorker.onmessage = function (e) {
 
