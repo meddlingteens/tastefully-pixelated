@@ -641,6 +641,8 @@ document.addEventListener("mouseup", stopDrawing);
 
 
 function setMode(newMode) {
+  console.log("SET MODE CALLED:", newMode);
+
   mode = newMode;
 
   drawBtn.classList.remove("active");
@@ -654,16 +656,6 @@ function setMode(newMode) {
 
 
 
-
-
-
-// Button listeners now call setMode (no duplicate logic)
-drawBtn.addEventListener("click", () => setMode("draw"));
-moveBtn.addEventListener("click", () => setMode("move"));
-
-if (eraseBtn) {
-  eraseBtn.addEventListener("click", () => setMode("erase"));
-}
 
 // Set default mode on load
 setMode("draw");
