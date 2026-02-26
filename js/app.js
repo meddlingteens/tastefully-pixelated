@@ -85,28 +85,17 @@ function renderMaskPreview() {
 
   tempCtx.putImageData(imageData, 0, 0);
 
-  // IMPORTANT: use SAME transform math as drawImage()
+ 
+  
+maskCtx.drawImage(
+  tempCanvas,
+  imageDrawX,
+  imageDrawY,
+  currentDrawWidth,
+  currentDrawHeight
+);
 
-  const imgRatio = image.width / image.height;
-  const canvasRatio = baseCanvas.width / baseCanvas.height;
 
-  let drawWidth, drawHeight;
-
-  if (imgRatio > canvasRatio) {
-    drawWidth = baseCanvas.width * zoomLevel;
-    drawHeight = drawWidth / imgRatio;
-  } else {
-    drawHeight = baseCanvas.height * zoomLevel;
-    drawWidth = drawHeight * imgRatio;
-  }
-
-  maskCtx.drawImage(
-    tempCanvas,
-    imageDrawX,
-    imageDrawY,
-    drawWidth,
-    drawHeight
-  );
 }
 
 
@@ -186,6 +175,9 @@ setRandomBanner();
 
 let imageDrawX = 0;
 let imageDrawY = 0;
+
+let currentDrawWidth = 0;
+let currentDrawHeight = 0;
 
   let zoomLevel = 1;
   let targetZoom = 1;
@@ -401,6 +393,9 @@ kernelIntensity[i] = Math.floor(intensity * 255);
 imageDrawX = (baseCanvas.width - drawWidth) / 2 + offsetX;
 imageDrawY = (baseCanvas.height - drawHeight) / 2 + offsetY;
 
+currentDrawWidth = drawWidth;
+currentDrawHeight = drawHeight;
+
 baseCtx.drawImage(image, imageDrawX, imageDrawY, drawWidth, drawHeight);
 
   }
@@ -480,30 +475,29 @@ maskCanvas.addEventListener("mousedown", function (e) {
 
   isDrawing = true;
 
-  if (mode === "move") {
+const rect = maskCanvas.getBoundingClientRect();
+const mouseX = e.clientX - rect.left;
+const mouseY = e.clientY - rect.top;
+
+if (mode === "move") {
+
+  lastX = mouseX - offsetX;
+  lastY = mouseY - offsetY;
+
+  maskCanvas.style.cursor = "grabbing";
+
+} else {
+
+  // Always initialize in canvas space
+  lastX = mouseX;
+  lastY = mouseY;
+
+  maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+}
 
 
 
 
-    const rect = maskCanvas.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-
-    lastX = mouseX - offsetX;
-    lastY = mouseY - offsetY;
-
-    maskCanvas.style.cursor = "grabbing";
-  } else {
-
-    lastX = null;
-    lastY = null;
-
-
-
-
-    // Clear previous preview so drawing starts clean
-    maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
-  }
 });
 
 
@@ -556,11 +550,20 @@ maskCanvas.addEventListener("mousemove", function (e) {
       lastY = y;
     }
 
+    // Safety guard to prevent divide-by-zero
+    if (!image || currentDrawWidth === 0 || currentDrawHeight === 0) {
+      return;
+    }
+
     const dx = x - lastX;
     const dy = y - lastY;
 
     const dist = Math.max(Math.abs(dx), Math.abs(dy));
     const steps = Math.max(1, Math.floor(dist / (brushSize / 4)));
+
+    // Move scale calculation OUTSIDE loops
+    const scaleX = currentDrawWidth / image.width;
+    const scaleY = currentDrawHeight / image.height;
 
     for (let s = 0; s <= steps; s++) {
 
@@ -568,20 +571,16 @@ maskCanvas.addEventListener("mousemove", function (e) {
       const ix = lastX + dx * t;
       const iy = lastY + dy * t;
 
+      const imgX = (ix - imageDrawX) / scaleX;
+      const imgY = (iy - imageDrawY) / scaleY;
+
+      const baseX = Math.floor(imgX);
+      const baseY = Math.floor(imgY);
+
       for (let i = 0; i < kernelSize; i++) {
 
-
-
-const imgX = (ix - imageDrawX) / zoomLevel;
-const imgY = (iy - imageDrawY) / zoomLevel;
-
-const px = Math.floor(imgX + kernelDX[i]);
-const py = Math.floor(imgY + kernelDY[i]);
-
-
-
-
-
+        const px = baseX + kernelDX[i];
+        const py = baseY + kernelDY[i];
 
         if (px < 0 || py < 0 || px >= maskWidth || py >= maskHeight)
           continue;
@@ -602,9 +601,6 @@ const py = Math.floor(imgY + kernelDY[i]);
       }
     }
 
-    // 🔥 CRITICAL FIX: Clear before re-render
-    maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
-
     renderMaskPreview();
 
     lastX = x;
@@ -612,13 +608,11 @@ const py = Math.floor(imgY + kernelDY[i]);
   }
 });
 
-
 maskCanvas.addEventListener("mouseup", function () {
   isDrawing = false;
   lastX = lastY = null;
   if (mode === "move") maskCanvas.style.cursor = "grab";
 });
-
 
 maskCanvas.addEventListener("mouseleave", function () {
   isDrawing = false;
@@ -628,8 +622,6 @@ maskCanvas.addEventListener("mouseleave", function () {
     previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
   }
 });
-
-
 
 
 
@@ -645,7 +637,8 @@ maskCanvas.addEventListener("mouseleave", function () {
 
 
 function setMode(newMode) {
-  console.log("Mode:", newMode);  // ← ADD THIS LINE
+ 
+
   mode = newMode;
 
   drawBtn.classList.remove("active");
@@ -764,25 +757,28 @@ const baseData = imageCtx.getImageData(
   applyBtn.disabled = true;   // 👈 RIGHT HERE
   isApplying = true;
 
-  pixelWorker.postMessage(
-    {
-      buffer: baseData.data.buffer,
-      maskBuffer: maskBuffer.buffer,
 
-width: image.width,
-height: image.height,
+pixelWorker.postMessage(
+  {
+    buffer: baseData.data.buffer,
+    maskBuffer: maskBuffer.buffer,
+    width: image.width,
+    height: image.height,
+    pixelSize: 20,
+    dirtyMinX,
+    dirtyMinY,
+    dirtyMaxX,
+    dirtyMaxY
+  },
+  [
+    baseData.data.buffer
+  ]
+);
 
-      pixelSize: 20,
-      dirtyMinX,
-      dirtyMinY,
-      dirtyMaxX,
-      dirtyMaxY
-    },
-    [
-      baseData.data.buffer,
-      maskBuffer.buffer
-    ]
-  );
+
+
+
+
 });
 
 
