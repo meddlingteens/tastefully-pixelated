@@ -478,33 +478,48 @@ dirtyMaxY = -Infinity;
 
 maskCanvas.addEventListener("mousedown", function (e) {
 
-console.log("MOUSEDOWN");
+  console.log("MOUSEDOWN FIRED");
 
-  if (!image) return;
-  if (isApplying) return;
+  if (!image) {
+    console.log("EXIT: image is falsy");
+    return;
+  }
+
+  if (isApplying) {
+    console.log("EXIT: isApplying is true");
+    return;
+  }
+
+  console.log("Mode at mousedown:", mode);
 
   isDrawing = true;
+  console.log("isDrawing set to:", isDrawing);
 
-const rect = maskCanvas.getBoundingClientRect();
-const mouseX = e.clientX - rect.left;
-const mouseY = e.clientY - rect.top;
+  const rect = maskCanvas.getBoundingClientRect();
+  const mouseX = e.clientX - rect.left;
+  const mouseY = e.clientY - rect.top;
 
-if (mode === "move") {
+  console.log("Mouse position:", mouseX, mouseY);
 
-  lastX = mouseX - offsetX;
-  lastY = mouseY - offsetY;
+  if (mode === "move") {
 
-  maskCanvas.style.cursor = "grabbing";
+    lastX = mouseX - offsetX;
+    lastY = mouseY - offsetY;
 
-} else {
+    console.log("Move start:", lastX, lastY);
 
-  // Always initialize in canvas space
-  lastX = mouseX;
-  lastY = mouseY;
+    maskCanvas.style.cursor = "grabbing";
 
-  maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
-}
+  } else {
 
+    // Always initialize in canvas space
+    lastX = mouseX;
+    lastY = mouseY;
+
+    console.log("Draw start:", lastX, lastY);
+
+    maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+  }
 
 
 
