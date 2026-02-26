@@ -515,13 +515,23 @@ maskCanvas.addEventListener("mousedown", function (e) {
 
   } else {
 
-    // Always initialize in canvas space
-    lastX = mouseX;
-    lastY = mouseY;
+// Reset dirty bounds for new stroke
+dirtyMinX = Infinity;
+dirtyMinY = Infinity;
+dirtyMaxX = -Infinity;
+dirtyMaxY = -Infinity;
 
-    console.log("Draw start:", lastX, lastY);
+// Always initialize in canvas space
+lastX = mouseX;
+lastY = mouseY;
 
-    maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+console.log("Draw start:", lastX, lastY);
+
+maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+
+
+
+
   }
 
 
