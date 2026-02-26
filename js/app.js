@@ -554,7 +554,9 @@ if (isDrawing && mode === "move") {
 
 
   // DRAW / ERASE MODE
- if (isDrawing && (mode === "draw" || mode === "erase")) {
+if (isDrawing && (mode === "draw" || mode === "erase")) {
+
+  if (!image || !maskBuffer) return;
 
   const dx = x - lastX;
   const dy = y - lastY;
@@ -562,7 +564,7 @@ if (isDrawing && mode === "move") {
   const dist = Math.max(Math.abs(dx), Math.abs(dy));
   const steps = Math.max(1, Math.floor(dist / (brushSize / 4)));
 
-  // Calculate scale ONCE per stroke segment (not inside kernel loop)
+  // Calculate scale ONCE per stroke segment
   const scaleX = currentDrawWidth / image.width;
   const scaleY = currentDrawHeight / image.height;
 
@@ -579,6 +581,13 @@ if (isDrawing && mode === "move") {
     const baseX = Math.floor(imgX);
     const baseY = Math.floor(imgY);
 
+    // Skip if base point is completely outside image
+    if (baseX < -brushSize || baseY < -brushSize ||
+        baseX >= maskWidth + brushSize ||
+        baseY >= maskHeight + brushSize) {
+      continue;
+    }
+
     for (let i = 0; i < kernelSize; i++) {
 
       const px = baseX + kernelDX[i];
@@ -588,6 +597,13 @@ if (isDrawing && mode === "move") {
         continue;
 
       const index = py * maskWidth + px;
+
+      // ✅ Dirty tracking restored
+      dirtyMinX = Math.min(dirtyMinX, px);
+      dirtyMinY = Math.min(dirtyMinY, py);
+      dirtyMaxX = Math.max(dirtyMaxX, px);
+      dirtyMaxY = Math.max(dirtyMaxY, py);
+
       const value = kernelIntensity[i];
 
       if (mode === "erase") {
@@ -603,8 +619,7 @@ if (isDrawing && mode === "move") {
   lastX = x;
   lastY = y;
 }
-
-
+});
 
 
 
