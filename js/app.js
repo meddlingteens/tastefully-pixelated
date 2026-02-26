@@ -41,6 +41,14 @@ const eraseBtn = document.getElementById("eraseBtn");
 const canvasSelectBtn = document.getElementById("canvasSelectBtn");
 
 
+
+// 🔎 DEBUG — check button bindings
+console.log("drawBtn:", drawBtn);
+console.log("moveBtn:", moveBtn);
+console.log("eraseBtn:", eraseBtn);
+
+
+
 // Safely wire Select Photo
 if (canvasSelectBtn && uploadInput) {
   canvasSelectBtn.addEventListener("click", function () {
@@ -642,6 +650,12 @@ document.addEventListener("mouseup", stopDrawing);
 
 function setMode(newMode) {
   console.log("SET MODE CALLED:", newMode);
+
+
+
+
+
+
 
   mode = newMode;
 
