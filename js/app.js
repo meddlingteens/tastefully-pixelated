@@ -602,6 +602,9 @@ if (isDrawing && (mode === "draw" || mode === "erase")) {
   const dist = Math.max(Math.abs(dx), Math.abs(dy));
   const steps = Math.max(1, Math.floor(dist / (brushSize / 4)));
 
+  const scaleX = image.width / currentDrawWidth;
+  const scaleY = image.height / currentDrawHeight;
+
   for (let s = 0; s <= steps; s++) {
 
     const t = s / steps;
@@ -610,21 +613,26 @@ if (isDrawing && (mode === "draw" || mode === "erase")) {
 
     for (let i = 0; i < kernelSize; i++) {
 
-      // Convert canvas space → image space
-const scaleX = image.width / currentDrawWidth;
-const scaleY = image.height / currentDrawHeight;
+      // Apply kernel offset in canvas space first
+      const canvasX = ix + kernelDX[i];
+      const canvasY = iy + kernelDY[i];
 
-const imgX = (ix - imageDrawX) * scaleX;
-const imgY = (iy - imageDrawY) * scaleY;
+      // Ignore if outside visible image area on canvas
+      if (
+        canvasX < imageDrawX ||
+        canvasY < imageDrawY ||
+        canvasX > imageDrawX + currentDrawWidth ||
+        canvasY > imageDrawY + currentDrawHeight
+      ) {
+        continue;
+      }
 
-const baseX = Math.floor(imgX);
-const baseY = Math.floor(imgY);
+      // Convert that exact point to image space
+      const imgX = (canvasX - imageDrawX) * scaleX;
+      const imgY = (canvasY - imageDrawY) * scaleY;
 
-const px = baseX + kernelDX[i];
-const py = baseY + kernelDY[i];
-
-
-
+      const px = Math.floor(imgX);
+      const py = Math.floor(imgY);
 
       if (px < 0 || py < 0 || px >= maskWidth || py >= maskHeight)
         continue;
@@ -653,6 +661,9 @@ const py = baseY + kernelDY[i];
   lastX = x;
   lastY = y;
 }
+
+
+
 
 });
 
