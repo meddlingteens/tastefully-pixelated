@@ -64,36 +64,10 @@ if (canvasSelectBtn && uploadInput) {
 // MASK PREVIEW RENDER
 // ======================================================
 
-
-
-
 function renderMaskPreview() {
-
-  if (!maskCtx || !maskBuffer || !image) return;
-
-  maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
-
-  const scaleX = currentDrawWidth / image.width;
-  const scaleY = currentDrawHeight / image.height;
-
-  maskCtx.fillStyle = "white";
-
-  for (let y = 0; y < maskHeight; y++) {
-    for (let x = 0; x < maskWidth; x++) {
-
-      const index = y * maskWidth + x;
-
-      if (maskBuffer[index] > 0) {
-
-        const canvasX = imageDrawX + x * scaleX;
-        const canvasY = imageDrawY + y * scaleY;
-
-        maskCtx.fillRect(canvasX, canvasY, scaleX, scaleY);
-      }
-    }
-  }
+  // Preview is drawn live during drawing.
+  // No reconstruction from maskBuffer.
 }
-
 
 
 
@@ -601,6 +575,12 @@ if (isDrawing && (mode === "draw" || mode === "erase")) {
     const ix = lastX + dx * t;
     const iy = lastY + dy * t;
 
+// --- Preview rendering (canvas space) ---
+maskCtx.fillStyle = "white";
+maskCtx.beginPath();
+maskCtx.arc(ix, iy, brushSize / 2, 0, Math.PI * 2);
+maskCtx.fill();
+
     for (let i = 0; i < kernelSize; i++) {
 
       // Apply kernel offset in canvas space first
@@ -645,7 +625,6 @@ if (isDrawing && (mode === "draw" || mode === "erase")) {
 
   console.log("dirtyMinX:", dirtyMinX);
 
-  maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
   renderMaskPreview();
 
   lastX = x;
