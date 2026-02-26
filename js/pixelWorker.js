@@ -24,11 +24,24 @@ self.onmessage = function (e) {
   for (let y = startY; y < endY; y += pixelSize) {
     for (let x = startX; x < endX; x += pixelSize) {
 
-      const alpha = mask[y * width + x] / 255;
-      if (alpha <= 0) continue;
-
-      const blockWidth = Math.min(pixelSize, width - x);
+      const blockWidth  = Math.min(pixelSize, width - x);
       const blockHeight = Math.min(pixelSize, height - y);
+
+      let alpha = 0;
+
+      // Scan block for any mask presence
+      for (let yy = 0; yy < blockHeight && alpha === 0; yy++) {
+        const rowIndex = (y + yy) * width;
+        for (let xx = 0; xx < blockWidth; xx++) {
+          const maskValue = mask[rowIndex + (x + xx)];
+          if (maskValue > 0) {
+            alpha = maskValue / 255;
+            break;
+          }
+        }
+      }
+
+      if (alpha <= 0) continue;
 
       let r = 0, g = 0, b = 0, count = 0;
 
@@ -62,6 +75,5 @@ self.onmessage = function (e) {
     }
   }
 
-  // Transfer buffer back
   self.postMessage({ buffer }, [buffer]);
 };
