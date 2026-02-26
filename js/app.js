@@ -478,6 +478,8 @@ dirtyMaxY = -Infinity;
 
 maskCanvas.addEventListener("mousedown", function (e) {
 
+console.log("MOUSEDOWN");
+
   if (!image) return;
   if (isApplying) return;
 
@@ -511,6 +513,7 @@ if (mode === "move") {
 
 maskCanvas.addEventListener("mousemove", function (e) {
 
+console.log("MOUSEMOVE", mode);
   if (!image) return;
   if (isApplying) return;
 
@@ -550,70 +553,76 @@ maskCanvas.addEventListener("mousemove", function (e) {
     return;
   }
 
-  // DRAW / ERASE MODE
-  if (isDrawing && (mode === "draw" || mode === "erase")) {
+ 
 
-    if (lastX === null) {
-      lastX = x;
-      lastY = y;
-    }
 
-    // Safety guard to prevent divide-by-zero
-    if (!image || currentDrawWidth === 0 || currentDrawHeight === 0) {
-      return;
-    }
 
-    const dx = x - lastX;
-    const dy = y - lastY;
 
-    const dist = Math.max(Math.abs(dx), Math.abs(dy));
-    const steps = Math.max(1, Math.floor(dist / (brushSize / 4)));
 
-    // Move scale calculation OUTSIDE loops
-    const scaleX = currentDrawWidth / image.width;
-    const scaleY = currentDrawHeight / image.height;
+// DRAW / ERASE MODE
+if (isDrawing && (mode === "draw" || mode === "erase")) {
 
-    for (let s = 0; s <= steps; s++) {
+  console.log("DRAW BLOCK RUNNING");
 
-      const t = s / steps;
-      const ix = lastX + dx * t;
-      const iy = lastY + dy * t;
+  if (!image || currentDrawWidth === 0 || currentDrawHeight === 0) {
+    console.log("Guard exit:",
+      "image:", !!image,
+      "currentDrawWidth:", currentDrawWidth,
+      "currentDrawHeight:", currentDrawHeight
+    );
+    return;
+  }
 
-      const imgX = (ix - imageDrawX) / scaleX;
-      const imgY = (iy - imageDrawY) / scaleY;
-
-      const baseX = Math.floor(imgX);
-      const baseY = Math.floor(imgY);
-
-      for (let i = 0; i < kernelSize; i++) {
-
-        const px = baseX + kernelDX[i];
-        const py = baseY + kernelDY[i];
-
-        if (px < 0 || py < 0 || px >= maskWidth || py >= maskHeight)
-          continue;
-
-        dirtyMinX = Math.min(dirtyMinX, px);
-        dirtyMinY = Math.min(dirtyMinY, py);
-        dirtyMaxX = Math.max(dirtyMaxX, px);
-        dirtyMaxY = Math.max(dirtyMaxY, py);
-
-        const index = py * maskWidth + px;
-        const value = kernelIntensity[i];
-
-        if (mode === "erase") {
-          maskBuffer[index] = Math.max(0, maskBuffer[index] - value);
-        } else {
-          maskBuffer[index] = Math.min(255, maskBuffer[index] + value);
-        }
-      }
-    }
-
-    renderMaskPreview();
-
+  if (lastX === null) {
     lastX = x;
     lastY = y;
   }
+
+  const dx = x - lastX;
+  const dy = y - lastY;
+
+  const dist = Math.max(Math.abs(dx), Math.abs(dy));
+  const steps = Math.max(1, Math.floor(dist / (brushSize / 4)));
+
+  for (let s = 0; s <= steps; s++) {
+
+    const t = s / steps;
+    const ix = lastX + dx * t;
+    const iy = lastY + dy * t;
+
+    for (let i = 0; i < kernelSize; i++) {
+
+      const px = Math.floor(ix + kernelDX[i]);
+      const py = Math.floor(iy + kernelDY[i]);
+
+      if (px < 0 || py < 0 || px >= maskWidth || py >= maskHeight)
+        continue;
+
+      dirtyMinX = Math.min(dirtyMinX, px);
+      dirtyMinY = Math.min(dirtyMinY, py);
+      dirtyMaxX = Math.max(dirtyMaxX, px);
+      dirtyMaxY = Math.max(dirtyMaxY, py);
+
+      const index = py * maskWidth + px;
+      const value = kernelIntensity[i];
+
+      if (mode === "erase") {
+        maskBuffer[index] = Math.max(0, maskBuffer[index] - value);
+      } else {
+        maskBuffer[index] = Math.min(255, maskBuffer[index] + value);
+      }
+    }
+  }
+
+  console.log("dirtyMinX:", dirtyMinX);
+
+  maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+  renderMaskPreview();
+
+  lastX = x;
+  lastY = y;
+}
+
 });
 
 function stopDrawing() {
