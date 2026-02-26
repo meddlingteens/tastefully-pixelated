@@ -708,8 +708,6 @@ setMode("draw");
   // ======================================================
 
 
-
-
 applyBtn.addEventListener("click", function () {
 
   if (!pixelWorker) {
@@ -721,69 +719,54 @@ applyBtn.addEventListener("click", function () {
   if (dirtyMinX === Infinity) return;
   if (isApplying) return;
 
+  // Create image-space canvas ONCE
+  const imageCanvas = document.createElement("canvas");
+  imageCanvas.width = image.width;
+  imageCanvas.height = image.height;
 
+  const imageCtx = imageCanvas.getContext("2d");
+  imageCtx.drawImage(image, 0, 0);
 
-historyStack.push(
-  baseCtx.getImageData(0, 0, baseCanvas.width, baseCanvas.height)
-);
+  // Save history (image-space)
+  historyStack.push(
+    imageCtx.getImageData(0, 0, image.width, image.height)
+  );
 
-if (historyStack.length > MAX_HISTORY) {
-  historyStack.shift();
-}
+  if (historyStack.length > MAX_HISTORY) {
+    historyStack.shift();
+  }
 
   redoStack = [];
 
+  // Get base image data for worker
+  const baseData = imageCtx.getImageData(
+    0,
+    0,
+    image.width,
+    image.height
+  );
 
-
-// Create temp image-space canvas
-const imageCanvas = document.createElement("canvas");
-imageCanvas.width = image.width;
-imageCanvas.height = image.height;
-
-const imageCtx = imageCanvas.getContext("2d");
-
-// Draw original image at 1:1 (no zoom, no offset)
-imageCtx.drawImage(image, 0, 0);
-
-const baseData = imageCtx.getImageData(
-  0,
-  0,
-  image.width,
-  image.height
-);
-
-
-
-  applyBtn.disabled = true;   // 👈 RIGHT HERE
+  applyBtn.disabled = true;
   isApplying = true;
 
-
-pixelWorker.postMessage(
-  {
-    buffer: baseData.data.buffer,
-    maskBuffer: maskBuffer.buffer,
-    width: image.width,
-    height: image.height,
-    pixelSize: 20,
-    dirtyMinX,
-    dirtyMinY,
-    dirtyMaxX,
-    dirtyMaxY
-  },
-  [
-    baseData.data.buffer
-  ]
-);
-
-
-
-
+  pixelWorker.postMessage(
+    {
+      buffer: baseData.data.buffer,
+      maskBuffer: maskBuffer.buffer,
+      width: image.width,
+      height: image.height,
+      pixelSize: 20,
+      dirtyMinX,
+      dirtyMinY,
+      dirtyMaxX,
+      dirtyMaxY
+    },
+    [
+      baseData.data.buffer
+    ]
+  );
 
 });
-
-
-
-
 
 
   // ======================================================
@@ -801,7 +784,19 @@ pixelWorker.postMessage(
         baseCtx.getImageData(0, 0, baseCanvas.width, baseCanvas.height)
       );
 
-      baseCtx.putImageData(previous, 0, 0);
+
+const tempCanvas = document.createElement("canvas");
+tempCanvas.width = image.width;
+tempCanvas.height = image.height;
+
+const tempCtx = tempCanvas.getContext("2d");
+tempCtx.putImageData(previous, 0, 0);
+
+image = tempCanvas;
+drawImage();
+
+
+
     }
   });
 
