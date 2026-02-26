@@ -554,7 +554,56 @@ if (isDrawing && mode === "move") {
 
 
   // DRAW / ERASE MODE
-if (isDrawing && (mode === "draw" || mode === "erase")) { const dx = x - lastX; const dy = y - lastY; const dist = Math.max(Math.abs(dx), Math.abs(dy)); const steps = Math.max(1, Math.floor(dist / (brushSize / 4))); // Calculate scale ONCE per stroke segment (not inside kernel loop) const scaleX = currentDrawWidth / image.width; const scaleY = currentDrawHeight / image.height; for (let s = 0; s <= steps; s++) { const t = s / steps; const ix = lastX + dx * t; const iy = lastY + dy * t; // Convert canvas space → image space const imgX = (ix - imageDrawX) / scaleX; const imgY = (iy - imageDrawY) / scaleY; const baseX = Math.floor(imgX); const baseY = Math.floor(imgY); for (let i = 0; i < kernelSize; i++) { const px = baseX + kernelDX[i]; const py = baseY + kernelDY[i]; if (px < 0 || py < 0 || px >= maskWidth || py >= maskHeight) continue; const index = py * maskWidth + px; const value = kernelIntensity[i]; if (mode === "erase") { maskBuffer[index] = Math.max(0, maskBuffer[index] - value); } else { maskBuffer[index] = Math.min(255, maskBuffer[index] + value); } } } renderMaskPreview(); lastX = x; lastY = y; }
+ if (isDrawing && (mode === "draw" || mode === "erase")) {
+
+  const dx = x - lastX;
+  const dy = y - lastY;
+
+  const dist = Math.max(Math.abs(dx), Math.abs(dy));
+  const steps = Math.max(1, Math.floor(dist / (brushSize / 4)));
+
+  // Calculate scale ONCE per stroke segment (not inside kernel loop)
+  const scaleX = currentDrawWidth / image.width;
+  const scaleY = currentDrawHeight / image.height;
+
+  for (let s = 0; s <= steps; s++) {
+
+    const t = s / steps;
+    const ix = lastX + dx * t;
+    const iy = lastY + dy * t;
+
+    // Convert canvas space → image space
+    const imgX = (ix - imageDrawX) / scaleX;
+    const imgY = (iy - imageDrawY) / scaleY;
+
+    const baseX = Math.floor(imgX);
+    const baseY = Math.floor(imgY);
+
+    for (let i = 0; i < kernelSize; i++) {
+
+      const px = baseX + kernelDX[i];
+      const py = baseY + kernelDY[i];
+
+      if (px < 0 || py < 0 || px >= maskWidth || py >= maskHeight)
+        continue;
+
+      const index = py * maskWidth + px;
+      const value = kernelIntensity[i];
+
+      if (mode === "erase") {
+        maskBuffer[index] = Math.max(0, maskBuffer[index] - value);
+      } else {
+        maskBuffer[index] = Math.min(255, maskBuffer[index] + value);
+      }
+    }
+  }
+
+  renderMaskPreview();
+
+  lastX = x;
+  lastY = y;
+}
+
 });
 
 
