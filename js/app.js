@@ -88,8 +88,7 @@ function renderMaskPreview() {
     data[idx]     = 255;
     data[idx + 1] = 255;
     data[idx + 2] = 255;
-data[idx + 3] = Math.min(255, alpha * 2);
-
+data[idx + 3] = alpha > 0 ? 255 : 0;
 
   }
 
