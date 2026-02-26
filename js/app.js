@@ -639,23 +639,12 @@ document.addEventListener("mouseup", stopDrawing);
 
 
 
-  // ======================================================
-  // MODE BUTTONS
-  // ======================================================
-
-
-// Get erase button first (so setMode can use it)
-
-
+// ======================================================
+// MODE BUTTONS
+// ======================================================
 
 function setMode(newMode) {
   console.log("SET MODE CALLED:", newMode);
-
-
-
-
-
-
 
   mode = newMode;
 
@@ -668,14 +657,13 @@ function setMode(newMode) {
   if (newMode === "erase") eraseBtn.classList.add("active");
 }
 
-
-
-
 // Set default mode on load
 setMode("draw");
 
-
-
+// 🔥 Attach listeners
+drawBtn.addEventListener("click", () => setMode("draw"));
+moveBtn.addEventListener("click", () => setMode("move"));
+eraseBtn.addEventListener("click", () => setMode("erase"));
 
 
 
