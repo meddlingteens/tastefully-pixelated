@@ -148,11 +148,12 @@
 }
 
 
-#previewCanvas,
-#maskCanvas {
+
+
+
+#previewCanvas {
   pointer-events: none;
 }
-
 
 
 /* Sliders */
