@@ -144,6 +144,10 @@ setRandomBanner();
 
 let originalImageData = null;
 
+let eraseWorkingCanvas = null;
+let eraseWorkingCtx = null;
+let eraseWorkingImageData = null;
+
 let imageDrawX = 0;
 let imageDrawY = 0;
 
@@ -486,7 +490,9 @@ maskCanvas.addEventListener("mousedown", function (e) {
 
     maskCanvas.style.cursor = "grabbing";
 
-  } else {
+  } 
+
+else {
 
 // Reset dirty bounds for new stroke
 dirtyMinX = Infinity;
@@ -497,6 +503,26 @@ dirtyMaxY = -Infinity;
 // Always initialize in canvas space
 lastX = mouseX;
 lastY = mouseY;
+
+
+if (mode === "erase") {
+
+  eraseWorkingCanvas = document.createElement("canvas");
+  eraseWorkingCanvas.width = image.width;
+  eraseWorkingCanvas.height = image.height;
+
+  eraseWorkingCtx = eraseWorkingCanvas.getContext("2d");
+  eraseWorkingCtx.drawImage(image, 0, 0);
+
+  eraseWorkingImageData = eraseWorkingCtx.getImageData(
+    0,
+    0,
+    image.width,
+    image.height
+  );
+}
+
+
 
 console.log("Draw start:", lastX, lastY);
 
@@ -642,16 +668,27 @@ if (isDrawing && (mode === "draw" || mode === "erase")) {
 
       if (mode === "erase") {
 
-        maskBuffer[index] = 0;
+      
 
-        const pixelIndex = (py * image.width + px) * 4;
+if (mode === "erase") {
 
-        workingImageData.data[pixelIndex]     = originalImageData.data[pixelIndex];
-        workingImageData.data[pixelIndex + 1] = originalImageData.data[pixelIndex + 1];
-        workingImageData.data[pixelIndex + 2] = originalImageData.data[pixelIndex + 2];
-        workingImageData.data[pixelIndex + 3] = 255;
+  maskBuffer[index] = 0;
 
-      } else {
+  const pixelIndex = (py * image.width + px) * 4;
+
+eraseWorkingImageData.data[pixelIndex]     = originalImageData.data[pixelIndex];
+eraseWorkingImageData.data[pixelIndex + 1] = originalImageData.data[pixelIndex + 1];
+eraseWorkingImageData.data[pixelIndex + 2] = originalImageData.data[pixelIndex + 2];
+eraseWorkingImageData.data[pixelIndex + 3] = 255;
+
+}
+
+
+
+
+
+
+		else {
 
         maskBuffer[index] = 255;
 
@@ -664,16 +701,11 @@ if (isDrawing && (mode === "draw" || mode === "erase")) {
   }
 
   // Commit erase changes once per stroke
-  if (mode === "erase" && workingImageData) {
-    workingCtx.putImageData(workingImageData, 0, 0);
-    image = workingCanvas;
-    drawImage();
-  }
-
-  lastX = x;
-  lastY = y;
+  if (mode === "erase" && eraseWorkingImageData) {
+  eraseWorkingCtx.putImageData(eraseWorkingImageData, 0, 0);
+  image = eraseWorkingCanvas;
+  drawImage();
 }
-
 
 });
 
@@ -681,6 +713,10 @@ function stopDrawing() {
   isDrawing = false;
   lastX = null;
   lastY = null;
+
+eraseWorkingCanvas = null;
+eraseWorkingCtx = null;
+eraseWorkingImageData = null;
 
   if (mode === "move") {
     maskCanvas.style.cursor = "grab";
