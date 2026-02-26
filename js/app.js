@@ -575,11 +575,29 @@ if (isDrawing && (mode === "draw" || mode === "erase")) {
     const ix = lastX + dx * t;
     const iy = lastY + dy * t;
 
-// --- Preview rendering (canvas space) ---
-maskCtx.fillStyle = "white";
-maskCtx.beginPath();
-maskCtx.arc(ix, iy, brushSize / 2, 0, Math.PI * 2);
-maskCtx.fill();
+
+if (mode === "draw") {
+
+  maskCtx.globalCompositeOperation = "source-over";
+  maskCtx.fillStyle = "white";
+  maskCtx.beginPath();
+  maskCtx.arc(ix, iy, brushSize / 2, 0, Math.PI * 2);
+  maskCtx.fill();
+
+} else if (mode === "erase") {
+
+  maskCtx.globalCompositeOperation = "destination-out";
+  maskCtx.beginPath();
+  maskCtx.arc(ix, iy, brushSize / 2, 0, Math.PI * 2);
+  maskCtx.fill();
+
+  maskCtx.globalCompositeOperation = "source-over";
+}
+
+
+
+
+
 
     for (let i = 0; i < kernelSize; i++) {
 
