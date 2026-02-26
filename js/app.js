@@ -1,3 +1,4 @@
+
 document.addEventListener("DOMContentLoaded", function () {
 
  // ======================================================
@@ -142,8 +143,6 @@ setRandomBanner();
 
   let image = null;
 
-let originalImageData = null;
-
 let imageDrawX = 0;
 let imageDrawY = 0;
 
@@ -178,8 +177,6 @@ let currentDrawHeight = 0;
   let dirtyMinY = Infinity;
   let dirtyMaxX = -Infinity;
   let dirtyMaxY = -Infinity;
-
-
 
   const MAX_HISTORY = 20;
   let historyStack = [];
@@ -388,32 +385,19 @@ baseCtx.drawImage(image, imageDrawX, imageDrawY, drawWidth, drawHeight);
     image = new Image();
 
 image.onload = function () {
-
-  resizeCanvas();
-  drawImage();
-
-  // 🔥 Store original image pixels for erase restore
-  const tempCanvas = document.createElement("canvas");
-  tempCanvas.width = image.width;
-  tempCanvas.height = image.height;
-
-  const tempCtx = tempCanvas.getContext("2d");
-  tempCtx.drawImage(image, 0, 0);
-
-  originalImageData = tempCtx.getImageData(0, 0, image.width, image.height);
-
-  maskWidth = image.width;
-  maskHeight = image.height;
-  maskBuffer = new Uint8Array(maskWidth * maskHeight);
-
-  dirtyMinX = Infinity;
-  dirtyMinY = Infinity;
-  dirtyMaxX = -Infinity;
-  dirtyMaxY = -Infinity;
-};
+  zoomLevel = 1;
+  offsetX = 0;
+  offsetY = 0;
 
 
+maskWidth = image.width;
+maskHeight = image.height;
+maskBuffer = new Uint8Array(maskWidth * maskHeight);
 
+dirtyMinX = Infinity;
+dirtyMinY = Infinity;
+dirtyMaxX = -Infinity;
+dirtyMaxY = -Infinity;
 
 
 console.log("IMAGE WIDTH:", image.width);
@@ -424,8 +408,6 @@ console.log("CANVAS HEIGHT:", baseCanvas.height);
 
 
   drawImage();
-
-
 
   setRandomSubhead();
   setRandomBanner();
@@ -563,26 +545,6 @@ console.log("MOUSEMOVE", mode);
 // DRAW / ERASE MODE
 if (isDrawing && (mode === "draw" || mode === "erase")) {
 
-
-let workingImageData = null;
-
-if (mode === "erase") {
-  const tempCanvas = document.createElement("canvas");
-  tempCanvas.width = image.width;
-  tempCanvas.height = image.height;
-
-  const tempCtx = tempCanvas.getContext("2d");
-  tempCtx.drawImage(image, 0, 0);
-
-  workingImageData = tempCtx.getImageData(0, 0, image.width, image.height);
-}
-
-
-
-
-
-
-
   console.log("DRAW BLOCK RUNNING");
 
   if (!image || currentDrawWidth === 0 || currentDrawHeight === 0) {
@@ -672,40 +634,11 @@ if (mode === "draw") {
       const index = py * maskWidth + px;
       const value = kernelIntensity[i];
 
-if (mode === "erase") {
-
-  // Clear mask data
-  maskBuffer[index] = 0;
-
-  // Restore original pixels immediately
-  const pixelIndex = (py * image.width + px) * 4;
-
-  const imageCanvas = document.createElement("canvas");
-  imageCanvas.width = image.width;
-  imageCanvas.height = image.height;
-
-  const imageCtx = imageCanvas.getContext("2d");
-  imageCtx.drawImage(image, 0, 0);
-
-  const currentData = imageCtx.getImageData(0, 0, image.width, image.height);
-
-  currentData.data[pixelIndex]     = originalImageData.data[pixelIndex];
-  currentData.data[pixelIndex + 1] = originalImageData.data[pixelIndex + 1];
-  currentData.data[pixelIndex + 2] = originalImageData.data[pixelIndex + 2];
-  currentData.data[pixelIndex + 3] = 255;
-
-  imageCtx.putImageData(currentData, 0, 0);
-
-  image = imageCanvas;
-  drawImage();
-
-} else {
-
-  maskBuffer[index] = 255;
-
-}
-
-
+      if (mode === "erase") {
+        maskBuffer[index] = Math.max(0, maskBuffer[index] - value);
+      } else {
+        maskBuffer[index] = Math.min(255, maskBuffer[index] + value);
+      }
     }
   }
 
