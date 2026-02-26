@@ -322,59 +322,52 @@ window.addEventListener("resize", resizeCanvas);
 
 
 
-  // ======================================================
-  // BUILD KERNEL
-  // ======================================================
+ // ======================================================
+// BUILD KERNEL
+// ======================================================
 
-  function buildBrushKernel() {
+function buildBrushKernel() {
 
-    const radius = Math.floor(brushSize / 2);
-    const radiusSq = radius * radius;
+  const radius = Math.floor(brushSize / 2);
+  const radiusSq = radius * radius;
 
-    const hardness = Math.min(0.99, Math.max(0.01, brushHardness));
-    const k = 1 - hardness;
+  let count = 0;
 
-    let count = 0;
-
-    for (let yy = -radius; yy <= radius; yy++) {
-      for (let xx = -radius; xx <= radius; xx++) {
-        if (xx * xx + yy * yy <= radiusSq) count++;
-      }
-    }
-
-    kernelDX = new Int16Array(count);
-    kernelDY = new Int16Array(count);
-    kernelIntensity = new Uint8Array(count);
-    kernelSize = count;
-
-    let i = 0;
-
-    for (let yy = -radius; yy <= radius; yy++) {
-      for (let xx = -radius; xx <= radius; xx++) {
-
-        const distSq = xx * xx + yy * yy;
-        if (distSq > radiusSq) continue;
-
-        const falloff = 1 - (distSq / radiusSq);
-        
-
-
-const intensity =
-  brushOpacity *
-  (falloff * (1 - k) + falloff * falloff * k);
-
-kernelIntensity[i] = Math.floor(intensity * 255);
-
-
-
-        kernelDX[i] = xx;
-        kernelDY[i] = yy;
-        i++;
-      }
+  // Count pixels inside circle
+  for (let yy = -radius; yy <= radius; yy++) {
+    for (let xx = -radius; xx <= radius; xx++) {
+      if (xx * xx + yy * yy <= radiusSq) count++;
     }
   }
 
-  buildBrushKernel();
+  kernelDX = new Int16Array(count);
+  kernelDY = new Int16Array(count);
+  kernelIntensity = new Uint8Array(count);
+  kernelSize = count;
+
+  let i = 0;
+
+  for (let yy = -radius; yy <= radius; yy++) {
+    for (let xx = -radius; xx <= radius; xx++) {
+
+      const distSq = xx * xx + yy * yy;
+      if (distSq > radiusSq) continue;
+
+      kernelDX[i] = xx;
+      kernelDY[i] = yy;
+
+      // 🔥 Fully opaque, hard brush
+      kernelIntensity[i] = 255;
+
+      i++;
+    }
+  }
+}
+
+buildBrushKernel();
+
+
+
 
   // ======================================================
   // DRAW IMAGE
