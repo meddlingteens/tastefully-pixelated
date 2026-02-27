@@ -458,95 +458,75 @@ if (uploadInput) {
 }
 
 
-  // ======================================================
-// MOUSE EVENTS
+
+
+// ======================================================
+// MOUSEDOWN
 // ======================================================
 
 maskCanvas.addEventListener("mousedown", function (e) {
 
-  console.log("MOUSEDOWN FIRED");
-
-  if (!image) {
-    console.log("EXIT: image is falsy");
-    return;
-  }
-
-  if (isApplying) {
-    console.log("EXIT: isApplying is true");
-    return;
-  }
-
-  console.log("Mode at mousedown:", mode);
+  if (!image) return;
+  if (isApplying) return;
 
   isDrawing = true;
-  console.log("isDrawing set to:", isDrawing);
 
   const rect = maskCanvas.getBoundingClientRect();
   const mouseX = e.clientX - rect.left;
   const mouseY = e.clientY - rect.top;
 
-  console.log("Mouse position:", mouseX, mouseY);
-
+  // MOVE MODE
   if (mode === "move") {
 
     lastX = mouseX - offsetX;
     lastY = mouseY - offsetY;
 
-    console.log("Move start:", lastX, lastY);
-
     maskCanvas.style.cursor = "grabbing";
-
-  } 
-
-else {
-
-// Reset dirty bounds for new stroke
-dirtyMinX = Infinity;
-dirtyMinY = Infinity;
-dirtyMaxX = -Infinity;
-dirtyMaxY = -Infinity;
-
-// Always initialize in canvas space
-lastX = mouseX;
-lastY = mouseY;
-
-
-if (mode === "erase") {
-
-  eraseWorkingCanvas = document.createElement("canvas");
-  eraseWorkingCanvas.width = image.width;
-  eraseWorkingCanvas.height = image.height;
-
-  eraseWorkingCtx = eraseWorkingCanvas.getContext("2d");
-  eraseWorkingCtx.drawImage(image, 0, 0);
-
-  eraseWorkingImageData = eraseWorkingCtx.getImageData(
-    0,
-    0,
-    image.width,
-    image.height
-  );
-}
-
-
-
-console.log("Draw start:", lastX, lastY);
-
-maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
-
-
-
-
+    return;
   }
 
+  // DRAW / ERASE MODE
 
+  dirtyMinX = Infinity;
+  dirtyMinY = Infinity;
+  dirtyMaxX = -Infinity;
+  dirtyMaxY = -Infinity;
+
+  lastX = mouseX;
+  lastY = mouseY;
+
+  if (mode === "erase") {
+
+    eraseWorkingCanvas = document.createElement("canvas");
+    eraseWorkingCanvas.width = image.width;
+    eraseWorkingCanvas.height = image.height;
+
+    eraseWorkingCtx = eraseWorkingCanvas.getContext("2d");
+    eraseWorkingCtx.drawImage(image, 0, 0);
+
+    eraseWorkingImageData = eraseWorkingCtx.getImageData(
+      0,
+      0,
+      image.width,
+      image.height
+    );
+  }
 
 });
 
 
+
+
+
+
+
+
+// ======================================================
+// MOUSEMOVE
+// ======================================================
+
 maskCanvas.addEventListener("mousemove", function (e) {
 
-console.log("MOUSEMOVE", mode);
   if (!image) return;
   if (isApplying) return;
 
@@ -554,160 +534,118 @@ console.log("MOUSEMOVE", mode);
   const x = e.clientX - rect.left;
   const y = e.clientY - rect.top;
 
-  // Clear brush preview
-  if (previewCtx) {
-    previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
-  }
+  // DRAW / ERASE MODE
+  if (isDrawing && (mode === "draw" || mode === "erase")) {
 
+    if (!image || currentDrawWidth === 0 || currentDrawHeight === 0) {
+      return;
+    }
 
+    if (lastX === null) {
+      lastX = x;
+      lastY = y;
+    }
 
+    const dx = x - lastX;
+    const dy = y - lastY;
 
-  // Draw brush outline when not drawing
-  if (!isDrawing && mode !== "move" && previewCtx) {
-    previewCtx.beginPath();
-    previewCtx.arc(x, y, brushSize / 2, 0, Math.PI * 2);
-    previewCtx.strokeStyle = "rgba(255,255,255,0.6)";
-    previewCtx.lineWidth = 1;
-    previewCtx.stroke();
-  }
+    const dist = Math.max(Math.abs(dx), Math.abs(dy));
+    const steps = Math.max(1, Math.floor(dist / (brushSize / 4)));
 
-  // MOVE MODE
-  if (isDrawing && mode === "move") {
+    const scaleX = image.width / currentDrawWidth;
+    const scaleY = image.height / currentDrawHeight;
 
-    const mouseX = x;
-    const mouseY = y;
+    for (let s = 0; s <= steps; s++) {
 
-    offsetX = mouseX - lastX;
-    offsetY = mouseY - lastY;
+      const t = s / steps;
+      const ix = lastX + dx * t;
+      const iy = lastY + dy * t;
 
-    drawImage();
-    renderMaskPreview();
+      // Preview brush
+      maskCtx.globalCompositeOperation =
+        (mode === "erase") ? "destination-out" : "source-over";
 
-    return;
-  }
+      maskCtx.fillStyle = "white";
+      maskCtx.beginPath();
+      maskCtx.arc(ix, iy, brushSize / 2, 0, Math.PI * 2);
+      maskCtx.fill();
 
- 
+      maskCtx.globalCompositeOperation = "source-over";
 
+      for (let i = 0; i < kernelSize; i++) {
 
+        const canvasX = ix + kernelDX[i];
+        const canvasY = iy + kernelDY[i];
 
+        if (
+          canvasX < imageDrawX ||
+          canvasY < imageDrawY ||
+          canvasX > imageDrawX + currentDrawWidth ||
+          canvasY > imageDrawY + currentDrawHeight
+        ) continue;
 
+        const imgX = (canvasX - imageDrawX) * scaleX;
+        const imgY = (canvasY - imageDrawY) * scaleY;
 
-// DRAW / ERASE MODE
-if (isDrawing && (mode === "draw" || mode === "erase")) {
+        const px = Math.floor(imgX);
+        const py = Math.floor(imgY);
 
-  if (!image || currentDrawWidth === 0 || currentDrawHeight === 0) {
-    return;
-  }
+        if (px < 0 || py < 0 || px >= maskWidth || py >= maskHeight)
+          continue;
 
-  
-  if (lastX === null) {
-    lastX = x;
-    lastY = y;
-  }
+        const index = py * maskWidth + px;
 
-  const dx = x - lastX;
-  const dy = y - lastY;
-
-  const dist = Math.max(Math.abs(dx), Math.abs(dy));
-  const steps = Math.max(1, Math.floor(dist / (brushSize / 4)));
-
-  const scaleX = image.width / currentDrawWidth;
-  const scaleY = image.height / currentDrawHeight;
-
-  for (let s = 0; s <= steps; s++) {
-
-    const t = s / steps;
-    const ix = lastX + dx * t;
-    const iy = lastY + dy * t;
-
-    // ---- Preview (always white brush) ----
-    maskCtx.globalCompositeOperation = (mode === "erase")
-      ? "destination-out"
-      : "source-over";
-
-    maskCtx.fillStyle = "white";
-    maskCtx.beginPath();
-    maskCtx.arc(ix, iy, brushSize / 2, 0, Math.PI * 2);
-    maskCtx.fill();
-
-    maskCtx.globalCompositeOperation = "source-over";
-
-    for (let i = 0; i < kernelSize; i++) {
-
-      const canvasX = ix + kernelDX[i];
-      const canvasY = iy + kernelDY[i];
-
-      if (
-        canvasX < imageDrawX ||
-        canvasY < imageDrawY ||
-        canvasX > imageDrawX + currentDrawWidth ||
-        canvasY > imageDrawY + currentDrawHeight
-      ) {
-        continue;
-      }
-
-      const imgX = (canvasX - imageDrawX) * scaleX;
-      const imgY = (canvasY - imageDrawY) * scaleY;
-
-      const px = Math.floor(imgX);
-      const py = Math.floor(imgY);
-
-      if (px < 0 || py < 0 || px >= maskWidth || py >= maskHeight)
-        continue;
-
-      const index = py * maskWidth + px;
-
-      if (mode === "erase") {
+        if (mode === "erase" && eraseWorkingImageData && originalImageData) {
 
   maskBuffer[index] = 0;
 
-
-
-
   const pixelIndex = (py * image.width + px) * 4;
 
-eraseWorkingImageData.data[pixelIndex]     = originalImageData.data[pixelIndex];
-eraseWorkingImageData.data[pixelIndex + 1] = originalImageData.data[pixelIndex + 1];
-eraseWorkingImageData.data[pixelIndex + 2] = originalImageData.data[pixelIndex + 2];
-eraseWorkingImageData.data[pixelIndex + 3] = 255;
+  eraseWorkingImageData.data[pixelIndex]     = originalImageData.data[pixelIndex];
+  eraseWorkingImageData.data[pixelIndex + 1] = originalImageData.data[pixelIndex + 1];
+  eraseWorkingImageData.data[pixelIndex + 2] = originalImageData.data[pixelIndex + 2];
+  eraseWorkingImageData.data[pixelIndex + 3] = 255;
 
 }
 
+        } else {
 
+          maskBuffer[index] = 255;
 
-
-
-
-		else {
-
-        maskBuffer[index] = 255;
-
-        dirtyMinX = Math.min(dirtyMinX, px);
-        dirtyMinY = Math.min(dirtyMinY, py);
-        dirtyMaxX = Math.max(dirtyMaxX, px);
-        dirtyMaxY = Math.max(dirtyMaxY, py);
+          dirtyMinX = Math.min(dirtyMinX, px);
+          dirtyMinY = Math.min(dirtyMinY, py);
+          dirtyMaxX = Math.max(dirtyMaxX, px);
+          dirtyMaxY = Math.max(dirtyMaxY, py);
+        }
       }
     }
+
+    // Commit erase ONLY while drawing
+    if (mode === "erase" && eraseWorkingImageData) {
+      eraseWorkingCtx.putImageData(eraseWorkingImageData, 0, 0);
+      image = eraseWorkingCanvas;
+      drawImage();
+    }
+
+    lastX = x;
+    lastY = y;
   }
-
-  // Commit erase changes once per stroke
-  if (mode === "erase" && eraseWorkingImageData) {
-  eraseWorkingCtx.putImageData(eraseWorkingImageData, 0, 0);
-  image = eraseWorkingCanvas;
-  drawImage();
-}
-
 });
 
+
+// ======================================================
+// STOP DRAWING
+// ======================================================
+
 function stopDrawing() {
+
   isDrawing = false;
   lastX = null;
   lastY = null;
-}
 
-eraseWorkingCanvas = null;
-eraseWorkingCtx = null;
-eraseWorkingImageData = null;
+  eraseWorkingCanvas = null;
+  eraseWorkingCtx = null;
+  eraseWorkingImageData = null;
 
   if (mode === "move") {
     maskCanvas.style.cursor = "grab";
@@ -720,9 +658,17 @@ eraseWorkingImageData = null;
 
 maskCanvas.addEventListener("mouseup", stopDrawing);
 maskCanvas.addEventListener("mouseleave", stopDrawing);
-
-// 🔥 Critical addition
 document.addEventListener("mouseup", stopDrawing);
+
+
+
+
+
+
+
+
+
+
 
 
 
