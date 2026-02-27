@@ -95,10 +95,12 @@ const subheadMessages = [
 ];
 
 function setRandomSubhead() {
-  const randomIndex = Math.floor(Math.random() * subheadMessages.length);
-  subhead.textContent = subheadMessages[randomIndex];
-}
 
+  if (!subhead) return;
+
+  const random = subheads[Math.floor(Math.random() * subheads.length)];
+  subhead.textContent = random;
+}
 
 
 
@@ -122,13 +124,19 @@ const bannerMessages = [
 ];
 
 function setRandomBanner() {
-  bannerHeadline.classList.add("fade-out");
+
+  if (!bannerHeadline) return;
+
+  const randomIndex = Math.floor(Math.random() * bannerHeadlines.length);
+  const randomHeadline = bannerHeadlines[randomIndex];
+
+  bannerHeadline.textContent = randomHeadline;
+
+  bannerHeadline.classList.remove("animate");
 
   setTimeout(() => {
-    const randomIndex = Math.floor(Math.random() * bannerMessages.length);
-    bannerHeadline.textContent = bannerMessages[randomIndex];
-    bannerHeadline.classList.remove("fade-out");
-  }, 150);
+    bannerHeadline.classList.add("animate");
+  }, 10);
 }
 
 
@@ -375,67 +383,76 @@ baseCtx.drawImage(image, imageDrawX, imageDrawY, drawWidth, drawHeight);
 
 
   // ======================================================
+// IMAGE // ======================================================
 // IMAGE UPLOAD
 // ======================================================
 
-uploadInput.addEventListener("change", function (e) {
+if (uploadInput) {
 
-  const file = e.target.files[0];
-  if (!file) return;
+  uploadInput.addEventListener("change", function (e) {
 
-  const reader = new FileReader();
+    const file = e.target.files[0];
+    if (!file) return;
 
-  reader.onload = function (event) {
+    const reader = new FileReader();
 
-    image = new Image();
+    reader.onload = function (event) {
 
-    image.onload = function () {
+      image = new Image();
 
-      resizeCanvas();
-      drawImage();
+      image.onload = function () {
 
-      // 🔥 Store original image pixels for erase restore
-      const tempCanvas = document.createElement("canvas");
-      tempCanvas.width = image.width;
-      tempCanvas.height = image.height;
+        resizeCanvas();
+        drawImage();
 
-      const tempCtx = tempCanvas.getContext("2d");
-      tempCtx.drawImage(image, 0, 0);
+        // Store original image pixels for erase restore
+        const tempCanvas = document.createElement("canvas");
+        tempCanvas.width = image.width;
+        tempCanvas.height = image.height;
 
-      originalImageData = tempCtx.getImageData(
-        0,
-        0,
-        image.width,
-        image.height
-      );
+        const tempCtx = tempCanvas.getContext("2d");
+        tempCtx.drawImage(image, 0, 0);
 
-      maskWidth = image.width;
-      maskHeight = image.height;
-      maskBuffer = new Uint8Array(maskWidth * maskHeight);
+        originalImageData = tempCtx.getImageData(
+          0,
+          0,
+          image.width,
+          image.height
+        );
 
-      dirtyMinX = Infinity;
-      dirtyMinY = Infinity;
-      dirtyMaxX = -Infinity;
-      dirtyMaxY = -Infinity;
+        maskWidth = image.width;
+        maskHeight = image.height;
+        maskBuffer = new Uint8Array(maskWidth * maskHeight);
 
-      // UI updates AFTER image fully loads
-      setRandomSubhead();
-      setRandomBanner();
+        dirtyMinX = Infinity;
+        dirtyMinY = Infinity;
+        dirtyMaxX = -Infinity;
+        dirtyMaxY = -Infinity;
 
-      const overlay = document.querySelector(".canvas-overlay");
-      if (overlay) overlay.classList.add("hidden");
+        // UI updates AFTER image fully loads
+        if (typeof setRandomSubhead === "function") {
+          setRandomSubhead();
+        }
 
-      canvasContainer.classList.add("photo-loaded");
+        if (typeof setRandomBanner === "function") {
+          setRandomBanner();
+        }
+
+        const overlay = document.querySelector(".canvas-overlay");
+        if (overlay) overlay.classList.add("hidden");
+
+        if (canvasContainer) {
+          canvasContainer.classList.add("photo-loaded");
+        }
+      };
+
+      image.src = event.target.result;
     };
 
-    image.src = event.target.result;
-  };
+    reader.readAsDataURL(file);
+  });
 
-  reader.readAsDataURL(file);
-});
-
-
-
+}
 
 
   // ======================================================
