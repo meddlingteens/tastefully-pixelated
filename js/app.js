@@ -703,6 +703,7 @@ function stopDrawing() {
   isDrawing = false;
   lastX = null;
   lastY = null;
+}
 
 eraseWorkingCanvas = null;
 eraseWorkingCtx = null;
