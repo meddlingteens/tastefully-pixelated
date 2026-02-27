@@ -593,22 +593,7 @@ if (isDrawing && (mode === "draw" || mode === "erase")) {
     return;
   }
 
-  let workingImageData = null;
-  let workingCanvas = null;
-  let workingCtx = null;
-
-  if (mode === "erase") {
-
-    workingCanvas = document.createElement("canvas");
-    workingCanvas.width = image.width;
-    workingCanvas.height = image.height;
-
-    workingCtx = workingCanvas.getContext("2d");
-    workingCtx.drawImage(image, 0, 0);
-
-    workingImageData = workingCtx.getImageData(0, 0, image.width, image.height);
-  }
-
+  
   if (lastX === null) {
     lastX = x;
     lastY = y;
@@ -668,11 +653,10 @@ if (isDrawing && (mode === "draw" || mode === "erase")) {
 
       if (mode === "erase") {
 
-      
-
-if (mode === "erase") {
-
   maskBuffer[index] = 0;
+
+
+
 
   const pixelIndex = (py * image.width + px) * 4;
 
