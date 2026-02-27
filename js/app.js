@@ -98,10 +98,12 @@ function setRandomSubhead() {
 
   if (!subhead) return;
 
-  const random = subheads[Math.floor(Math.random() * subheads.length)];
+  const random = subheadMessages[
+    Math.floor(Math.random() * subheadMessages.length)
+  ];
+
   subhead.textContent = random;
 }
-
 
 
 // ======================================================
@@ -127,8 +129,8 @@ function setRandomBanner() {
 
   if (!bannerHeadline) return;
 
-  const randomIndex = Math.floor(Math.random() * bannerHeadlines.length);
-  const randomHeadline = bannerHeadlines[randomIndex];
+  const randomIndex = Math.floor(Math.random() * bannerMessages.length);
+  const randomHeadline = bannerMessages[randomIndex];
 
   bannerHeadline.textContent = randomHeadline;
 
@@ -138,6 +140,7 @@ function setRandomBanner() {
     bannerHeadline.classList.add("animate");
   }, 10);
 }
+
 
 
 setRandomSubhead();
