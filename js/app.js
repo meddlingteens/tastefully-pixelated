@@ -375,13 +375,10 @@ baseCtx.drawImage(image, imageDrawX, imageDrawY, drawWidth, drawHeight);
 
 
   // ======================================================
-  // IMAGE UPLOAD
-  // ======================================================
+// IMAGE UPLOAD
+// ======================================================
 
-
-
-
- uploadInput.addEventListener("change", function (e) {
+uploadInput.addEventListener("change", function (e) {
 
   const file = e.target.files[0];
   if (!file) return;
@@ -389,64 +386,53 @@ baseCtx.drawImage(image, imageDrawX, imageDrawY, drawWidth, drawHeight);
   const reader = new FileReader();
 
   reader.onload = function (event) {
+
     image = new Image();
 
-image.onload = function () {
+    image.onload = function () {
 
-  resizeCanvas();
-  drawImage();
+      resizeCanvas();
+      drawImage();
 
-  // 🔥 Store original image pixels for erase restore
-  const tempCanvas = document.createElement("canvas");
-  tempCanvas.width = image.width;
-  tempCanvas.height = image.height;
+      // 🔥 Store original image pixels for erase restore
+      const tempCanvas = document.createElement("canvas");
+      tempCanvas.width = image.width;
+      tempCanvas.height = image.height;
 
-  const tempCtx = tempCanvas.getContext("2d");
-  tempCtx.drawImage(image, 0, 0);
+      const tempCtx = tempCanvas.getContext("2d");
+      tempCtx.drawImage(image, 0, 0);
 
-  originalImageData = tempCtx.getImageData(0, 0, image.width, image.height);
+      originalImageData = tempCtx.getImageData(
+        0,
+        0,
+        image.width,
+        image.height
+      );
 
-  maskWidth = image.width;
-  maskHeight = image.height;
-  maskBuffer = new Uint8Array(maskWidth * maskHeight);
+      maskWidth = image.width;
+      maskHeight = image.height;
+      maskBuffer = new Uint8Array(maskWidth * maskHeight);
 
-  dirtyMinX = Infinity;
-  dirtyMinY = Infinity;
-  dirtyMaxX = -Infinity;
-  dirtyMaxY = -Infinity;
-};
+      dirtyMinX = Infinity;
+      dirtyMinY = Infinity;
+      dirtyMaxX = -Infinity;
+      dirtyMaxY = -Infinity;
 
+      // UI updates AFTER image fully loads
+      setRandomSubhead();
+      setRandomBanner();
 
+      const overlay = document.querySelector(".canvas-overlay");
+      if (overlay) overlay.classList.add("hidden");
 
-
-
-console.log("IMAGE WIDTH:", image.width);
-console.log("IMAGE HEIGHT:", image.height);
-console.log("CANVAS WIDTH:", baseCanvas.width);
-console.log("CANVAS HEIGHT:", baseCanvas.height);
-
-
-
-  drawImage();
-
-
-
-  setRandomSubhead();
-  setRandomBanner();
-
-  const overlay = document.querySelector(".canvas-overlay");
-  if (overlay) overlay.classList.add("hidden");
-
-  canvasContainer.classList.add("photo-loaded");
-};
-
+      canvasContainer.classList.add("photo-loaded");
+    };
 
     image.src = event.target.result;
   };
 
   reader.readAsDataURL(file);
 });
-
 
 
 
