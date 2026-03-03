@@ -237,12 +237,12 @@ try {
 
   if (version !== applyVersion) return;
 
-    // Rebuild ImageData from worker buffer
-    const imageData = new ImageData(
-      new Uint8ClampedArray(buffer),
-      image.width,
-      image.height
-    );
+const imageData = new ImageData(
+  new Uint8ClampedArray(buffer),
+  e.data.width,
+  e.data.height
+);
+
 
     // Draw processed image
     const tempCanvas = document.createElement("canvas");
