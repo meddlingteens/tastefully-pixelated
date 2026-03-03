@@ -527,8 +527,13 @@ maskCanvas.addEventListener("mousemove", function (e) {
 
   // MOVE MODE
   if (isDrawing && mode === "move") {
-    offsetX = x - lastX;
-    offsetY = y - lastY;
+
+    const dx = x - startDragX;
+    const dy = y - startDragY;
+
+    offsetX = startOffsetX + dx;
+    offsetY = startOffsetY + dy;
+
     drawImage();
     return;
   }
@@ -560,7 +565,6 @@ maskCanvas.addEventListener("mousemove", function (e) {
       const ix = lastX + dx * t;
       const iy = lastY + dy * t;
 
-      // Preview brush
       maskCtx.globalCompositeOperation =
         (mode === "erase") ? "destination-out" : "source-over";
 
@@ -617,11 +621,9 @@ maskCanvas.addEventListener("mousemove", function (e) {
           dirtyMaxX = Math.max(dirtyMaxX, px);
           dirtyMaxY = Math.max(dirtyMaxY, py);
         }
-      } // end kernel loop
+      }
+    }
 
-    } // end steps loop
-
-    // Commit erase ONLY while drawing
     if (mode === "erase" && eraseWorkingImageData) {
       eraseWorkingCtx.putImageData(eraseWorkingImageData, 0, 0);
       image = eraseWorkingCanvas;
@@ -632,6 +634,8 @@ maskCanvas.addEventListener("mousemove", function (e) {
     lastY = y;
   }
 });
+
+
 
 
 
