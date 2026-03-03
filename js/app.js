@@ -252,13 +252,20 @@ try {
     const tempCtx = tempCanvas.getContext("2d");
     tempCtx.putImageData(imageData, 0, 0);
 
-    // Replace image reference
+    // Replace image reference (bakes pixels in)
     image = tempCanvas;
     drawImage();
 
-    // 🚫 DO NOT clear mask here
-    // Mask clearing now happens immediately in Apply
-    // This prevents async race issues
+    // ✅ Reset mask for next additive pass
+    maskBuffer = new Uint8Array(maskWidth * maskHeight);
+
+    dirtyMinX = Infinity;
+    dirtyMinY = Infinity;
+    dirtyMaxX = -Infinity;
+    dirtyMaxY = -Infinity;
+
+    // Clear visible mask strokes
+    maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
 
     // Re-enable Apply button
     isApplying = false;
@@ -272,8 +279,6 @@ try {
   // Fail gracefully — app still runs without Apply
   pixelWorker = null;
 }
-
-
 
 
 
@@ -877,8 +882,7 @@ imageCanvas.width = originalImageData.width;
 imageCanvas.height = originalImageData.height;
 
 const imageCtx = imageCanvas.getContext("2d");
-imageCtx.putImageData(originalImageData, 0, 0);  
-
+imageCtx.drawImage(image, 0, 0);
 
 
 
