@@ -1,12 +1,13 @@
 self.onmessage = function (e) {
 
   const {
-    buffer,
-    maskBuffer,
-    width,
-    height,
-    pixelSize
-  } = e.data;
+  buffer,
+  maskBuffer,
+  width,
+  height,
+  pixelSize,
+  version
+} = e.data;
 
   const data = new Uint8ClampedArray(buffer);
   const mask = new Uint8Array(maskBuffer);
