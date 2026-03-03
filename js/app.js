@@ -533,12 +533,8 @@ maskCanvas.addEventListener("mousedown", function (e) {
   return;
 }
 
-  // DRAW / ERASE MODE
 
-  dirtyMinX = Infinity;
-  dirtyMinY = Infinity;
-  dirtyMaxX = -Infinity;
-  dirtyMaxY = -Infinity;
+
 
   lastX = mouseX;
   lastY = mouseY;
