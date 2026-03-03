@@ -66,10 +66,29 @@ if (canvasSelectBtn && uploadInput) {
 // ======================================================
 
 function renderMaskPreview() {
-  // Preview is drawn live during drawing.
-  // No reconstruction from maskBuffer.
-}
 
+  if (!image || !maskBuffer) return;
+
+  maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+
+  const scaleX = currentDrawWidth / image.width;
+  const scaleY = currentDrawHeight / image.height;
+
+  maskCtx.fillStyle = "white";
+
+  for (let y = 0; y < maskHeight; y++) {
+    for (let x = 0; x < maskWidth; x++) {
+
+      const index = y * maskWidth + x;
+      if (maskBuffer[index] === 0) continue;
+
+      const canvasX = imageDrawX + x * scaleX;
+      const canvasY = imageDrawY + y * scaleY;
+
+      maskCtx.fillRect(canvasX, canvasY, scaleX, scaleY);
+    }
+  }
+}
 
 
 
@@ -387,10 +406,9 @@ function updateBrushCursor() {
 
 
 
-
-  // ======================================================
-  // DRAW IMAGE
-  // ======================================================
+// ======================================================
+// DRAW IMAGE
+// ======================================================
 
 function drawImage() {
 
@@ -418,8 +436,10 @@ function drawImage() {
   currentDrawHeight = drawHeight;
 
   baseCtx.drawImage(image, imageDrawX, imageDrawY, drawWidth, drawHeight);
-}
 
+  // 🔥 Re-render mask preview so it follows zoom/move
+  renderMaskPreview();
+}
 
 
 
@@ -604,9 +624,7 @@ maskCanvas.addEventListener("mousemove", function (e) {
       // Draw preview circle
       maskCtx.globalCompositeOperation = "source-over";
       maskCtx.fillStyle = "white";
-      maskCtx.beginPath();
-      maskCtx.arc(ix, iy, previewRadius, 0, Math.PI * 2);
-      maskCtx.fill();
+
 
       // Update mask buffer
       for (let i = 0; i < kernelSize; i++) {
