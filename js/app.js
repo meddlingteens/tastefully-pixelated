@@ -593,8 +593,8 @@ maskCanvas.addEventListener("mousemove", function (e) {
     const dy = y - lastY;
 
     const dist = Math.max(Math.abs(dx), Math.abs(dy));
-    const steps = Math.max(1, Math.floor(dist / (brushSize / 4)));
-
+const scaledBrushSize = brushSize * zoomLevel;
+const steps = Math.max(1, Math.floor(dist / (scaledBrushSize / 4)));
     const scaleX = image.width / currentDrawWidth;
     const scaleY = image.height / currentDrawHeight;
 
@@ -609,8 +609,8 @@ maskCanvas.addEventListener("mousemove", function (e) {
 
       maskCtx.fillStyle = "white";
       maskCtx.beginPath();
-      maskCtx.arc(ix, iy, brushSize / 2, 0, Math.PI * 2);
-      maskCtx.fill();
+const scaledBrushSize = brushSize * zoomLevel;
+maskCtx.arc(ix, iy, scaledBrushSize / 2, 0, Math.PI * 2);      maskCtx.fill();
 
       maskCtx.globalCompositeOperation = "source-over";
 
