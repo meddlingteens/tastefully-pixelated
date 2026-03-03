@@ -40,7 +40,7 @@ const drawBtn = document.getElementById("drawBtn");
 const moveBtn = document.getElementById("moveBtn");
 const eraseBtn = document.getElementById("eraseBtn");
 const canvasSelectBtn = document.getElementById("canvasSelectBtn");
-
+const undoBtn = document.getElementById("undoBtn");
 
 
 // 🔎 DEBUG — check button bindings
@@ -256,8 +256,7 @@ const imageData = new ImageData(
     image = tempCanvas;
     drawImage();
 
-    // ✅ Reset mask for next additive pass
-    maskBuffer = new Uint8Array(maskWidth * maskHeight);
+     maskBuffer = new Uint8Array(maskWidth * maskHeight);
 
     dirtyMinX = Infinity;
     dirtyMinY = Infinity;
@@ -858,47 +857,60 @@ pixelWorker.postMessage(
 // UNDO
 // ======================================================
 
+function performUndo() {
+
+  if (historyStack.length === 0) return;
+
+  applyVersion++; // invalidate any in-flight worker
+
+  const previous = historyStack.pop();
+
+  // Save current for redo
+  const currentCanvas = document.createElement("canvas");
+  currentCanvas.width = image.width;
+  currentCanvas.height = image.height;
+
+  const currentCtx = currentCanvas.getContext("2d");
+  currentCtx.drawImage(image, 0, 0);
+
+  redoStack.push(
+    currentCtx.getImageData(0, 0, image.width, image.height)
+  );
+
+  // Restore previous state
+  const tempCanvas = document.createElement("canvas");
+  tempCanvas.width = previous.width;
+  tempCanvas.height = previous.height;
+
+  const tempCtx = tempCanvas.getContext("2d");
+  tempCtx.putImageData(previous, 0, 0);
+
+  image = tempCanvas;
+
+  drawImage();
+
+  maskBuffer = new Uint8Array(maskWidth * maskHeight);
+  dirtyMinX = Infinity;
+  dirtyMinY = Infinity;
+  dirtyMaxX = -Infinity;
+  dirtyMaxY = -Infinity;
+  maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+}
+
+// Keyboard shortcut
 document.addEventListener("keydown", function (e) {
-
   if ((e.ctrlKey || e.metaKey) && e.key === "z") {
-
-    if (historyStack.length === 0) return;
-
-    applyVersion++; // invalidate any in-flight worker
-
-    const previous = historyStack.pop();
-
-    // Save current for redo
-    const currentCanvas = document.createElement("canvas");
-    currentCanvas.width = image.width;
-    currentCanvas.height = image.height;
-
-    const currentCtx = currentCanvas.getContext("2d");
-    currentCtx.drawImage(image, 0, 0);
-
-    redoStack.push(
-      currentCtx.getImageData(0, 0, image.width, image.height)
-    );
-
-    // Restore using ImageData dimensions (critical fix)
-    const tempCanvas = document.createElement("canvas");
-    tempCanvas.width = previous.width;
-    tempCanvas.height = previous.height;
-
-    const tempCtx = tempCanvas.getContext("2d");
-    tempCtx.putImageData(previous, 0, 0);
-
-    image = tempCanvas;
-
-    drawImage();
-
-    maskBuffer = new Uint8Array(maskWidth * maskHeight);
-    dirtyMinX = Infinity;
-    dirtyMinY = Infinity;
-    dirtyMaxX = -Infinity;
-    dirtyMaxY = -Infinity;
-    maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+    performUndo();
   }
+});
+
+// Undo button
+if (undoBtn) {
+  undoBtn.addEventListener("click", performUndo);
+}
+
+
+
 });
 
 
