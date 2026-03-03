@@ -51,6 +51,13 @@
   flex-wrap: nowrap;
 }
 
+.banner-content {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+
 #bannerHeadline {
   white-space: nowrap;
 }
