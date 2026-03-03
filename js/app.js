@@ -664,6 +664,7 @@ maskCanvas.addEventListener("mousemove", function (e) {
 
     lastX = x;
     lastY = y;
+renderMaskPreview();
   }
 });
 
