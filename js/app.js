@@ -156,9 +156,7 @@ setRandomBanner();
 
 let originalImageData = null;
 
-let eraseWorkingCanvas = null;
-let eraseWorkingCtx = null;
-let eraseWorkingImageData = null;
+
 
 let imageDrawX = 0;
 let imageDrawY = 0;
@@ -539,23 +537,7 @@ maskCanvas.addEventListener("mousedown", function (e) {
   lastX = mouseX;
   lastY = mouseY;
 
-  if (mode === "erase") {
-
-    eraseWorkingCanvas = document.createElement("canvas");
-    eraseWorkingCanvas.width = image.width;
-    eraseWorkingCanvas.height = image.height;
-
-    eraseWorkingCtx = eraseWorkingCanvas.getContext("2d");
-    eraseWorkingCtx.drawImage(image, 0, 0);
-
-    eraseWorkingImageData = eraseWorkingCtx.getImageData(
-      0,
-      0,
-      image.width,
-      image.height
-    );
-  }
-
+ 
 });
 
 
@@ -586,7 +568,8 @@ maskCanvas.addEventListener("mousemove", function (e) {
   }
 
   // DRAW / ERASE MODE
-  if (isDrawing && (mode === "draw" || mode === "erase")) {
+
+if (isDrawing && mode === "draw")
 
     if (!image || currentDrawWidth === 0 || currentDrawHeight === 0) {
       return;
@@ -657,21 +640,15 @@ const canvasY = iy + kernelDY[i] * (brushSize / (imageRadius * 2));
 
         const index = py * maskWidth + px;
 
-        if (mode === "erase") {
+maskBuffer[index] = 255;
 
-          if (eraseWorkingImageData && originalImageData) {
+dirtyMinX = Math.min(dirtyMinX, px);
+dirtyMinY = Math.min(dirtyMinY, py);
+dirtyMaxX = Math.max(dirtyMaxX, px);
+dirtyMaxY = Math.max(dirtyMaxY, py);
 
-            maskBuffer[index] = 0;
 
-            const pixelIndex = (py * image.width + px) * 4;
 
-            eraseWorkingImageData.data[pixelIndex]     = originalImageData.data[pixelIndex];
-            eraseWorkingImageData.data[pixelIndex + 1] = originalImageData.data[pixelIndex + 1];
-            eraseWorkingImageData.data[pixelIndex + 2] = originalImageData.data[pixelIndex + 2];
-            eraseWorkingImageData.data[pixelIndex + 3] = 255;
-          }
-
-        } else {
 
           maskBuffer[index] = 255;
 
@@ -683,11 +660,7 @@ const canvasY = iy + kernelDY[i] * (brushSize / (imageRadius * 2));
       }
     }
 
-    if (mode === "erase" && eraseWorkingImageData) {
-      eraseWorkingCtx.putImageData(eraseWorkingImageData, 0, 0);
-      image = eraseWorkingCanvas;
-      drawImage();
-    }
+
 
     lastX = x;
     lastY = y;
@@ -752,7 +725,6 @@ function setMode(newMode) {
   // Reset all button states
   drawBtn.classList.remove("active");
   moveBtn.classList.remove("active");
-  eraseBtn.classList.remove("active");
 
   if (newMode === "draw") {
     drawBtn.classList.add("active");
@@ -764,15 +736,10 @@ function setMode(newMode) {
     maskCanvas.style.cursor = "grab";
   }
 
-  if (newMode === "erase") {
-    eraseBtn.classList.add("active");
-    maskCanvas.style.cursor = "crosshair";
-  }
 }
 
 drawBtn.addEventListener("click", () => setMode("draw"));
 moveBtn.addEventListener("click", () => setMode("move"));
-eraseBtn.addEventListener("click", () => setMode("erase"));
 
 setMode("draw");
 
