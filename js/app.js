@@ -523,60 +523,60 @@ drawImage();
 
 
 
-
 // ======================================================
-// MOUSEDOWN
+// POINTER DOWN
 // ======================================================
 
-maskCanvas.addEventListener("mousedown", function (e) {
+maskCanvas.addEventListener("pointerdown", function (e) {
 
   if (!image) return;
   if (isApplying) return;
+
+  e.preventDefault();
+  maskCanvas.setPointerCapture(e.pointerId);
 
   isDrawing = true;
-
-  const rect = maskCanvas.getBoundingClientRect();
-  const mouseX = e.clientX - rect.left;
-  const mouseY = e.clientY - rect.top;
-
-  // MOVE MODE
- if (mode === "move") {
-
-  startDragX = mouseX;
-  startDragY = mouseY;
-
-  startOffsetX = offsetX;
-  startOffsetY = offsetY;
-
-  maskCanvas.style.cursor = "grabbing";
-  return;
-}
-
-
-
-
-  lastX = mouseX;
-  lastY = mouseY;
-
- 
-});
-
-
-// ======================================================
-// MOUSEMOVE
-// ======================================================
-
-maskCanvas.addEventListener("mousemove", function (e) {
-
-  if (!image) return;
-  if (isApplying) return;
 
   const rect = maskCanvas.getBoundingClientRect();
   const x = e.clientX - rect.left;
   const y = e.clientY - rect.top;
 
   // MOVE MODE
-  if (isDrawing && mode === "move") {
+  if (mode === "move") {
+
+    startDragX = x;
+    startDragY = y;
+
+    startOffsetX = offsetX;
+    startOffsetY = offsetY;
+
+    maskCanvas.style.cursor = "grabbing";
+    return;
+  }
+
+  lastX = x;
+  lastY = y;
+});
+
+
+// ======================================================
+// POINTER MOVE
+// ======================================================
+
+maskCanvas.addEventListener("pointermove", function (e) {
+
+  if (!isDrawing) return;
+  if (!image) return;
+  if (isApplying) return;
+
+  e.preventDefault();
+
+  const rect = maskCanvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
+  // MOVE MODE
+  if (mode === "move") {
 
     const dx = x - startDragX;
     const dy = y - startDragY;
@@ -589,7 +589,7 @@ maskCanvas.addEventListener("mousemove", function (e) {
   }
 
   // DRAW MODE
-  if (isDrawing && mode === "draw") {
+  if (mode === "draw") {
 
     if (!image || currentDrawWidth === 0 || currentDrawHeight === 0) {
       return;
@@ -621,12 +621,6 @@ maskCanvas.addEventListener("mousemove", function (e) {
       const ix = lastX + dx * t;
       const iy = lastY + dy * t;
 
-      // Draw preview circle
-      maskCtx.globalCompositeOperation = "source-over";
-      maskCtx.fillStyle = "white";
-
-
-      // Update mask buffer
       for (let i = 0; i < kernelSize; i++) {
 
         const canvasX =
@@ -662,12 +656,23 @@ maskCanvas.addEventListener("mousemove", function (e) {
       }
     }
 
-lastX = x;
-lastY = y;
-drawImage();   // ← this recalculates draw bounds
+    lastX = x;
+    lastY = y;
+
+    drawImage();
   }
 });
 
+
+// ======================================================
+// POINTER UP
+// ======================================================
+
+maskCanvas.addEventListener("pointerup", function (e) {
+  e.preventDefault();
+  maskCanvas.releasePointerCapture(e.pointerId);
+  stopDrawing();
+});
 
 
 
@@ -695,12 +700,22 @@ function stopDrawing() {
   }
 }
 
-maskCanvas.addEventListener("mouseup", stopDrawing);
-maskCanvas.addEventListener("mouseleave", stopDrawing);
-document.addEventListener("mouseup", stopDrawing);
+maskCanvas.addEventListener("pointerdown", function (e) {
+  e.preventDefault();
+  maskCanvas.setPointerCapture(e.pointerId);
+  handlePointerDown(e);
+});
 
+maskCanvas.addEventListener("pointermove", function (e) {
+  e.preventDefault();
+  handlePointerMove(e);
+});
 
-
+maskCanvas.addEventListener("pointerup", function (e) {
+  e.preventDefault();
+  maskCanvas.releasePointerCapture(e.pointerId);
+  stopDrawing();
+});
 
 
 
