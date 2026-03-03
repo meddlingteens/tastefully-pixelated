@@ -68,6 +68,19 @@
   flex-shrink: 0;
 }
 
+/* Ensure banner + canvas align perfectly and spacing is controlled */
+.banner,
+.canvas-container {
+  box-sizing: border-box;
+}
+
+/* Cancel horizontal .app padding so banner and canvas truly align */
+.banner,
+.canvas-container {
+  margin-left: -32px;
+  margin-right: -32px;
+  width: calc(100% + 64px);
+}
 
 /*canvas*/
 
