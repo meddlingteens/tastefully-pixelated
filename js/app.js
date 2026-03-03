@@ -410,8 +410,11 @@ function drawImage() {
 
 
 
-  // ======================================================
-// IMAGE // ======================================================
+
+
+
+
+// ======================================================
 // IMAGE UPLOAD
 // ======================================================
 
@@ -430,8 +433,12 @@ if (uploadInput) {
 
       image.onload = function () {
 
-        resizeCanvas();
-        drawImage();
+resizeCanvas();
+
+offsetX = 0;
+offsetY = 0;
+
+drawImage();
 
         // Store original image pixels for erase restore
         const tempCanvas = document.createElement("canvas");
@@ -760,10 +767,15 @@ function setMode(newMode) {
     updateBrushCursor();
   });
 
- zoomSlider.addEventListener("input", function (e) {
+zoomSlider.addEventListener("input", function (e) {
   zoomLevel = parseFloat(e.target.value);
+
+  offsetX = 0;
+  offsetY = 0;
+
   drawImage();
 });
+
 
 
 
