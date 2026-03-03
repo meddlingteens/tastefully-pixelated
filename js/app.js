@@ -248,6 +248,11 @@ drawImage();
 
 
 
+
+
+
+
+/*
     // Clear mask preview layer
     maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
 
@@ -259,6 +264,18 @@ drawImage();
     dirtyMinY = Infinity;
     dirtyMaxX = -Infinity;
     dirtyMaxY = -Infinity;
+
+
+*/
+
+
+
+
+
+
+
+
+
 
     // Re-enable Apply button
     isApplying = false;
@@ -793,6 +810,14 @@ setMode("draw");
     updateBrushCursor();
   });
 
+
+pixelSlider.addEventListener("input", e => {
+  pixelSize = parseInt(e.target.value);
+  reapplyPixelation();
+});
+
+
+
 zoomSlider.addEventListener("input", function (e) {
   zoomLevel = parseFloat(e.target.value);
 
@@ -811,6 +836,42 @@ zoomSlider.addEventListener("input", function (e) {
   // ======================================================
   // APPLY
   // ======================================================
+
+// 🔹 ADD THIS FUNCTION RIGHT HERE
+function reapplyPixelation() {
+
+  if (!originalImageData) return;
+  if (!pixelWorker) return;
+
+  const imageCanvas = document.createElement("canvas");
+  imageCanvas.width = originalImageData.width;
+  imageCanvas.height = originalImageData.height;
+
+  const ctx = imageCanvas.getContext("2d");
+  ctx.putImageData(originalImageData, 0, 0);
+
+  const baseData = ctx.getImageData(
+    0,
+    0,
+    imageCanvas.width,
+    imageCanvas.height
+  );
+
+  pixelWorker.postMessage(
+    {
+      buffer: baseData.data.buffer,
+      maskBuffer: maskBuffer.buffer,
+      width: imageCanvas.width,
+      height: imageCanvas.height,
+      pixelSize: pixelSize,
+      dirtyMinX,
+      dirtyMinY,
+      dirtyMaxX,
+      dirtyMaxY
+    },
+    [baseData.data.buffer]
+  );
+}
 
 
 applyBtn.addEventListener("click", function () {
