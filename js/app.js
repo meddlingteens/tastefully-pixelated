@@ -596,8 +596,8 @@ maskCanvas.addEventListener("mousemove", function (e) {
 
 
 const imageBrushRadius = (brushSize / 2) * (image.width / currentDrawWidth);
-const steps = Math.max(1, Math.floor(dist / (brushSize / 4)));
-
+const previewRadius = (brushSize / 2) * (currentDrawWidth / image.width);
+const steps = Math.max(1, Math.floor(dist / (previewRadius / 2)));
 
 
 
@@ -616,8 +616,10 @@ const steps = Math.max(1, Math.floor(dist / (brushSize / 4)));
       maskCtx.fillStyle = "white";
       maskCtx.beginPath();
 
-      // ✅ Preview remains canvas-space (not zoom-scaled)
-      maskCtx.arc(ix, iy, brushSize / 2, 0, Math.PI * 2);
+const previewRadius = (brushSize / 2) * (currentDrawWidth / image.width);
+maskCtx.arc(ix, iy, previewRadius, 0, Math.PI * 2);
+
+
 
       maskCtx.fill();
       maskCtx.globalCompositeOperation = "source-over";
