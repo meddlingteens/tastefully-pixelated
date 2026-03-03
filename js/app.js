@@ -550,7 +550,6 @@ maskCanvas.addEventListener("mousedown", function (e) {
 });
 
 
-
 // ======================================================
 // MOUSEMOVE
 // ======================================================
@@ -593,8 +592,10 @@ maskCanvas.addEventListener("mousemove", function (e) {
     const dy = y - lastY;
 
     const dist = Math.max(Math.abs(dx), Math.abs(dy));
-const scaledBrushSize = brushSize * zoomLevel;
-const steps = Math.max(1, Math.floor(dist / (scaledBrushSize / 4)));
+
+    // ✅ Reverted to original brush-based step calculation
+    const steps = Math.max(1, Math.floor(dist / (brushSize / 4)));
+
     const scaleX = image.width / currentDrawWidth;
     const scaleY = image.height / currentDrawHeight;
 
@@ -609,9 +610,11 @@ const steps = Math.max(1, Math.floor(dist / (scaledBrushSize / 4)));
 
       maskCtx.fillStyle = "white";
       maskCtx.beginPath();
-const scaledBrushSize = brushSize * zoomLevel;
-maskCtx.arc(ix, iy, scaledBrushSize / 2, 0, Math.PI * 2);      maskCtx.fill();
 
+      // ✅ Preview remains canvas-space (not zoom-scaled)
+      maskCtx.arc(ix, iy, brushSize / 2, 0, Math.PI * 2);
+
+      maskCtx.fill();
       maskCtx.globalCompositeOperation = "source-over";
 
       for (let i = 0; i < kernelSize; i++) {
@@ -678,7 +681,6 @@ maskCtx.arc(ix, iy, scaledBrushSize / 2, 0, Math.PI * 2);      maskCtx.fill();
 
 
 
-
 // ======================================================
 // STOP DRAWING
 // ======================================================
@@ -726,18 +728,18 @@ document.addEventListener("mouseup", stopDrawing);
 // ======================================================
 // MODE BUTTONS
 // ======================================================
-
 function setMode(newMode) {
 
   mode = newMode;
 
-drawBtn.addEventListener("click", () => setMode("draw"));
-moveBtn.addEventListener("click", () => setMode("move"));
-eraseBtn.addEventListener("click", () => setMode("erase"));
+  // Reset all button states
+  drawBtn.classList.remove("active");
+  moveBtn.classList.remove("active");
+  eraseBtn.classList.remove("active");
 
   if (newMode === "draw") {
     drawBtn.classList.add("active");
-    updateBrushCursor(); // show dynamic brush cursor
+    updateBrushCursor();
   }
 
   if (newMode === "move") {
@@ -750,6 +752,13 @@ eraseBtn.addEventListener("click", () => setMode("erase"));
     maskCanvas.style.cursor = "crosshair";
   }
 }
+
+drawBtn.addEventListener("click", () => setMode("draw"));
+moveBtn.addEventListener("click", () => setMode("move"));
+eraseBtn.addEventListener("click", () => setMode("erase"));
+
+setMode("draw");
+
 
 
 
