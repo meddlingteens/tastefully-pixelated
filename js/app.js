@@ -48,7 +48,7 @@ console.log("drawBtn:", drawBtn);
 console.log("moveBtn:", moveBtn);
 console.log("eraseBtn:", eraseBtn);
 
-
+console.log("undoBtn:", undoBtn);
 
 // Safely wire Select Photo
 if (canvasSelectBtn && uploadInput) {
@@ -908,7 +908,6 @@ document.addEventListener("keydown", function (e) {
 if (undoBtn) {
   undoBtn.addEventListener("click", performUndo);
 }
-
 
 
 });
