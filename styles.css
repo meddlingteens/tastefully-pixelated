@@ -74,11 +74,7 @@
   box-sizing: border-box;
 }
 
-.banner,
-.canvas-container {
-  box-sizing: border-box;
-  overflow: hidden;
-}
+
 
 /*canvas*/
 
