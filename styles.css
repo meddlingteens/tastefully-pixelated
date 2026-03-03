@@ -54,6 +54,10 @@
   white-space: nowrap;
 }
 
+.banner h2 {
+  white-space: nowrap;
+}
+
 .banner-cta {
   display: flex;
   align-items: center;
