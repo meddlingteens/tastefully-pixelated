@@ -72,5 +72,7 @@ self.onmessage = function (e) {
     }
   }
 
-  self.postMessage({ buffer }, [buffer]);
+self.postMessage({ buffer, version: e.data.version }, [buffer]);
+
+
 };

@@ -217,7 +217,7 @@ let pixelSize = 12; // match slider default
 
 
   let redoStack = [];
-
+let applyVersion = 0;
 
 
 
@@ -233,7 +233,9 @@ try {
 
   pixelWorker.onmessage = function (e) {
 
-    const { buffer } = e.data;
+  const { buffer, version } = e.data;
+
+  if (version !== applyVersion) return;
 
     // Rebuild ImageData from worker buffer
     const imageData = new ImageData(
@@ -783,7 +785,7 @@ applyBtn.addEventListener("click", function () {
   if (dirtyMinX === Infinity) return;
   if (isApplying) return;
 
-  // ✅ Immediately clear visible mask preview
+ 
   maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
 
   // Create image-space canvas from CURRENT image (additive)
@@ -813,25 +815,32 @@ applyBtn.addEventListener("click", function () {
     image.height
   );
 
+
+
+applyVersion++;
+const currentVersion = applyVersion;
+
+
   applyBtn.disabled = true;
   isApplying = true;
 
-  pixelWorker.postMessage(
-    {
-      buffer: baseData.data.buffer,
-      maskBuffer: maskBuffer.buffer,
-      width: image.width,
-      height: image.height,
-      pixelSize: pixelSize,   // ✅ use real slider value
-      dirtyMinX,
-      dirtyMinY,
-      dirtyMaxX,
-      dirtyMaxY
-    },
-    [
-      baseData.data.buffer
-    ]
-  );
+pixelWorker.postMessage(
+  {
+    buffer: baseData.data.buffer,
+    maskBuffer: maskBuffer.buffer,
+    width: image.width,
+    height: image.height,
+    pixelSize: pixelSize,
+    dirtyMinX,
+    dirtyMinY,
+    dirtyMaxX,
+    dirtyMaxY,
+    version: currentVersion
+  },
+  [baseData.data.buffer]
+);
+
+
 });
 
 
