@@ -34,6 +34,7 @@ window.addEventListener("error", function (e) {
 const applyBtn = document.getElementById("applyBtn");
 const brushSlider = document.getElementById("brushSlider");
 const zoomSlider = document.getElementById("zoomSlider");
+const pixelSlider = document.getElementById("pixelSlider");
 const uploadInput = document.getElementById("uploadInput");
 const drawBtn = document.getElementById("drawBtn");
 const moveBtn = document.getElementById("moveBtn");
@@ -183,8 +184,18 @@ let startOffsetX = 0;
 let startOffsetY = 0;
 
   let brushSize = 40;
+let pixelSize = 12; // match slider default
+
+
+
+
   let brushHardness = 0.7;
   let brushOpacity = 1.0;
+
+
+
+
+
 
   let maskBuffer = null;
   let maskWidth = 0;
@@ -837,7 +848,7 @@ zoomSlider.addEventListener("input", function (e) {
   // APPLY
   // ======================================================
 
-// 🔹 ADD THIS FUNCTION RIGHT HERE
+
 function reapplyPixelation() {
 
   if (!originalImageData) return;
@@ -885,13 +896,20 @@ applyBtn.addEventListener("click", function () {
   if (dirtyMinX === Infinity) return;
   if (isApplying) return;
 
-  // Create image-space canvas ONCE
-  const imageCanvas = document.createElement("canvas");
-  imageCanvas.width = image.width;
-  imageCanvas.height = image.height;
 
-  const imageCtx = imageCanvas.getContext("2d");
-  imageCtx.drawImage(image, 0, 0);
+
+const imageCanvas = document.createElement("canvas");
+imageCanvas.width = originalImageData.width;
+imageCanvas.height = originalImageData.height;
+
+const imageCtx = imageCanvas.getContext("2d");
+imageCtx.putImageData(originalImageData, 0, 0);  
+
+
+
+
+
+
 
   // Save history (image-space)
   historyStack.push(
