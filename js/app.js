@@ -593,8 +593,13 @@ maskCanvas.addEventListener("mousemove", function (e) {
 
     const dist = Math.max(Math.abs(dx), Math.abs(dy));
 
-    // ✅ Reverted to original brush-based step calculation
-    const steps = Math.max(1, Math.floor(dist / (brushSize / 4)));
+
+
+const imageBrushRadius = (brushSize / 2) * (image.width / currentDrawWidth);
+const steps = Math.max(1, Math.floor(dist / (brushSize / 4)));
+
+
+
 
     const scaleX = image.width / currentDrawWidth;
     const scaleY = image.height / currentDrawHeight;
@@ -619,8 +624,9 @@ maskCanvas.addEventListener("mousemove", function (e) {
 
       for (let i = 0; i < kernelSize; i++) {
 
-        const canvasX = ix + kernelDX[i];
-        const canvasY = iy + kernelDY[i];
+const imageRadius = imageBrushRadius;
+const canvasX = ix + kernelDX[i] * (brushSize / (imageRadius * 2));
+const canvasY = iy + kernelDY[i] * (brushSize / (imageRadius * 2));
 
         if (
           canvasX < imageDrawX ||
@@ -772,6 +778,9 @@ setMode("draw");
 
   brushSlider.addEventListener("input", e => {
     brushSize = parseInt(e.target.value);
+
+  console.log("brushSize:", brushSize); // ← add here
+
     buildBrushKernel();
     updateBrushCursor();
   });
