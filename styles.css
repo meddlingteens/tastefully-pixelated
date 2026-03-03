@@ -74,12 +74,10 @@
   box-sizing: border-box;
 }
 
-/* Cancel horizontal .app padding so banner and canvas truly align */
 .banner,
 .canvas-container {
-  margin-left: -32px;
-  margin-right: -32px;
-  width: calc(100% + 64px);
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 /*canvas*/
