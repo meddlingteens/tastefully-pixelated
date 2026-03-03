@@ -856,10 +856,11 @@ document.addEventListener("keydown", function (e) {
 
   if ((e.ctrlKey || e.metaKey) && e.key === "z") {
 
-    console.log("Undo triggered. History length:", historyStack.length);
+  applyVersion++; // ← add this line
+
+  if (historyStack.length === 0) return;
 
 
-    if (historyStack.length === 0) return;
 
     const previous = historyStack.pop();
 
