@@ -731,9 +731,9 @@ function setMode(newMode) {
 
   mode = newMode;
 
-  drawBtn.classList.remove("active");
-  moveBtn.classList.remove("active");
-  eraseBtn.classList.remove("active");
+drawBtn.addEventListener("click", () => setMode("draw"));
+moveBtn.addEventListener("click", () => setMode("move"));
+eraseBtn.addEventListener("click", () => setMode("erase"));
 
   if (newMode === "draw") {
     drawBtn.classList.add("active");
