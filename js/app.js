@@ -238,55 +238,30 @@ try {
     const { buffer } = e.data;
 
     // Rebuild ImageData from worker buffer
-const imageData = new ImageData(
-  new Uint8ClampedArray(buffer),
-  image.width,
-  image.height
-);
+    const imageData = new ImageData(
+      new Uint8ClampedArray(buffer),
+      image.width,
+      image.height
+    );
 
     // Draw processed image
-const tempCanvas = document.createElement("canvas");
-tempCanvas.width = image.width;
-tempCanvas.height = image.height;
+    const tempCanvas = document.createElement("canvas");
+    tempCanvas.width = image.width;
+    tempCanvas.height = image.height;
 
-const tempCtx = tempCanvas.getContext("2d");
-tempCtx.putImageData(imageData, 0, 0);
+    const tempCtx = tempCanvas.getContext("2d");
+    tempCtx.putImageData(imageData, 0, 0);
 
-// Instead of replacing image object,
-// draw directly into base canvas and preserve state
-image = tempCanvas;
-drawImage();
+    // Replace image reference
+    image = tempCanvas;
+    drawImage();
 
-
-
-
-
-
-
-/*
-    // Clear mask preview layer
+    // ✅ Clear ONLY the visible mask preview layer
     maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
 
-    // Reset mask buffer
-    maskBuffer = new Uint8Array(maskWidth * maskHeight);
-
-    // Reset dirty bounds (CRITICAL for stable draw behavior)
-    dirtyMinX = Infinity;
-    dirtyMinY = Infinity;
-    dirtyMaxX = -Infinity;
-    dirtyMaxY = -Infinity;
-
-
-*/
-
-
-
-
-
-
-
-
-
+    // 🚫 DO NOT reset maskBuffer
+    // 🚫 DO NOT reset dirty bounds
+    // We need them for pixelSize reapplication
 
     // Re-enable Apply button
     isApplying = false;
@@ -300,6 +275,9 @@ drawImage();
   // Fail gracefully — app still runs without Apply
   pixelWorker = null;
 }
+
+
+
 
 
 
