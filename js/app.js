@@ -352,7 +352,8 @@ function updateBrushCursor() {
 
   if (mode !== "draw") return;
 
-  const size = brushSize;
+  const MAX_CURSOR_SIZE = 96; // safe cross-browser limit
+  const size = Math.min(brushSize, MAX_CURSOR_SIZE);
   const radius = size / 2;
 
   const cursorCanvas = document.createElement("canvas");
