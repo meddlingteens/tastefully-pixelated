@@ -256,12 +256,9 @@ try {
     image = tempCanvas;
     drawImage();
 
-    // ✅ Clear ONLY the visible mask preview layer
-    maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
-
-    // 🚫 DO NOT reset maskBuffer
-    // 🚫 DO NOT reset dirty bounds
-    // We need them for pixelSize reapplication
+    // 🚫 DO NOT clear mask here
+    // Mask clearing now happens immediately in Apply
+    // This prevents async race issues
 
     // Re-enable Apply button
     isApplying = false;
@@ -275,7 +272,6 @@ try {
   // Fail gracefully — app still runs without Apply
   pixelWorker = null;
 }
-
 
 
 
