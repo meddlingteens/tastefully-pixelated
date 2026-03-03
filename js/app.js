@@ -512,9 +512,6 @@ maskCanvas.addEventListener("mousedown", function (e) {
 
 
 
-
-
-
 // ======================================================
 // MOUSEMOVE
 // ======================================================
@@ -527,6 +524,14 @@ maskCanvas.addEventListener("mousemove", function (e) {
   const rect = maskCanvas.getBoundingClientRect();
   const x = e.clientX - rect.left;
   const y = e.clientY - rect.top;
+
+  // MOVE MODE
+  if (isDrawing && mode === "move") {
+    offsetX = x - lastX;
+    offsetY = y - lastY;
+    drawImage();
+    return;
+  }
 
   // DRAW / ERASE MODE
   if (isDrawing && (mode === "draw" || mode === "erase")) {
@@ -627,7 +632,6 @@ maskCanvas.addEventListener("mousemove", function (e) {
     lastY = y;
   }
 });
-
 
 
 
