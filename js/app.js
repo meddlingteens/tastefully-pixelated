@@ -863,9 +863,8 @@ document.addEventListener("keydown", function (e) {
       currentCtx.getImageData(0, 0, image.width, image.height)
     );
 
-    // Restore previous state correctly
+    // Restore previous pixels directly into baseCanvas
     const tempCanvas = document.createElement("canvas");
-
     tempCanvas.width = image.width;
     tempCanvas.height = image.height;
 
@@ -873,20 +872,18 @@ document.addEventListener("keydown", function (e) {
     tempCtx.putImageData(previous, 0, 0);
 
     image = tempCanvas;
+
     drawImage();
 
-    // Reset mask state
+    // Hard reset mask state
     maskBuffer = new Uint8Array(maskWidth * maskHeight);
-
     dirtyMinX = Infinity;
     dirtyMinY = Infinity;
     dirtyMaxX = -Infinity;
     dirtyMaxY = -Infinity;
-
     maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
   }
 });
-
 
 
 
