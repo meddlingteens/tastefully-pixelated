@@ -263,7 +263,7 @@ drawImage();
 
 
 
-
+/*
     // Clear mask preview layer
     maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
 
@@ -277,7 +277,7 @@ drawImage();
     dirtyMaxY = -Infinity;
 
 
-
+*/
 
 
 
