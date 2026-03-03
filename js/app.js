@@ -567,9 +567,8 @@ maskCanvas.addEventListener("mousemove", function (e) {
     return;
   }
 
-  // DRAW / ERASE MODE
-
-if (isDrawing && mode === "draw")
+  // DRAW MODE
+  if (isDrawing && mode === "draw") {
 
     if (!image || currentDrawWidth === 0 || currentDrawHeight === 0) {
       return;
@@ -582,16 +581,15 @@ if (isDrawing && mode === "draw")
 
     const dx = x - lastX;
     const dy = y - lastY;
-
     const dist = Math.max(Math.abs(dx), Math.abs(dy));
 
+    const previewRadius =
+      (brushSize / 2) * (currentDrawWidth / image.width);
 
+    const imageBrushRadius =
+      (brushSize / 2) * (image.width / currentDrawWidth);
 
-const imageBrushRadius = (brushSize / 2) * (image.width / currentDrawWidth);
-const previewRadius = (brushSize / 2) * (currentDrawWidth / image.width);
-const steps = Math.max(1, Math.floor(dist / (previewRadius / 2)));
-
-
+    const steps = Math.max(1, Math.floor(dist / (previewRadius / 2)));
 
     const scaleX = image.width / currentDrawWidth;
     const scaleY = image.height / currentDrawHeight;
@@ -602,25 +600,21 @@ const steps = Math.max(1, Math.floor(dist / (previewRadius / 2)));
       const ix = lastX + dx * t;
       const iy = lastY + dy * t;
 
-      maskCtx.globalCompositeOperation =
-        (mode === "erase") ? "destination-out" : "source-over";
-
+      // Draw preview circle
+      maskCtx.globalCompositeOperation = "source-over";
       maskCtx.fillStyle = "white";
       maskCtx.beginPath();
-
-const previewRadius = (brushSize / 2) * (currentDrawWidth / image.width);
-maskCtx.arc(ix, iy, previewRadius, 0, Math.PI * 2);
-
-
-
+      maskCtx.arc(ix, iy, previewRadius, 0, Math.PI * 2);
       maskCtx.fill();
-      maskCtx.globalCompositeOperation = "source-over";
 
+      // Update mask buffer
       for (let i = 0; i < kernelSize; i++) {
 
-const imageRadius = imageBrushRadius;
-const canvasX = ix + kernelDX[i] * (brushSize / (imageRadius * 2));
-const canvasY = iy + kernelDY[i] * (brushSize / (imageRadius * 2));
+        const canvasX =
+          ix + kernelDX[i] * (brushSize / (imageBrushRadius * 2));
+
+        const canvasY =
+          iy + kernelDY[i] * (brushSize / (imageBrushRadius * 2));
 
         if (
           canvasX < imageDrawX ||
@@ -640,33 +634,19 @@ const canvasY = iy + kernelDY[i] * (brushSize / (imageRadius * 2));
 
         const index = py * maskWidth + px;
 
-maskBuffer[index] = 255;
+        maskBuffer[index] = 255;
 
-dirtyMinX = Math.min(dirtyMinX, px);
-dirtyMinY = Math.min(dirtyMinY, py);
-dirtyMaxX = Math.max(dirtyMaxX, px);
-dirtyMaxY = Math.max(dirtyMaxY, py);
-
-
-
-
-          maskBuffer[index] = 255;
-
-          dirtyMinX = Math.min(dirtyMinX, px);
-          dirtyMinY = Math.min(dirtyMinY, py);
-          dirtyMaxX = Math.max(dirtyMaxX, px);
-          dirtyMaxY = Math.max(dirtyMaxY, py);
-        }
+        dirtyMinX = Math.min(dirtyMinX, px);
+        dirtyMinY = Math.min(dirtyMinY, py);
+        dirtyMaxX = Math.max(dirtyMaxX, px);
+        dirtyMaxY = Math.max(dirtyMaxY, py);
       }
     }
-
-
 
     lastX = x;
     lastY = y;
   }
 });
-
 
 
 
