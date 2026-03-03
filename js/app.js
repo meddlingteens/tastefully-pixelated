@@ -796,10 +796,16 @@ applyBtn.addEventListener("click", function () {
   const imageCtx = imageCanvas.getContext("2d");
   imageCtx.drawImage(image, 0, 0); // ← additive (NOT originalImageData)
 
-  // Save history (image-space)
-  historyStack.push(
-    imageCtx.getImageData(0, 0, image.width, image.height)
-  );
+const snapshot = imageCtx.getImageData(0, 0, image.width, image.height);
+
+// CLONE the data so worker can't mutate it later
+const cloned = new ImageData(
+  new Uint8ClampedArray(snapshot.data),
+  snapshot.width,
+  snapshot.height
+);
+
+historyStack.push(cloned);
 
   if (historyStack.length > MAX_HISTORY) {
     historyStack.shift();
@@ -856,15 +862,13 @@ document.addEventListener("keydown", function (e) {
 
   if ((e.ctrlKey || e.metaKey) && e.key === "z") {
 
-  applyVersion++; // ← add this line
+    if (historyStack.length === 0) return;
 
-  if (historyStack.length === 0) return;
-
-
+    applyVersion++; // invalidate any in-flight worker
 
     const previous = historyStack.pop();
 
-    // Save current state for redo
+    // Save current for redo
     const currentCanvas = document.createElement("canvas");
     currentCanvas.width = image.width;
     currentCanvas.height = image.height;
@@ -876,10 +880,10 @@ document.addEventListener("keydown", function (e) {
       currentCtx.getImageData(0, 0, image.width, image.height)
     );
 
-    // Restore previous pixels directly into baseCanvas
+    // Restore using ImageData dimensions (critical fix)
     const tempCanvas = document.createElement("canvas");
-    tempCanvas.width = image.width;
-    tempCanvas.height = image.height;
+    tempCanvas.width = previous.width;
+    tempCanvas.height = previous.height;
 
     const tempCtx = tempCanvas.getContext("2d");
     tempCtx.putImageData(previous, 0, 0);
@@ -888,7 +892,6 @@ document.addEventListener("keydown", function (e) {
 
     drawImage();
 
-    // Hard reset mask state
     maskBuffer = new Uint8Array(maskWidth * maskHeight);
     dirtyMinX = Infinity;
     dirtyMinY = Infinity;
