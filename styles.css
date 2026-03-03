@@ -50,6 +50,10 @@
   justify-content: space-between;
 }
 
+#bannerHeadline {
+  white-space: nowrap;
+}
+
 .banner-cta {
   display: flex;
   align-items: center;
