@@ -662,9 +662,6 @@ function stopDrawing() {
   lastY = null;
 
 
-  eraseWorkingCanvas = null;
-  eraseWorkingCtx = null;
-  eraseWorkingImageData = null;
 
  if (mode === "move") {
   maskCanvas.style.cursor = "grab";
@@ -746,9 +743,7 @@ setMode("draw");
 
 pixelSlider.addEventListener("input", e => {
   pixelSize = parseInt(e.target.value);
-  reapplyPixelation();
 });
-
 
 
 zoomSlider.addEventListener("input", function (e) {
