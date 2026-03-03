@@ -46,6 +46,7 @@
   border: 3px solid #c0c0c0;
   background: linear-gradient(135deg,#5c3b9c,#2e1c55);
   color: #ffffff;
+  margin-bottom: 40px;   /* ← ADD THIS */
 }
 
 .banner h2 {
