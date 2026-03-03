@@ -909,14 +909,4 @@ if (undoBtn) {
   undoBtn.addEventListener("click", performUndo);
 }
 
-
 });
-
-
-
-});
-
-
-
-
-
