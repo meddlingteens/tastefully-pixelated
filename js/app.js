@@ -662,9 +662,9 @@ maskCanvas.addEventListener("mousemove", function (e) {
       }
     }
 
-    lastX = x;
-    lastY = y;
-renderMaskPreview();
+lastX = x;
+lastY = y;
+drawImage();   // ← this recalculates draw bounds
   }
 });
 
