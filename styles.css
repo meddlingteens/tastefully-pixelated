@@ -39,7 +39,7 @@ body::before {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #111;   /* ← add this */
+  background: #cococo;   /* ← add this */
 }
 
 /* =====================================================
