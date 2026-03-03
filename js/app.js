@@ -351,14 +351,20 @@ buildBrushKernel();
 function updateBrushCursor() {
 
   if (mode !== "draw") return;
+  if (!image || currentDrawWidth === 0) return;
 
-  const MAX_CURSOR_SIZE = 96; // safe cross-browser limit
-  const size = Math.min(brushSize, MAX_CURSOR_SIZE);
-  const radius = size / 2;
+  // Match preview brush scaling exactly
+  const previewRadius = (brushSize / 2) * (currentDrawWidth / image.width);
+  const size = Math.max(4, previewRadius * 2); // prevent 0 size
+
+  // Clamp only for browser cursor limits
+  const MAX_CURSOR_SIZE = 96;
+  const finalSize = Math.min(size, MAX_CURSOR_SIZE);
+  const radius = finalSize / 2;
 
   const cursorCanvas = document.createElement("canvas");
-  cursorCanvas.width = size;
-  cursorCanvas.height = size;
+  cursorCanvas.width = finalSize;
+  cursorCanvas.height = finalSize;
 
   const ctx = cursorCanvas.getContext("2d");
 
@@ -372,7 +378,6 @@ function updateBrushCursor() {
 
   maskCanvas.style.cursor = `url(${dataURL}) ${radius} ${radius}, crosshair`;
 }
-
 
 
 
