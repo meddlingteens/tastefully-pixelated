@@ -177,6 +177,10 @@ let currentDrawHeight = 0;
 
   let lastX = null;
   let lastY = null;
+let startDragX = 0;
+let startDragY = 0;
+let startOffsetX = 0;
+let startOffsetY = 0;
 
   let brushSize = 40;
   let brushHardness = 0.7;
@@ -344,6 +348,31 @@ function buildBrushKernel() {
 
 buildBrushKernel();
 
+function updateBrushCursor() {
+
+  if (mode !== "draw") return;
+
+  const size = brushSize;
+  const radius = size / 2;
+
+  const cursorCanvas = document.createElement("canvas");
+  cursorCanvas.width = size;
+  cursorCanvas.height = size;
+
+  const ctx = cursorCanvas.getContext("2d");
+
+  ctx.beginPath();
+  ctx.arc(radius, radius, radius - 1, 0, Math.PI * 2);
+  ctx.strokeStyle = "white";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  const dataURL = cursorCanvas.toDataURL();
+
+  maskCanvas.style.cursor = `url(${dataURL}) ${radius} ${radius}, crosshair`;
+}
+
+
 
 
 
@@ -472,14 +501,17 @@ maskCanvas.addEventListener("mousedown", function (e) {
   const mouseY = e.clientY - rect.top;
 
   // MOVE MODE
-  if (mode === "move") {
+ if (mode === "move") {
 
-    lastX = mouseX - offsetX;
-    lastY = mouseY - offsetY;
+  startDragX = mouseX;
+  startDragY = mouseY;
 
-    maskCanvas.style.cursor = "grabbing";
-    return;
-  }
+  startOffsetX = offsetX;
+  startOffsetY = offsetY;
+
+  maskCanvas.style.cursor = "grabbing";
+  return;
+}
 
   // DRAW / ERASE MODE
 
@@ -650,13 +682,17 @@ function stopDrawing() {
   lastX = null;
   lastY = null;
 
+
   eraseWorkingCanvas = null;
   eraseWorkingCtx = null;
   eraseWorkingImageData = null;
 
-  if (mode === "move") {
-    maskCanvas.style.cursor = "grab";
-  }
+ if (mode === "move") {
+  maskCanvas.style.cursor = "grab";
+} else if (mode === "draw") {
+  updateBrushCursor();
+}
+
 
   if (previewCtx) {
     previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
@@ -685,7 +721,6 @@ document.addEventListener("mouseup", stopDrawing);
 // ======================================================
 
 function setMode(newMode) {
-  console.log("SET MODE CALLED:", newMode);
 
   mode = newMode;
 
@@ -693,18 +728,24 @@ function setMode(newMode) {
   moveBtn.classList.remove("active");
   eraseBtn.classList.remove("active");
 
-  if (newMode === "draw") drawBtn.classList.add("active");
-  if (newMode === "move") moveBtn.classList.add("active");
-  if (newMode === "erase") eraseBtn.classList.add("active");
+  if (newMode === "draw") {
+    drawBtn.classList.add("active");
+    updateBrushCursor(); // show dynamic brush cursor
+  }
+
+  if (newMode === "move") {
+    moveBtn.classList.add("active");
+    maskCanvas.style.cursor = "grab";
+  }
+
+  if (newMode === "erase") {
+    eraseBtn.classList.add("active");
+    maskCanvas.style.cursor = "crosshair";
+  }
 }
 
-// Set default mode on load
-setMode("draw");
 
-// 🔥 Attach listeners
-drawBtn.addEventListener("click", () => setMode("draw"));
-moveBtn.addEventListener("click", () => setMode("move"));
-eraseBtn.addEventListener("click", () => setMode("erase"));
+
 
 
 
@@ -716,6 +757,7 @@ eraseBtn.addEventListener("click", () => setMode("erase"));
   brushSlider.addEventListener("input", e => {
     brushSize = parseInt(e.target.value);
     buildBrushKernel();
+    updateBrushCursor();
   });
 
  zoomSlider.addEventListener("input", function (e) {
