@@ -87,6 +87,11 @@ html, body {
 
 /*canvas*/
 
+
+canvas {
+  touch-action: none;
+}
+
 #previewCanvas {
   pointer-events: none;
 }
