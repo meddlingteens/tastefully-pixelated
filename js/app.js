@@ -515,8 +515,6 @@ maskCanvas.addEventListener("mousedown", function (e) {
 
 
 
-
-
 // ======================================================
 // MOUSEMOVE
 // ======================================================
@@ -570,51 +568,53 @@ maskCanvas.addEventListener("mousemove", function (e) {
 
       for (let i = 0; i < kernelSize; i++) {
 
-  const canvasX = ix + kernelDX[i];
-  const canvasY = iy + kernelDY[i];
+        const canvasX = ix + kernelDX[i];
+        const canvasY = iy + kernelDY[i];
 
-  if (
-    canvasX < imageDrawX ||
-    canvasY < imageDrawY ||
-    canvasX > imageDrawX + currentDrawWidth ||
-    canvasY > imageDrawY + currentDrawHeight
-  ) continue;
+        if (
+          canvasX < imageDrawX ||
+          canvasY < imageDrawY ||
+          canvasX > imageDrawX + currentDrawWidth ||
+          canvasY > imageDrawY + currentDrawHeight
+        ) continue;
 
-  const imgX = (canvasX - imageDrawX) * scaleX;
-  const imgY = (canvasY - imageDrawY) * scaleY;
+        const imgX = (canvasX - imageDrawX) * scaleX;
+        const imgY = (canvasY - imageDrawY) * scaleY;
 
-  const px = Math.floor(imgX);
-  const py = Math.floor(imgY);
+        const px = Math.floor(imgX);
+        const py = Math.floor(imgY);
 
-  if (px < 0 || py < 0 || px >= maskWidth || py >= maskHeight)
-    continue;
+        if (px < 0 || py < 0 || px >= maskWidth || py >= maskHeight)
+          continue;
 
-  const index = py * maskWidth + px;
+        const index = py * maskWidth + px;
 
-  if (mode === "erase") {
+        if (mode === "erase") {
 
-    if (eraseWorkingImageData && originalImageData) {
+          if (eraseWorkingImageData && originalImageData) {
 
-      maskBuffer[index] = 0;
+            maskBuffer[index] = 0;
 
-      const pixelIndex = (py * image.width + px) * 4;
+            const pixelIndex = (py * image.width + px) * 4;
 
-      eraseWorkingImageData.data[pixelIndex]     = originalImageData.data[pixelIndex];
-      eraseWorkingImageData.data[pixelIndex + 1] = originalImageData.data[pixelIndex + 1];
-      eraseWorkingImageData.data[pixelIndex + 2] = originalImageData.data[pixelIndex + 2];
-      eraseWorkingImageData.data[pixelIndex + 3] = 255;
-    }
+            eraseWorkingImageData.data[pixelIndex]     = originalImageData.data[pixelIndex];
+            eraseWorkingImageData.data[pixelIndex + 1] = originalImageData.data[pixelIndex + 1];
+            eraseWorkingImageData.data[pixelIndex + 2] = originalImageData.data[pixelIndex + 2];
+            eraseWorkingImageData.data[pixelIndex + 3] = 255;
+          }
 
-  } else {
+        } else {
 
-    maskBuffer[index] = 255;
+          maskBuffer[index] = 255;
 
-    dirtyMinX = Math.min(dirtyMinX, px);
-    dirtyMinY = Math.min(dirtyMinY, py);
-    dirtyMaxX = Math.max(dirtyMaxX, px);
-    dirtyMaxY = Math.max(dirtyMaxY, py);
-  }
-}    
+          dirtyMinX = Math.min(dirtyMinX, px);
+          dirtyMinY = Math.min(dirtyMinY, py);
+          dirtyMaxX = Math.max(dirtyMaxX, px);
+          dirtyMaxY = Math.max(dirtyMaxY, py);
+        }
+      } // end kernel loop
+
+    } // end steps loop
 
     // Commit erase ONLY while drawing
     if (mode === "erase" && eraseWorkingImageData) {
@@ -627,6 +627,9 @@ maskCanvas.addEventListener("mousemove", function (e) {
     lastY = y;
   }
 });
+
+
+
 
 
 // ======================================================
