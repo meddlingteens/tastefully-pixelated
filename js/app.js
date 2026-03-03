@@ -292,7 +292,6 @@ function resizeCanvas() {
 
   if (image) {
     drawImage();
-    renderMaskPreview();
   }
 }
 
@@ -352,36 +351,33 @@ buildBrushKernel();
   // DRAW IMAGE
   // ======================================================
 
-  function drawImage() {
+function drawImage() {
 
-    baseCtx.clearRect(0, 0, baseCanvas.width, baseCanvas.height);
+  baseCtx.clearRect(0, 0, baseCanvas.width, baseCanvas.height);
 
-    if (!image) return;
+  if (!image) return;
 
-    const imgRatio = image.width / image.height;
-    const canvasRatio = baseCanvas.width / baseCanvas.height;
+  const imgRatio = image.width / image.height;
+  const canvasRatio = baseCanvas.width / baseCanvas.height;
 
-    let drawWidth, drawHeight;
+  let drawWidth, drawHeight;
 
-    if (imgRatio > canvasRatio) {
-      drawWidth = baseCanvas.width * zoomLevel;
-      drawHeight = drawWidth / imgRatio;
-    } else {
-      drawHeight = baseCanvas.height * zoomLevel;
-      drawWidth = drawHeight * imgRatio;
-    }
-
-imageDrawX = (baseCanvas.width - drawWidth) / 2 + offsetX;
-imageDrawY = (baseCanvas.height - drawHeight) / 2 + offsetY;
-
-currentDrawWidth = drawWidth;
-currentDrawHeight = drawHeight;
-
-baseCtx.drawImage(image, imageDrawX, imageDrawY, drawWidth, drawHeight);
-
+  if (imgRatio > canvasRatio) {
+    drawWidth = baseCanvas.width * zoomLevel;
+    drawHeight = drawWidth / imgRatio;
+  } else {
+    drawHeight = baseCanvas.height * zoomLevel;
+    drawWidth = drawHeight * imgRatio;
   }
 
+  imageDrawX = (baseCanvas.width - drawWidth) / 2 + offsetX;
+  imageDrawY = (baseCanvas.height - drawHeight) / 2 + offsetY;
 
+  currentDrawWidth = drawWidth;
+  currentDrawHeight = drawHeight;
+
+  baseCtx.drawImage(image, imageDrawX, imageDrawY, drawWidth, drawHeight);
+}
 
 
 
@@ -574,51 +570,51 @@ maskCanvas.addEventListener("mousemove", function (e) {
 
       for (let i = 0; i < kernelSize; i++) {
 
-        const canvasX = ix + kernelDX[i];
-        const canvasY = iy + kernelDY[i];
+  const canvasX = ix + kernelDX[i];
+  const canvasY = iy + kernelDY[i];
 
-        if (
-          canvasX < imageDrawX ||
-          canvasY < imageDrawY ||
-          canvasX > imageDrawX + currentDrawWidth ||
-          canvasY > imageDrawY + currentDrawHeight
-        ) continue;
+  if (
+    canvasX < imageDrawX ||
+    canvasY < imageDrawY ||
+    canvasX > imageDrawX + currentDrawWidth ||
+    canvasY > imageDrawY + currentDrawHeight
+  ) continue;
 
-        const imgX = (canvasX - imageDrawX) * scaleX;
-        const imgY = (canvasY - imageDrawY) * scaleY;
+  const imgX = (canvasX - imageDrawX) * scaleX;
+  const imgY = (canvasY - imageDrawY) * scaleY;
 
-        const px = Math.floor(imgX);
-        const py = Math.floor(imgY);
+  const px = Math.floor(imgX);
+  const py = Math.floor(imgY);
 
-        if (px < 0 || py < 0 || px >= maskWidth || py >= maskHeight)
-          continue;
+  if (px < 0 || py < 0 || px >= maskWidth || py >= maskHeight)
+    continue;
 
-        const index = py * maskWidth + px;
+  const index = py * maskWidth + px;
 
-        if (mode === "erase" && eraseWorkingImageData && originalImageData) {
+  if (mode === "erase") {
 
-  maskBuffer[index] = 0;
+    if (eraseWorkingImageData && originalImageData) {
 
-  const pixelIndex = (py * image.width + px) * 4;
+      maskBuffer[index] = 0;
 
-  eraseWorkingImageData.data[pixelIndex]     = originalImageData.data[pixelIndex];
-  eraseWorkingImageData.data[pixelIndex + 1] = originalImageData.data[pixelIndex + 1];
-  eraseWorkingImageData.data[pixelIndex + 2] = originalImageData.data[pixelIndex + 2];
-  eraseWorkingImageData.data[pixelIndex + 3] = 255;
+      const pixelIndex = (py * image.width + px) * 4;
 
-}
-
-        } else {
-
-          maskBuffer[index] = 255;
-
-          dirtyMinX = Math.min(dirtyMinX, px);
-          dirtyMinY = Math.min(dirtyMinY, py);
-          dirtyMaxX = Math.max(dirtyMaxX, px);
-          dirtyMaxY = Math.max(dirtyMaxY, py);
-        }
-      }
+      eraseWorkingImageData.data[pixelIndex]     = originalImageData.data[pixelIndex];
+      eraseWorkingImageData.data[pixelIndex + 1] = originalImageData.data[pixelIndex + 1];
+      eraseWorkingImageData.data[pixelIndex + 2] = originalImageData.data[pixelIndex + 2];
+      eraseWorkingImageData.data[pixelIndex + 3] = 255;
     }
+
+  } else {
+
+    maskBuffer[index] = 255;
+
+    dirtyMinX = Math.min(dirtyMinX, px);
+    dirtyMinY = Math.min(dirtyMinY, py);
+    dirtyMaxX = Math.max(dirtyMaxX, px);
+    dirtyMaxY = Math.max(dirtyMaxY, py);
+  }
+}    
 
     // Commit erase ONLY while drawing
     if (mode === "erase" && eraseWorkingImageData) {
@@ -714,7 +710,6 @@ eraseBtn.addEventListener("click", () => setMode("erase"));
  zoomSlider.addEventListener("input", function (e) {
   zoomLevel = parseFloat(e.target.value);
   drawImage();
-  renderMaskPreview();
 });
 
 
