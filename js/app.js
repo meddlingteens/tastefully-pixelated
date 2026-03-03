@@ -823,46 +823,16 @@ zoomSlider.addEventListener("input", function (e) {
 
 
 
-  // ======================================================
-  // APPLY
-  // ======================================================
-
+ // ======================================================
+// APPLY
+// ======================================================
 
 function reapplyPixelation() {
-
-  if (!originalImageData) return;
-  if (!pixelWorker) return;
-
-  const imageCanvas = document.createElement("canvas");
-  imageCanvas.width = originalImageData.width;
-  imageCanvas.height = originalImageData.height;
-
-  const ctx = imageCanvas.getContext("2d");
-  ctx.putImageData(originalImageData, 0, 0);
-
-  const baseData = ctx.getImageData(
-    0,
-    0,
-    imageCanvas.width,
-    imageCanvas.height
-  );
-
-  pixelWorker.postMessage(
-    {
-      buffer: baseData.data.buffer,
-      maskBuffer: maskBuffer.buffer,
-      width: imageCanvas.width,
-      height: imageCanvas.height,
-      pixelSize: pixelSize,
-      dirtyMinX,
-      dirtyMinY,
-      dirtyMaxX,
-      dirtyMaxY
-    },
-    [baseData.data.buffer]
-  );
+  // In additive mode, reapply should just behave like Apply
+  // if there's an active mask region.
+  if (dirtyMinX === Infinity) return;
+  applyBtn.click();
 }
-
 
 applyBtn.addEventListener("click", function () {
 
@@ -875,19 +845,16 @@ applyBtn.addEventListener("click", function () {
   if (dirtyMinX === Infinity) return;
   if (isApplying) return;
 
+  // ✅ Immediately clear visible mask preview
+  maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
 
+  // Create image-space canvas from CURRENT image (additive)
+  const imageCanvas = document.createElement("canvas");
+  imageCanvas.width = image.width;
+  imageCanvas.height = image.height;
 
-const imageCanvas = document.createElement("canvas");
-imageCanvas.width = originalImageData.width;
-imageCanvas.height = originalImageData.height;
-
-const imageCtx = imageCanvas.getContext("2d");
-imageCtx.drawImage(image, 0, 0);
-
-
-
-
-
+  const imageCtx = imageCanvas.getContext("2d");
+  imageCtx.drawImage(image, 0, 0); // ← additive (NOT originalImageData)
 
   // Save history (image-space)
   historyStack.push(
@@ -917,7 +884,7 @@ imageCtx.drawImage(image, 0, 0);
       maskBuffer: maskBuffer.buffer,
       width: image.width,
       height: image.height,
-      pixelSize: 20,
+      pixelSize: pixelSize,   // ✅ use real slider value
       dirtyMinX,
       dirtyMinY,
       dirtyMaxX,
@@ -927,55 +894,67 @@ imageCtx.drawImage(image, 0, 0);
       baseData.data.buffer
     ]
   );
+});
+
+
+
+
+
+
+// ======================================================
+// UNDO
+// ======================================================
+
+document.addEventListener("keydown", function (e) {
+
+  if ((e.ctrlKey || e.metaKey) && e.key === "z") {
+
+    if (historyStack.length === 0) return;
+
+    const previous = historyStack.pop();
+
+    // Save current state for redo
+    const currentCanvas = document.createElement("canvas");
+    currentCanvas.width = image.width;
+    currentCanvas.height = image.height;
+
+    const currentCtx = currentCanvas.getContext("2d");
+    currentCtx.drawImage(image, 0, 0);
+
+    redoStack.push(
+      currentCtx.getImageData(0, 0, image.width, image.height)
+    );
+
+    // Restore previous state
+    const tempCanvas = document.createElement("canvas");
+    tempCanvas.width = previous.width;
+    tempCanvas.height = previous.height;
+
+    const tempCtx = tempCanvas.getContext("2d");
+    tempCtx.putImageData(previous, 0, 0);
+
+    image = tempCanvas;
+    drawImage();
+
+    // ✅ Clear mask state completely
+    maskBuffer = new Uint8Array(maskWidth * maskHeight);
+
+    dirtyMinX = Infinity;
+    dirtyMinY = Infinity;
+    dirtyMaxX = -Infinity;
+    dirtyMaxY = -Infinity;
+
+    maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+  }
+});
+
+
+
+
 
 });
 
 
-  // ======================================================
-  // UNDO
-  // ======================================================
-
-  document.addEventListener("keydown", function (e) {
-
-    if ((e.ctrlKey || e.metaKey) && e.key === "z") {
-
-      if (historyStack.length === 0) return;
 
 
 
-
-const previous = historyStack.pop();
-
-// Store redo in image-space
-const imageCanvas = document.createElement("canvas");
-imageCanvas.width = image.width;
-imageCanvas.height = image.height;
-
-const imageCtx = imageCanvas.getContext("2d");
-imageCtx.drawImage(image, 0, 0);
-
-redoStack.push(
-  imageCtx.getImageData(0, 0, image.width, image.height)
-);
-
-
-
-
-
-
-const tempCanvas = document.createElement("canvas");
-tempCanvas.width = image.width;
-tempCanvas.height = image.height;
-
-const tempCtx = tempCanvas.getContext("2d");
-tempCtx.putImageData(previous, 0, 0);
-
-image = tempCanvas;
-drawImage();
-
-
-
-    }
-  });
-
-});
