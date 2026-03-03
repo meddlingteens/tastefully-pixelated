@@ -1,0 +1,384 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: #000; /* or your app bg */
+}
+
+.app {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 768px) {
+  .banner {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+
+  .banner-spinner img {
+    width: 60px;
+  }
+}
+
+/* Header */
+
+.app h1 {
+  margin: 0; /* remove default browser margin */
+  font-size: 48px;
+  font-weight: 700;
+}
+
+.app p {
+  margin: 6px 0 24px 0;
+  color: #aaa;
+  font-size: 18px;
+}
+
+.app-title {
+  margin-bottom: 4px;
+}
+
+.subhead {
+  margin-top: 0;
+  margin-bottom: 24px;
+  opacity: 0.75;
+  pointer-events: none;
+}
+
+
+
+
+/* Banner */
+
+.banner {
+  display: flex;
+  align-items: center;
+  padding: 16px 24px;
+  border-radius: 18px;
+  border: 3px solid #c0c0c0;
+  background: linear-gradient(135deg,#5c3b9c,#2e1c55);
+  color: #ffffff;
+  margin-bottom: 35px;   /* ← ADD THIS */
+}
+
+.banner h2 {
+  white-space: nowrap;
+}
+
+.banner-spinner {
+  flex: 1;                     /* ← takes remaining space */
+  display: flex;
+  justify-content: center;     /* ← centers spinner */
+}
+
+.banner-spinner img {
+  width: 58px;
+  display: block;
+}
+
+.spend-btn {
+  flex-shrink: 0;
+}
+
+/* Ensure banner + canvas align perfectly and spacing is controlled */
+.banner,
+.canvas-container {
+  box-sizing: border-box;
+}
+
+
+
+/*canvas*/
+
+
+canvas {
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  display: block;
+}
+
+.canvas-wrapper {
+  flex: 1;
+  position: relative;
+}
+
+#previewCanvas {
+  pointer-events: none;
+}
+
+.canvas-container {
+  position: relative;
+  width: 100%;
+  height: 500px;
+  border-radius: 18px;
+  border: 3px solid #c0c0c0;
+  margin-bottom: 20px;
+  overflow: hidden;
+  background-image: url("images/backgroundPixelsLarge.webp");
+  background-size: cover;
+  background-position: center;
+}
+
+.canvas-container canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+#baseCanvas { z-index: 1; }
+#maskCanvas { z-index: 2; }
+#previewCanvas { z-index: 3; }
+
+.canvas-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 4;
+}
+
+.canvas-overlay.hidden {
+  display: none;
+}
+
+.bottom-bar {
+  height: 72px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background: rgba(20,20,20,0.95);
+}
+
+
+.primary-btn {
+  background: linear-gradient(135deg, #5c7cfa, #4c6ef5);
+  border: 2px solid #c0c0c0;
+  color: #fff;
+}
+
+.primary-btn:hover {
+  background: linear-gradient(135deg, #4c6ef5, #3b5bdb);
+}
+
+
+
+
+
+#previewCanvas {
+  pointer-events: none;
+}
+
+
+/* Sliders */
+
+
+
+.sliders {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 70%;
+}
+
+
+.slider-row {
+  margin-bottom: 48px;   /* increased spacing */
+  display: flex;
+}
+
+.slider-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+/* Buttons */
+
+.button-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+
+button.active {
+  box-shadow: 0 0 0 3px rgba(255,255,255,0.25);
+}
+
+
+
+.revert-btn {
+  padding: 8px 16px;
+}
+
+
+/* --- FORCE BUTTON STYLING --- */
+
+button {
+  padding: 10px 18px;
+  border: 2px solid #c0c0c0;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.05s ease;
+  color: #fff;
+}
+
+/* TOOL BUTTONS (Draw, Move, Erase, Apply) */
+button:not(.primary-btn) {
+  background: #1f1f1f;
+}
+
+button:not(.primary-btn):hover {
+  background: #2b2b2b;
+}
+
+button:not(.primary-btn).active {
+  background: #333;
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.15);
+}
+
+
+
+
+
+
+/* =========================
+   EDITING BUTTON COLORS
+   ========================= */
+
+/* DRAW */
+#drawBtn {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+#drawBtn:hover {
+  box-shadow: 0 0 12px rgba(59,130,246,0.4);
+}
+
+#drawBtn.active {
+  box-shadow: 0 0 0 2px #ffffff, 0 0 14px rgba(59,130,246,0.6);
+}
+
+
+/* MOVE */
+#moveBtn {
+  background: linear-gradient(135deg, #14b8a6, #0d9488);
+}
+
+#moveBtn:hover {
+  box-shadow: 0 0 12px rgba(20,184,166,0.4);
+}
+
+#moveBtn.active {
+  box-shadow: 0 0 0 2px #ffffff, 0 0 14px rgba(20,184,166,0.6);
+}
+
+
+/* ERASE */
+#eraseBtn {
+  background: linear-gradient(135deg, #f97316, #ea580c);
+}
+
+#eraseBtn:hover {
+  box-shadow: 0 0 12px rgba(249,115,22,0.4);
+}
+
+#eraseBtn.active {
+  box-shadow: 0 0 0 2px #ffffff, 0 0 14px rgba(249,115,22,0.6);
+}
+
+
+/* APPLY */
+#applyBtn {
+  background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+}
+
+#applyBtn:hover {
+  box-shadow: 0 0 12px rgba(139,92,246,0.4);
+}
+
+#applyBtn.active {
+  box-shadow: 0 0 0 2px #ffffff, 0 0 14px rgba(139,92,246,0.6);
+}
+
+
+
+
+
+
+/*----body stuff -----*/
+
+html, body {
+  margin: 0;
+  min-height: 100%;
+  font-family: sans-serif;
+  color: #fff;
+  background-color: transparent;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.75)),
+    url("images/backgroundPixelsLarge.webp");
+  background-size: cover;
+  background-position: center;
+}
+
+
+
+/* ===== CUSTOM SLIDER STYLING ===== */
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  background: #c0c0c0;
+  border-radius: 3px;
+  outline: none;
+}
+
+/* Chrome / Safari */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  background: #1e73d8;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+}
+
+/* Firefox */
+input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  background: #1e73d8;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+}
+
+input[type="range"]::-moz-range-track {
+  background: #c0c0c0;
+  height: 6px;
+  border-radius: 3px;
+}
+
+
+
+
