@@ -5,26 +5,18 @@ self.onmessage = function (e) {
     maskBuffer,
     width,
     height,
-    pixelSize,
-    dirtyMinX,
-    dirtyMinY,
-    dirtyMaxX,
-    dirtyMaxY
+    pixelSize
   } = e.data;
 
   const data = new Uint8ClampedArray(buffer);
   const mask = new Uint8Array(maskBuffer);
 
+  // 🔥 Process entire image grid (removes multi-region bug)
+  const startY = 0;
+  const endY   = height;
 
-const startY = Math.floor(Math.max(0, dirtyMinY - pixelSize) / pixelSize) * pixelSize;
-const endY   = Math.min(height, dirtyMaxY + pixelSize);
-
-const startX = Math.floor(Math.max(0, dirtyMinX - pixelSize) / pixelSize) * pixelSize;
-const endX   = Math.min(width, dirtyMaxX + pixelSize);
-
-
-
-
+  const startX = 0;
+  const endX   = width;
 
   for (let y = startY; y < endY; y += pixelSize) {
     for (let x = startX; x < endX; x += pixelSize) {
