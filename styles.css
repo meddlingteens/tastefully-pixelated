@@ -83,10 +83,9 @@ body::before {
   font-weight: 700;
 }
 
-.app p {
+.app p:not(.subhead) {
   margin: 6px 0 24px 0;
   color: #aaa;
-  font-size: 18px;
 }
 
 .app-title {
