@@ -35,13 +35,21 @@ body::before {
 
 .app {
   width: 100%;
-  max-width: 780px;           /* 800 + 10px left + 10px right */
-  padding: 0 10px;            /* 10px internal gutter */
+  max-width: 780px;
   box-sizing: border-box;
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #111;
+}
+
+/* =====================================================
+   APP BACKDROP
+===================================================== */
+
+.app-backdrop {
+  padding: 10px;              /* creates the 10px border area */
+  background: #111;           /* backdrop color */
+  border-radius: 20px;
 }
 
 /* =====================================================
