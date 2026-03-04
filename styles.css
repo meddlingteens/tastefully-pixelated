@@ -37,11 +37,15 @@ body::before {
   width: 100%;
   max-width: 780px;
   box-sizing: border-box;
+
   height: 100vh;
   height: 100svh;
   height: 100dvh;
+
   display: flex;
   flex-direction: column;
+
+  min-height: 0; /* ← THIS FIXES iPhone CUT-OFF */
 
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
