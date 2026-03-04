@@ -35,11 +35,13 @@ body::before {
 
 .app {
   width: 100%;
-  max-width: 800px;
+  max-width: 780px;           /* 800 + 10px left + 10px right */
+  padding: 0 10px;            /* 10px internal gutter */
+  box-sizing: border-box;
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #cococo;   /* ← add this */
+  background: #111;
 }
 
 /* =====================================================
