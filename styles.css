@@ -113,7 +113,7 @@ body::before {
   border: 3px solid #c0c0c0;
   background: linear-gradient(135deg,#5c3b9c,#2e1c55);
   color: #fff;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
   box-sizing: border-box;
 }
 
