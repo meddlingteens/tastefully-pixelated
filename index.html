@@ -22,38 +22,37 @@
 
 <link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="styles.css">
+
 </head>
 
 
 <body>
 
-
-
 <div class="app-backdrop">
-  <div class="app">
-    <!-- existing app content -->
-
-
-
 
   <div class="app">
 
     <h1 class="app-title">Tastefully Pixelated</h1>
     <p class="subhead" id="subhead"></p>
 
+
     <!-- Banner -->
     <div class="banner">
-  <h2 id="bannerHeadline"></h2>
 
-  <div class="banner-spinner">
-    <img src="images/spinner.png" alt="spinner">
-  </div>
+      <h2 id="bannerHeadline"></h2>
 
-  <button class="spend-btn">Spend</button>
-</div>
+      <div class="banner-spinner">
+        <img src="images/spinner.png" alt="spinner">
+      </div>
+
+      <button class="spend-btn">Spend</button>
+
+    </div>
+
 
     <!-- Canvas Area -->
     <div class="canvas-container" id="canvasContainer">
+
       <canvas id="baseCanvas"></canvas>
       <canvas id="maskCanvas"></canvas>
       <canvas id="previewCanvas"></canvas>
@@ -61,13 +60,17 @@
       <div class="canvas-overlay" id="canvasOverlay">
         <button class="primary-btn" id="canvasSelectBtn">Select Photo</button>
       </div>
+
     </div>
+
 
     <!-- Hidden File Input -->
     <input type="file" id="uploadInput" hidden accept="image/*">
 
+
     <!-- Sliders -->
     <div class="slider-row">
+
       <div class="sliders">
 
         <div class="slider-group">
@@ -86,19 +89,25 @@
         </div>
 
       </div>
+
     </div>
 
-   <div class="button-grid">
-  <button id="drawBtn">Draw</button>
-  <button id="moveBtn">Move</button>
-  <button id="applyBtn">Apply</button>
-  <button id="undoBtn">Undo</button>
-</div>
 
+    <!-- Controls -->
+    <div class="button-grid">
+
+      <button id="drawBtn">Draw</button>
+      <button id="moveBtn">Move</button>
+      <button id="applyBtn">Apply</button>
+      <button id="undoBtn">Undo</button>
+
+    </div>
 
   </div>
+
 </div>
 
-  <script src="js/app.js"></script>
+<script src="js/app.js"></script>
+
 </body>
 </html>
