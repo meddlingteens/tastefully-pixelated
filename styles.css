@@ -47,9 +47,12 @@ body::before {
 ===================================================== */
 
 .app-backdrop {
-  padding: 10px;              /* creates the 10px border area */
-  background: #111;           /* backdrop color */
+  width: 100%;
+  max-width: 800px;
+  padding: 10px;
+  background: #111;
   border-radius: 20px;
+  box-sizing: border-box;
 }
 
 /* =====================================================
