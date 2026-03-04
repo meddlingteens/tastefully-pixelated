@@ -211,11 +211,13 @@ canvas {
   display: flex;
   flex-direction: column;
   gap: 18px;
-  width: 70%;
+  flex: 1;
 }
 
 .slider-row {
   display: flex;
+  align-items: flex-start;
+  gap: 20px;
   margin-bottom: 8px;
 }
 
@@ -240,7 +242,7 @@ canvas {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-  width: 260px;
+  width: 220px;
 }
 
 .button-grid button {
