@@ -40,7 +40,7 @@ const drawBtn = document.getElementById("drawBtn");
 const moveBtn = document.getElementById("moveBtn");
 const eraseBtn = document.getElementById("eraseBtn");
 const canvasSelectBtn = document.getElementById("canvasSelectBtn");
-
+const undoBtn = document.getElementById("undoBtn");
 
 
 // 🔎 DEBUG — check button bindings
@@ -48,7 +48,7 @@ console.log("drawBtn:", drawBtn);
 console.log("moveBtn:", moveBtn);
 console.log("eraseBtn:", eraseBtn);
 
-
+console.log("undoBtn:", undoBtn);
 
 // Safely wire Select Photo
 if (canvasSelectBtn && uploadInput) {
@@ -66,10 +66,29 @@ if (canvasSelectBtn && uploadInput) {
 // ======================================================
 
 function renderMaskPreview() {
-  // Preview is drawn live during drawing.
-  // No reconstruction from maskBuffer.
-}
 
+  if (!image || !maskBuffer) return;
+
+  maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+
+  const scaleX = currentDrawWidth / image.width;
+  const scaleY = currentDrawHeight / image.height;
+
+  maskCtx.fillStyle = "white";
+
+  for (let y = 0; y < maskHeight; y++) {
+    for (let x = 0; x < maskWidth; x++) {
+
+      const index = y * maskWidth + x;
+      if (maskBuffer[index] === 0) continue;
+
+      const canvasX = imageDrawX + x * scaleX;
+      const canvasY = imageDrawY + y * scaleY;
+
+      maskCtx.fillRect(canvasX, canvasY, scaleX, scaleY);
+    }
+  }
+}
 
 
 
@@ -114,13 +133,12 @@ function setRandomSubhead() {
 const bannerHeadline = document.getElementById("bannerHeadline");
 
 const bannerMessages = [
-  "This is where you can advertise your useless crap",
+  "Advertise useless crap",
   "Buy, buy, buy!",
   "Sell stuff no one needs.",
   "Buy this shiny thing.",
-  "Consumers of the world, unite!",
   "A thing to buy goes here.",
-  "More stuff, that's what you need!",
+  "Buy more stuff!",
   "Buy!",
   "Uh, spend money here",
   "Spend!"
@@ -237,12 +255,12 @@ try {
 
   if (version !== applyVersion) return;
 
-    // Rebuild ImageData from worker buffer
-    const imageData = new ImageData(
-      new Uint8ClampedArray(buffer),
-      image.width,
-      image.height
-    );
+const imageData = new ImageData(
+  new Uint8ClampedArray(buffer),
+  e.data.width,
+  e.data.height
+);
+
 
     // Draw processed image
     const tempCanvas = document.createElement("canvas");
@@ -256,8 +274,7 @@ try {
     image = tempCanvas;
     drawImage();
 
-    // ✅ Reset mask for next additive pass
-    maskBuffer = new Uint8Array(maskWidth * maskHeight);
+     maskBuffer = new Uint8Array(maskWidth * maskHeight);
 
     dirtyMinX = Infinity;
     dirtyMinY = Infinity;
@@ -388,10 +405,9 @@ function updateBrushCursor() {
 
 
 
-
-  // ======================================================
-  // DRAW IMAGE
-  // ======================================================
+// ======================================================
+// DRAW IMAGE
+// ======================================================
 
 function drawImage() {
 
@@ -419,8 +435,10 @@ function drawImage() {
   currentDrawHeight = drawHeight;
 
   baseCtx.drawImage(image, imageDrawX, imageDrawY, drawWidth, drawHeight);
-}
 
+  // 🔥 Re-render mask preview so it follows zoom/move
+  renderMaskPreview();
+}
 
 
 
@@ -504,60 +522,60 @@ drawImage();
 
 
 
-
 // ======================================================
-// MOUSEDOWN
+// POINTER DOWN
 // ======================================================
 
-maskCanvas.addEventListener("mousedown", function (e) {
+maskCanvas.addEventListener("pointerdown", function (e) {
 
   if (!image) return;
   if (isApplying) return;
+
+  e.preventDefault();
+  maskCanvas.setPointerCapture(e.pointerId);
 
   isDrawing = true;
-
-  const rect = maskCanvas.getBoundingClientRect();
-  const mouseX = e.clientX - rect.left;
-  const mouseY = e.clientY - rect.top;
-
-  // MOVE MODE
- if (mode === "move") {
-
-  startDragX = mouseX;
-  startDragY = mouseY;
-
-  startOffsetX = offsetX;
-  startOffsetY = offsetY;
-
-  maskCanvas.style.cursor = "grabbing";
-  return;
-}
-
-
-
-
-  lastX = mouseX;
-  lastY = mouseY;
-
- 
-});
-
-
-// ======================================================
-// MOUSEMOVE
-// ======================================================
-
-maskCanvas.addEventListener("mousemove", function (e) {
-
-  if (!image) return;
-  if (isApplying) return;
 
   const rect = maskCanvas.getBoundingClientRect();
   const x = e.clientX - rect.left;
   const y = e.clientY - rect.top;
 
   // MOVE MODE
-  if (isDrawing && mode === "move") {
+  if (mode === "move") {
+
+    startDragX = x;
+    startDragY = y;
+
+    startOffsetX = offsetX;
+    startOffsetY = offsetY;
+
+    maskCanvas.style.cursor = "grabbing";
+    return;
+  }
+
+  lastX = x;
+  lastY = y;
+});
+
+
+// ======================================================
+// POINTER MOVE
+// ======================================================
+
+maskCanvas.addEventListener("pointermove", function (e) {
+
+  if (!isDrawing) return;
+  if (!image) return;
+  if (isApplying) return;
+
+  e.preventDefault();
+
+  const rect = maskCanvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
+  // MOVE MODE
+  if (mode === "move") {
 
     const dx = x - startDragX;
     const dy = y - startDragY;
@@ -570,7 +588,7 @@ maskCanvas.addEventListener("mousemove", function (e) {
   }
 
   // DRAW MODE
-  if (isDrawing && mode === "draw") {
+  if (mode === "draw") {
 
     if (!image || currentDrawWidth === 0 || currentDrawHeight === 0) {
       return;
@@ -602,14 +620,6 @@ maskCanvas.addEventListener("mousemove", function (e) {
       const ix = lastX + dx * t;
       const iy = lastY + dy * t;
 
-      // Draw preview circle
-      maskCtx.globalCompositeOperation = "source-over";
-      maskCtx.fillStyle = "white";
-      maskCtx.beginPath();
-      maskCtx.arc(ix, iy, previewRadius, 0, Math.PI * 2);
-      maskCtx.fill();
-
-      // Update mask buffer
       for (let i = 0; i < kernelSize; i++) {
 
         const canvasX =
@@ -647,9 +657,21 @@ maskCanvas.addEventListener("mousemove", function (e) {
 
     lastX = x;
     lastY = y;
+
+    drawImage();
   }
 });
 
+
+// ======================================================
+// POINTER UP
+// ======================================================
+
+maskCanvas.addEventListener("pointerup", function (e) {
+  e.preventDefault();
+  maskCanvas.releasePointerCapture(e.pointerId);
+  stopDrawing();
+});
 
 
 
@@ -677,12 +699,22 @@ function stopDrawing() {
   }
 }
 
-maskCanvas.addEventListener("mouseup", stopDrawing);
-maskCanvas.addEventListener("mouseleave", stopDrawing);
-document.addEventListener("mouseup", stopDrawing);
+maskCanvas.addEventListener("pointerdown", function (e) {
+  e.preventDefault();
+  maskCanvas.setPointerCapture(e.pointerId);
+  handlePointerDown(e);
+});
 
+maskCanvas.addEventListener("pointermove", function (e) {
+  e.preventDefault();
+  handlePointerMove(e);
+});
 
-
+maskCanvas.addEventListener("pointerup", function (e) {
+  e.preventDefault();
+  maskCanvas.releasePointerCapture(e.pointerId);
+  stopDrawing();
+});
 
 
 
@@ -796,10 +828,16 @@ applyBtn.addEventListener("click", function () {
   const imageCtx = imageCanvas.getContext("2d");
   imageCtx.drawImage(image, 0, 0); // ← additive (NOT originalImageData)
 
-  // Save history (image-space)
-  historyStack.push(
-    imageCtx.getImageData(0, 0, image.width, image.height)
-  );
+const snapshot = imageCtx.getImageData(0, 0, image.width, image.height);
+
+// CLONE the data so worker can't mutate it later
+const cloned = new ImageData(
+  new Uint8ClampedArray(snapshot.data),
+  snapshot.width,
+  snapshot.height
+);
+
+historyStack.push(cloned);
 
   if (historyStack.length > MAX_HISTORY) {
     historyStack.shift();
@@ -852,54 +890,71 @@ pixelWorker.postMessage(
 // UNDO
 // ======================================================
 
+function performUndo() {
+
+  if (historyStack.length === 0) return;
+
+  applyVersion++; // invalidate any in-flight worker
+
+  const previous = historyStack.pop();
+
+  // Save current for redo
+  const currentCanvas = document.createElement("canvas");
+  currentCanvas.width = image.width;
+  currentCanvas.height = image.height;
+
+  const currentCtx = currentCanvas.getContext("2d");
+  currentCtx.drawImage(image, 0, 0);
+
+  redoStack.push(
+    currentCtx.getImageData(0, 0, image.width, image.height)
+  );
+
+  // Restore previous state
+  const tempCanvas = document.createElement("canvas");
+  tempCanvas.width = previous.width;
+  tempCanvas.height = previous.height;
+
+  const tempCtx = tempCanvas.getContext("2d");
+  tempCtx.putImageData(previous, 0, 0);
+
+  image = tempCanvas;
+
+  drawImage();
+
+  maskBuffer = new Uint8Array(maskWidth * maskHeight);
+  dirtyMinX = Infinity;
+  dirtyMinY = Infinity;
+  dirtyMaxX = -Infinity;
+  dirtyMaxY = -Infinity;
+  maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+}
+
+// Keyboard shortcut
 document.addEventListener("keydown", function (e) {
-
   if ((e.ctrlKey || e.metaKey) && e.key === "z") {
-
-    if (historyStack.length === 0) return;
-
-    applyVersion++; // invalidate any in-flight worker
-
-    const previous = historyStack.pop();
-
-    // Save current for redo
-    const currentCanvas = document.createElement("canvas");
-    currentCanvas.width = image.width;
-    currentCanvas.height = image.height;
-
-    const currentCtx = currentCanvas.getContext("2d");
-    currentCtx.drawImage(image, 0, 0);
-
-    redoStack.push(
-      currentCtx.getImageData(0, 0, image.width, image.height)
-    );
-
-    // Restore using ImageData dimensions (critical fix)
-    const tempCanvas = document.createElement("canvas");
-    tempCanvas.width = previous.width;
-    tempCanvas.height = previous.height;
-
-    const tempCtx = tempCanvas.getContext("2d");
-    tempCtx.putImageData(previous, 0, 0);
-
-    image = tempCanvas;
-
-    drawImage();
-
-    maskBuffer = new Uint8Array(maskWidth * maskHeight);
-    dirtyMinX = Infinity;
-    dirtyMinY = Infinity;
-    dirtyMaxX = -Infinity;
-    dirtyMaxY = -Infinity;
-    maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+    performUndo();
   }
 });
 
-
+// Undo button
+if (undoBtn) {
+  undoBtn.addEventListener("click", performUndo);
+}
 
 });
 
 
+// end DOMContentLoaded
 
 
 
+// ======================================================
+// SERVICE WORKER
+// ======================================================
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/service-worker.js");
+  });
+}
