@@ -62,7 +62,7 @@ body::before {
 @media (max-width: 768px) {
   .banner {
     padding: 8px 12px;
-    font-size: 14px;
+    font-size: 12px;
   }
 
   .banner-spinner img {
