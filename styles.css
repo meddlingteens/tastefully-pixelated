@@ -96,7 +96,7 @@ body::before {
 
 .subhead {
   margin-top: 0;
-  margin-bottom: 8px;
+  margin-bottom: 2px;
   opacity: 0.75;
   pointer-events: none;
 }
