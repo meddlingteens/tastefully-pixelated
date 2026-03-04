@@ -216,11 +216,12 @@ canvas {
   flex-direction: column;
   gap: 18px;
   flex: 1;
+  min-width: 0;
 }
 
 .slider-row {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 20px;
   margin-bottom: 8px;
 }
@@ -229,7 +230,6 @@ canvas {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  width: 100%;
 }
 
 /* =====================================================
