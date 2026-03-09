@@ -42,6 +42,39 @@ const eraseBtn = document.getElementById("eraseBtn");
 const canvasSelectBtn = document.getElementById("canvasSelectBtn");
 const undoBtn = document.getElementById("undoBtn");
 const takePhotoBtn = document.getElementById("takePhotoBtn");
+const shareBtn = document.getElementById("shareBtn");
+
+
+if (shareBtn) {
+  shareBtn.addEventListener("click", async () => {
+
+if (!navigator.share) {
+  const link = document.createElement("a");
+  link.download = "pixelated.png";
+  link.href = baseCanvas.toDataURL();
+  link.click();
+  return;
+}
+
+    try {
+
+      const blob = await new Promise(resolve => {
+        baseCanvas.toBlob(resolve, "image/png");
+      });
+
+      const file = new File([blob], "pixelated.png", { type: "image/png" });
+
+await navigator.share({
+  files: [file],
+  title: "Tastefully Pixelated",
+  text: "Tastefully pixelated 😎"
+});
+
+    } catch (err) {
+      console.error("Share failed:", err);
+    }
+  });
+}
 
 // 🔎 DEBUG — check button bindings
 console.log("drawBtn:", drawBtn);
@@ -706,32 +739,6 @@ function stopDrawing() {
     previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
   }
 }
-
-maskCanvas.addEventListener("pointerdown", function (e) {
-  e.preventDefault();
-  maskCanvas.setPointerCapture(e.pointerId);
-  handlePointerDown(e);
-});
-
-maskCanvas.addEventListener("pointermove", function (e) {
-  e.preventDefault();
-  handlePointerMove(e);
-});
-
-maskCanvas.addEventListener("pointerup", function (e) {
-  e.preventDefault();
-  maskCanvas.releasePointerCapture(e.pointerId);
-  stopDrawing();
-});
-
-
-
-
-
-
-
-
-
 
 
 // ======================================================
