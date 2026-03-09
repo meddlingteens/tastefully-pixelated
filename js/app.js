@@ -765,14 +765,14 @@ setMode("draw");
   // SLIDERS
   // ======================================================
 
+if (brushSlider) {
   brushSlider.addEventListener("input", e => {
     brushSize = parseInt(e.target.value);
-
-  console.log("brushSize:", brushSize); // ← add here
 
     buildBrushKernel();
     updateBrushCursor();
   });
+}
 
 
 pixelSlider.addEventListener("input", e => {
@@ -943,3 +943,18 @@ if (undoBtn) {
 }
 
 });
+
+
+// end DOMContentLoaded
+
+
+
+// ======================================================
+// SERVICE WORKER
+// ======================================================
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/service-worker.js");
+  });
+}
