@@ -38,9 +38,9 @@ body::before {
   max-width: 780px;
   box-sizing: border-box;
 
-  height: 100vh;
-  height: 100svh;
-  height: 100dvh;
+min-height: 100vh;
+min-height: 100svh;
+min-height: 100dvh;
 
   display: flex;
   flex-direction: column;
