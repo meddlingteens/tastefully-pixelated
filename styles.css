@@ -359,8 +359,8 @@ button:not(.primary-btn).active {
 }
 
 .canvas-photo-btn {
-  width: 160px;
-  height: 160px;
+  width: 80px;
+  height: 80px;
 
   border-radius: 50%;
 
@@ -369,13 +369,12 @@ button:not(.primary-btn).active {
   justify-content: center;
   text-align: center;
 
-  font-size: 16px;
+  font-size: 13px;
   font-weight: 700;
   line-height: 1.2;
 
-  padding: 20px;
+  padding: 8px;
 }
-
 /* =====================================================
    TOOL COLORS
 ===================================================== */
