@@ -56,7 +56,7 @@ padding-bottom: calc(env(safe-area-inset-bottom) + 4px);}
 
 .app-backdrop {
   display: inline-block;
-  padding: 15px;
+  padding: 12px 15px 10px 15px;
   background: #111;
   border-radius: 20px;
   box-sizing: border-box;
