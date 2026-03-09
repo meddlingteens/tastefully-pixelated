@@ -768,7 +768,6 @@ setMode("draw");
 if (brushSlider) {
   brushSlider.addEventListener("input", e => {
     brushSize = parseInt(e.target.value);
-
     buildBrushKernel();
     updateBrushCursor();
   });
