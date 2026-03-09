@@ -41,7 +41,7 @@ const moveBtn = document.getElementById("moveBtn");
 const eraseBtn = document.getElementById("eraseBtn");
 const canvasSelectBtn = document.getElementById("canvasSelectBtn");
 const undoBtn = document.getElementById("undoBtn");
-
+const takePhotoBtn = document.getElementById("takePhotoBtn");
 
 // 🔎 DEBUG — check button bindings
 console.log("drawBtn:", drawBtn);
@@ -55,7 +55,15 @@ if (canvasSelectBtn && uploadInput) {
   canvasSelectBtn.addEventListener("click", function () {
     uploadInput.click();
   });
-} else {
+} 
+
+if (takePhotoBtn && uploadInput) {
+  takePhotoBtn.addEventListener("click", function () {
+    uploadInput.click();
+  });
+}
+
+else {
   console.warn("Select photo elements missing.");
 }
 
