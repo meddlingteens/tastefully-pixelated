@@ -38,7 +38,6 @@ const pixelSlider = document.getElementById("pixelSlider");
 const uploadInput = document.getElementById("uploadInput");
 const drawBtn = document.getElementById("drawBtn");
 const moveBtn = document.getElementById("moveBtn");
-const eraseBtn = document.getElementById("eraseBtn");
 const canvasSelectBtn = document.getElementById("canvasSelectBtn");
 const undoBtn = document.getElementById("undoBtn");
 const takePhotoBtn = document.getElementById("takePhotoBtn");
@@ -79,7 +78,6 @@ await navigator.share({
 // 🔎 DEBUG — check button bindings
 console.log("drawBtn:", drawBtn);
 console.log("moveBtn:", moveBtn);
-console.log("eraseBtn:", eraseBtn);
 
 console.log("undoBtn:", undoBtn);
 
@@ -174,15 +172,8 @@ function setRandomSubhead() {
 const bannerHeadline = document.getElementById("bannerHeadline");
 
 const bannerMessages = [
-  "Advertise useless crap",
-  "Buy, buy, buy!",
-  "Sell stuff no one needs.",
-  "Buy this shiny thing.",
-  "A thing to buy goes here.",
-  "Buy more stuff!",
-  "Buy!",
-  "Uh, spend money here",
-  "Spend!"
+  "Buy us a beer!",
+  "Mmmm, frosty!"
 ];
 
 function setRandomBanner() {
@@ -793,14 +784,12 @@ pixelSlider.addEventListener("input", e => {
   pixelSize = parseInt(e.target.value);
 });
 
-
 zoomSlider.addEventListener("input", function (e) {
+
   zoomLevel = parseFloat(e.target.value);
 
-  offsetX = 0;
-  offsetY = 0;
-
   drawImage();
+
 });
 
 
