@@ -232,7 +232,7 @@ canvas {
   display: flex;
   flex-direction: column;
   gap: 18px;
-  align-items: center;
+  width: 100%;
 }
 
 .slider-row {
@@ -247,8 +247,8 @@ canvas {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  width: 100%;
 }
-
 /* =====================================================
    BUTTONS
 ===================================================== */
