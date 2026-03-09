@@ -374,6 +374,28 @@ button:not(.primary-btn).active {
 
   padding: 8px;
 }
+
+
+
+/* =====================================================
+   BUTTON GRID
+===================================================== */
+
+.button-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.button-grid button {
+  width: 100%;
+}
+
+
+
+
+
 /* =====================================================
    TOOL COLORS
 ===================================================== */
