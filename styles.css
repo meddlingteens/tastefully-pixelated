@@ -38,17 +38,20 @@ body::before {
   max-width: 780px;
   box-sizing: border-box;
 
-min-height: 100vh;
-min-height: 100svh;
-min-height: 100dvh;
+  min-height: 100vh;
+  min-height: 100svh;
+  min-height: 100dvh;
 
   display: flex;
   flex-direction: column;
+  gap: 10px;
 
-  min-height: 0; /* ← THIS FIXES iPhone CUT-OFF */
+  min-height: 0;
 
   padding-top: env(safe-area-inset-top);
-padding-bottom: calc(env(safe-area-inset-bottom) + 4px);}
+  padding-bottom: calc(env(safe-area-inset-bottom) + 4px);
+}
+
 
 /* =====================================================
    APP BACKDROP
@@ -151,7 +154,8 @@ padding-bottom: calc(env(safe-area-inset-bottom) + 4px);}
 .canvas-container {
   position: relative;
   width: 100%;
-  min-height: 340px;
+  flex: 1;
+  min-height: 260px;
   margin-bottom: 8px;
 }
 
