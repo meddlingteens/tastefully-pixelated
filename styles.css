@@ -151,11 +151,11 @@ padding-bottom: calc(env(safe-area-inset-bottom) + 4px);}
 .canvas-container {
   position: relative;
   width: 100%;
-  flex: 1;
+  flex: 0 0 420px;
   min-height: 340px;
   margin-bottom: 8px;
-
   display: flex;
+  align-items: stretch;
 }
 
 .canvas-container canvas {
@@ -273,6 +273,18 @@ button {
   cursor: pointer;
   transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.05s ease;
   color: #fff;
+}
+
+.small-buttons {
+  display: flex;
+  gap: 6px;
+}
+
+.small-buttons button {
+  flex: 1;
+  padding: 6px 10px;
+  font-size: 12px;
+  height: 34px;
 }
 
 button:not(.primary-btn) {
