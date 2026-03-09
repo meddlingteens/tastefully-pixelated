@@ -4,7 +4,7 @@
 
 html,
 body {
-  height: 100%;
+  min-height: 100%;
   margin: 0;
   font-family: sans-serif;
   color: #fff;
@@ -14,7 +14,7 @@ body {
 body {
   display: flex;
   justify-content: center;
-  background-color: transparent;
+  align-items: flex-start;
 }
 
 body::before {
@@ -55,11 +55,10 @@ body::before {
   display: inline-block;
 
   padding: 12px 15px 10px 15px;
+
   background: #111;
   border-radius: 20px;
   box-sizing: border-box;
-
-  height: auto;
 }
 
 /* =====================================================
@@ -174,8 +173,8 @@ body::before {
 .canvas-container {
   position: relative;
   width: 100%;
-  flex: 1;
-  min-height: 320px;
+  height: 340px;   /* fixed visual canvas height */
+
   margin-bottom: 8px;
 
   border-radius: 18px;
