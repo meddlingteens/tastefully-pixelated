@@ -357,7 +357,23 @@ button:not(.primary-btn).active {
   padding: 8px 16px;
 }
 
+.canvas-photo-btn {
+  width: 160px;
+  height: 160px;
 
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.2;
+
+  padding: 20px;
+}
 
 /* =====================================================
    TOOL COLORS
