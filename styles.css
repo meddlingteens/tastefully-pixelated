@@ -112,8 +112,11 @@ body::before {
 ===================================================== */
 
 .banner {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
   align-items: center;
+  gap: 16px;
+
   padding: 16px 24px;
   border-radius: 18px;
   border: 3px solid #c0c0c0;
@@ -121,25 +124,36 @@ body::before {
   color: #fff;
   margin-bottom: 14px;
   box-sizing: border-box;
+
+  min-height: 68px;
+
+  letter-spacing: 0.02em;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.35);
 }
 
 .banner h2 {
-  white-space: nowrap;
+  margin: 0;
+
+  white-space: normal;
+  overflow: hidden;
+
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+
+  font-size: clamp(14px, 2vw, 20px);
+  line-height: 1.2;
 }
 
 .banner-spinner {
-  flex: 1;
   display: flex;
   justify-content: center;
-}
-
-.banner-spinner img {
-  width: 58px;
-  display: block;
+  align-items: center;
+  width: 70px;
 }
 
 .spend-btn {
-  flex-shrink: 0;
+  align-self: center;
 }
 
 /* =====================================================
@@ -215,16 +229,24 @@ canvas {
 }
 
 .camera-btn {
-  flex: 0 0 140px;
-  height: 80px;
-  justify-self: start;
-  font-size: 16px;
+  width: 64px;
+  height: 64px;
+  flex: 0 0 64px;
+
+  border-radius: 50%;
+
+  font-size: 11px;
   font-weight: 700;
-  border-radius: 10px;
+
   background: linear-gradient(135deg,#22c55e,#16a34a);
+  box-shadow: 0 0 0 3px rgba(255,255,255,0.15);
+
   display: flex;
   align-items: center;
   justify-content: center;
+  text-align: center;
+
+  padding: 0;
 }
 
 /* =====================================================
@@ -291,6 +313,10 @@ button {
   font-size: 12px;
   line-height: 1;
   border-radius: 6px;
+}
+
+.small-buttons button + button {
+  margin-left: 8px;
 }
 
 button:not(.primary-btn) {
