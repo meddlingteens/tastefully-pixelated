@@ -151,11 +151,8 @@ padding-bottom: calc(env(safe-area-inset-bottom) + 4px);}
 .canvas-container {
   position: relative;
   width: 100%;
-  flex: 0 0 420px;
   min-height: 340px;
   margin-bottom: 8px;
-  display: flex;
-  align-items: stretch;
 }
 
 .canvas-container canvas {
