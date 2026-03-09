@@ -383,17 +383,16 @@ button:not(.primary-btn).active {
 
 .button-grid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 10px;
-  margin-top: 10px;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin-top: 12px;
+  width: 100%;
 }
 
 .button-grid button {
   width: 100%;
   min-width: 0;
-  white-space: nowrap;
 }
-
 
 
 
@@ -403,55 +402,64 @@ button:not(.primary-btn).active {
 ===================================================== */
 
 #drawBtn {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  background: #1c4080;
 }
 
 #drawBtn:hover {
-  box-shadow: 0 0 12px rgba(59,130,246,0.4);
+  box-shadow: 0 0 10px rgba(28,64,128,0.5);
 }
 
 #drawBtn.active {
-  box-shadow: 0 0 0 2px #fff, 0 0 14px rgba(59,130,246,0.6);
+  box-shadow: 0 0 0 2px #fff, 0 0 12px rgba(28,64,128,0.7);
 }
 
 #moveBtn {
-  background: linear-gradient(135deg, #14b8a6, #0d9488);
+  background: #79bdcf;
 }
 
 #moveBtn:hover {
-  box-shadow: 0 0 12px rgba(20,184,166,0.4);
+  box-shadow: 0 0 10px rgba(121,189,207,0.6);
 }
 
 #moveBtn.active {
-  box-shadow: 0 0 0 2px #fff, 0 0 14px rgba(20,184,166,0.6);
-}
-
-#eraseBtn {
-  background: linear-gradient(135deg, #f97316, #ea580c);
-}
-
-#eraseBtn:hover {
-  box-shadow: 0 0 12px rgba(249,115,22,0.4);
-}
-
-#eraseBtn.active {
-  box-shadow: 0 0 0 2px #fff, 0 0 14px rgba(249,115,22,0.6);
+  box-shadow: 0 0 0 2px #fff, 0 0 12px rgba(121,189,207,0.7);
 }
 
 #applyBtn {
-  background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+  background: #c8f2f4;
+  color: #083238;
 }
 
 #applyBtn:hover {
-  box-shadow: 0 0 12px rgba(139,92,246,0.4);
+  box-shadow: 0 0 10px rgba(200,242,244,0.7);
 }
 
 #applyBtn.active {
-  box-shadow: 0 0 0 2px #fff, 0 0 14px rgba(139,92,246,0.6);
+  box-shadow: 0 0 0 2px #fff, 0 0 12px rgba(200,242,244,0.9);
+}
+
+#undoBtn {
+  background: #5b93bd;
+}
+
+#undoBtn:hover {
+  box-shadow: 0 0 10px rgba(91,147,189,0.6);
+}
+
+#undoBtn.active {
+  box-shadow: 0 0 0 2px #fff, 0 0 12px rgba(91,147,189,0.7);
 }
 
 #shareBtn {
-  background: linear-gradient(135deg, #10b981, #059669);
+  background: #64b0c9;
+}
+
+#shareBtn:hover {
+  box-shadow: 0 0 10px rgba(100,176,201,0.6);
+}
+
+#shareBtn.active {
+  box-shadow: 0 0 0 2px #fff, 0 0 12px rgba(100,176,201,0.7);
 }
 
 
