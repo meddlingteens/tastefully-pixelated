@@ -267,9 +267,9 @@ canvas {
 
 .slider-row {
   display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
+  grid-template-columns: 1fr auto; /* sliders left, buttons right */
   gap: 20px;
+  align-items: start;
   margin-bottom: 8px;
 }
 
