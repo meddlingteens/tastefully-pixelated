@@ -11,6 +11,13 @@ const baseCanvas = document.getElementById("baseCanvas");
 const maskCanvas = document.getElementById("maskCanvas");
 const previewCanvas = document.getElementById("previewCanvas");
 
+// 👇 ADD RIGHT HERE
+baseCanvas.style.touchAction = "none";
+maskCanvas.style.touchAction = "none";
+if (previewCanvas) previewCanvas.style.touchAction = "none";
+
+
+
 if (!canvasContainer || !baseCanvas || !maskCanvas) {
   console.error("Critical canvas elements missing.");
   return;
@@ -218,6 +225,22 @@ let currentDrawHeight = 0;
   let targetZoom = 1;
   let offsetX = 0;
   let offsetY = 0;
+let lastTapTime = 0;
+
+
+
+let activePointers = new Map();
+
+let initialPinchDistance = 0;
+let initialZoom = 1;
+
+let initialMidX = 0;
+let initialMidY = 0;
+
+let initialOffsetX = 0;
+let initialOffsetY = 0;
+
+
 
   let isDrawing = false;
   let mode = "draw";
@@ -560,7 +583,59 @@ drawImage();
 
 maskCanvas.addEventListener("pointerdown", function (e) {
 
+// 👇 DOUBLE TAP DETECTION
+const now = Date.now();
+const DOUBLE_TAP_DELAY = 300;
+
+
+
+if (
+  activePointers.size === 1 &&
+  now - lastTapTime < DOUBLE_TAP_DELAY &&
+  (zoomLevel !== 1 || offsetX !== 0 || offsetY !== 0)
+) {
+  zoomLevel = 1;
+  offsetX = 0;
+  offsetY = 0;
+
+  drawImage();
+
+  lastTapTime = 0;
+  return;
+}
+
+
+
+
+lastTapTime = now;
+
+  activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
   if (!image) return;
+
+
+
+  if (activePointers.size === 2) {
+    const points = Array.from(activePointers.values());
+
+    const dx = points[1].x - points[0].x;
+    const dy = points[1].y - points[0].y;
+
+    initialPinchDistance = Math.sqrt(dx * dx + dy * dy);
+    initialZoom = zoomLevel;
+
+    initialMidX = (points[0].x + points[1].x) / 2;
+    initialMidY = (points[0].y + points[1].y) / 2;
+
+    initialOffsetX = offsetX;
+    initialOffsetY = offsetY;
+
+    isDrawing = false;
+  }
+
+
+
+
   if (isApplying) return;
 
   e.preventDefault();
@@ -594,7 +669,45 @@ maskCanvas.addEventListener("pointerdown", function (e) {
 // POINTER MOVE
 // ======================================================
 
+
+
+
+
+
 maskCanvas.addEventListener("pointermove", function (e) {
+
+  if (activePointers.has(e.pointerId)) {
+    activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  }
+
+  if (activePointers.size === 2) {
+
+    const points = Array.from(activePointers.values());
+
+    const dx = points[1].x - points[0].x;
+    const dy = points[1].y - points[0].y;
+
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    const scale = distance / initialPinchDistance;
+    zoomLevel = initialZoom * scale;
+
+    zoomLevel = Math.max(0.5, Math.min(3, zoomLevel));
+
+    const midX = (points[0].x + points[1].x) / 2;
+    const midY = (points[0].y + points[1].y) / 2;
+
+    const moveX = midX - initialMidX;
+    const moveY = midY - initialMidY;
+
+    offsetX = initialOffsetX + moveX;
+    offsetY = initialOffsetY + moveY;
+
+    drawImage();
+    return;
+  }
+
+
 
   if (!isDrawing) return;
   if (!image) return;
@@ -626,22 +739,35 @@ maskCanvas.addEventListener("pointermove", function (e) {
       return;
     }
 
-    if (lastX === null) {
-      lastX = x;
-      lastY = y;
-    }
+if (lastX === null) {
+  lastX = x;
+  lastY = y;
+  return;
+}
 
-    const dx = x - lastX;
-    const dy = y - lastY;
-    const dist = Math.max(Math.abs(dx), Math.abs(dy));
 
-    const previewRadius =
-      (brushSize / 2) * (currentDrawWidth / image.width);
 
-    const imageBrushRadius =
-      (brushSize / 2) * (image.width / currentDrawWidth);
+const dx = x - lastX;
+const dy = y - lastY;
 
-    const steps = Math.max(1, Math.floor(dist / (previewRadius / 2)));
+// TRUE distance
+const distance = Math.sqrt(dx * dx + dy * dy);
+
+// Better spacing
+const stepSpacing = Math.max(1, brushSize * 0.15);
+
+// Use CEIL instead of FLOOR
+const steps = Math.max(1, Math.ceil(distance / stepSpacing));
+
+const previewRadius =
+  (brushSize / 2) * (currentDrawWidth / image.width);
+
+const imageBrushRadius =
+  (brushSize / 2) * (image.width / currentDrawWidth);
+
+
+
+
 
     const scaleX = image.width / currentDrawWidth;
     const scaleY = image.height / currentDrawHeight;
@@ -695,15 +821,25 @@ maskCanvas.addEventListener("pointermove", function (e) {
 });
 
 
+
+
 // ======================================================
 // POINTER UP
 // ======================================================
 
 maskCanvas.addEventListener("pointerup", function (e) {
+
+  activePointers.delete(e.pointerId);
+
   e.preventDefault();
   maskCanvas.releasePointerCapture(e.pointerId);
   stopDrawing();
 });
+
+maskCanvas.addEventListener("pointercancel", function (e) {
+  activePointers.delete(e.pointerId);
+});
+
 
 
 
