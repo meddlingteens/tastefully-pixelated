@@ -978,6 +978,8 @@ const cloned = new ImageData(
 
 historyStack.push(cloned);
 
+undoBtn.disabled = historyStack.length === 0;
+
   if (historyStack.length > MAX_HISTORY) {
     historyStack.shift();
   }
@@ -1031,11 +1033,21 @@ pixelWorker.postMessage(
 
 function performUndo() {
 
-  if (historyStack.length === 0) return;
+  if (historyStack.length === 0) {
+    resetApp(); // 👈 NEW BEHAVIOR
+    return;
+  }
+
+
+
+
+
 
   applyVersion++; // invalidate any in-flight worker
 
   const previous = historyStack.pop();
+
+undoBtn.disabled = historyStack.length === 0;
 
   // Save current for redo
   const currentCanvas = document.createElement("canvas");
@@ -1068,6 +1080,67 @@ function performUndo() {
   dirtyMaxY = -Infinity;
   maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
 }
+
+
+
+function resetApp() {
+
+  // Core image state
+  image = null;
+  originalImageData = null;
+
+  // Reset transforms
+  zoomLevel = 1;
+  offsetX = 0;
+  offsetY = 0;
+
+  // Clear history
+  historyStack = [];
+  redoStack = [];
+
+  // Reset mask state
+  maskBuffer = null;
+  maskWidth = 0;
+  maskHeight = 0;
+
+  dirtyMinX = Infinity;
+  dirtyMinY = Infinity;
+  dirtyMaxX = -Infinity;
+  dirtyMaxY = -Infinity;
+
+  // Clear canvases
+  baseCtx.clearRect(0, 0, baseCanvas.width, baseCanvas.height);
+  maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+
+  if (previewCtx) {
+    previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+  }
+
+  // Reset interaction state
+  isDrawing = false;
+  lastX = null;
+  lastY = null;
+
+  // Reset UI
+  const overlay = document.querySelector(".canvas-overlay");
+  if (overlay) overlay.classList.remove("hidden");
+
+  if (canvasContainer) {
+    canvasContainer.classList.remove("photo-loaded");
+  }
+
+  // Reset mode + cursor
+  setMode("draw");
+
+  // ✅ Disable undo (no history left)
+  if (undoBtn) {
+    undoBtn.disabled = true;
+  }
+}
+
+
+
+
 
 // Keyboard shortcut
 document.addEventListener("keydown", function (e) {
