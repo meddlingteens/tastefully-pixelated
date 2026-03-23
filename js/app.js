@@ -1,5 +1,38 @@
 document.addEventListener("DOMContentLoaded", function () {
 
+
+
+
+const modal = document.getElementById("supportModal");
+const closeBtn = document.getElementById("closeModal");
+
+// Show after 2.5 seconds
+setTimeout(() => {
+  if (modal) {
+    modal.classList.remove("hidden");
+
+    // allow DOM to render before animating
+    requestAnimationFrame(() => {
+      modal.classList.add("show");
+    });
+  }
+}, 2500);
+
+// Close modal
+if (closeBtn) {
+  closeBtn.addEventListener("click", () => {
+    modal.classList.remove("show");
+
+    setTimeout(() => {
+      modal.classList.add("hidden");
+    }, 300);
+  });
+}
+
+
+
+
+
  // ======================================================
 // ELEMENTS
 // ======================================================
