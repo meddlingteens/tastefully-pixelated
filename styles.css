@@ -216,6 +216,52 @@ body::before {
 
 
 
+
+
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 999;
+
+  opacity: 0;
+  pointer-events: none;
+
+  transition: opacity 0.3s ease;
+}
+
+.modal.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background: #1a1a1a;
+  padding: 20px;
+  border-radius: 16px;
+  width: 80%;
+  max-width: 300px;
+  text-align: center;
+
+  transform: translateY(10px);
+  transition: transform 0.3s ease;
+}
+
+.modal.show .modal-content {
+  transform: translateY(0);
+}
+
+
 /* =====================================================
    CANVAS (BALANCED HEIGHT — NO SCROLL, NOT TOO BIG)
 ===================================================== */
