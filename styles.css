@@ -15,7 +15,7 @@ body {
 body {
   display: flex;
   justify-content: center;
-  align-items: stretch; /* 🔥 allow full-height app */
+  align-items: flex-start;
 }
 
 body::before {
@@ -38,8 +38,8 @@ body::before {
   width: 100%;
   display: flex;
   flex-direction: column;
-
   gap: 8px;
+  height: auto;
 }
 
 
