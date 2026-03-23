@@ -104,60 +104,114 @@ body::before {
 }
 
 /* =====================================================
-   BANNER
+   BANNER (PREMIUM + ADMOB-READY)
 ===================================================== */
 
 .banner {
-  display: grid;
-  grid-template-columns: 1fr auto auto;
-  align-items: center;
-  gap: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
 
-  padding: 16px 24px;
-  margin-bottom: 14px;
+  gap: 8px;
 
-  border-radius: 18px;
-  border: 3px solid #c0c0c0;
-  background: linear-gradient(135deg,#5c3b9c,#2e1c55);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+
+  border-radius: 16px;
+  border: 1px solid #2a2a2a;
+  background: #1a1a1a;
 
   color: #fff;
   box-sizing: border-box;
 
-  min-height: 68px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
 
-  letter-spacing: 0.02em;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+  position: relative;
+  overflow: hidden;
 }
 
+/* Inner content row (headline + spinner + CTA) */
+.banner-content {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Headline */
 .banner h2 {
   margin: 0;
+
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.2;
 
   white-space: normal;
   overflow: hidden;
 
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-
-  font-size: clamp(14px, 2vw, 20px);
-  line-height: 1.2;
+  -webkit-line-clamp: 2;
 }
 
+/* Spinner */
 .banner-spinner {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 70px;
+  width: 60px;
 }
 
 .banner-spinner img {
-  width: 40px;
+  width: 32px;
   height: auto;
+  opacity: 0.9;
 }
 
+/* CTA Button */
 .spend-btn {
-  align-self: center;
+  padding: 8px 14px;
+
+  background: #ffffff;
+  color: #000;
+
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+
+  border: none;
+
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
+
+.spend-btn:active {
+  transform: scale(0.96);
+}
+
+/* Ad container (AdMob-ready) */
+.ad-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+
+  min-height: 50px; /* prevents layout jump when ad loads */
+}
+
+/* Subtle premium highlight */
+.banner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background: linear-gradient(
+    120deg,
+    rgba(255,255,255,0.05),
+    transparent 40%
+  );
+
+  pointer-events: none;
+}
+
 
 
 
