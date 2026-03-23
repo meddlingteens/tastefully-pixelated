@@ -604,6 +604,7 @@ button:not(.primary-btn).active {
   grid-template-columns: repeat(5, 1fr);
   gap: 12px;
   margin-top: 12px;
+  padding-bottom: 10px; /* 👈 ADD THIS */
   width: 100%;
 }
 
