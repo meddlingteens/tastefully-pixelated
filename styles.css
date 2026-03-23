@@ -3,13 +3,11 @@
 ===================================================== */
 
 html,
+html,
 body {
-  height: 100%;
   margin: 0;
   font-family: sans-serif;
   color: #fff;
-
-  overflow: hidden; /* 🔥 prevent scrolling */
 }
 
 body {
@@ -29,6 +27,25 @@ body::before {
   background-size: cover;
   background-position: center;
 }
+
+
+
+@media (max-width: 768px) {
+  html,
+  body {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+}
+
+
+
 
 /* =====================================================
    APP CONTAINER
