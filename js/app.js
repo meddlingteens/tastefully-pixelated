@@ -7,16 +7,12 @@ const modal = document.getElementById("supportModal");
 const closeBtn = document.getElementById("closeModal");
 
 // Show after 2.5 seconds
-setTimeout(() => {
-  if (modal) {
-    modal.classList.remove("hidden");
-
-    // allow DOM to render before animating
-    requestAnimationFrame(() => {
-      modal.classList.add("show");
-    });
-  }
-}, 2500);
+// setTimeout(() => {
+//   modal.classList.remove("hidden");
+//   requestAnimationFrame(() => {
+//     modal.classList.add("show");
+//   });
+// }, 2500);
 
 // Close modal
 if (closeBtn) {
