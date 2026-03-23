@@ -217,24 +217,19 @@ body::before {
 
 
 /* =====================================================
-   CANVAS (FLEXIBLE, NO-SCROLL LAYOUT)
+   CANVAS (BALANCED HEIGHT — NO SCROLL, NOT TOO BIG)
 ===================================================== */
 
 .canvas-wrapper {
-  flex: 1;
   position: relative;
-
-  display: flex;
-  flex-direction: column;
 }
 
-/* 🔥 KEY CHANGE: flexible height instead of fixed */
+/* 🔥 KEY: Use viewport-based height instead of flex */
 .canvas-container {
   position: relative;
   width: 100%;
 
-  flex: 1;                /* grows to fill available space */
-  min-height: 180px;      /* prevents collapse on small screens */
+  height: clamp(180px, 38vh, 300px); /* 👈 MAGIC LINE */
 
   margin-bottom: 4px;
 
@@ -247,7 +242,7 @@ body::before {
   background-position: center;
 }
 
-/* Canvases stay perfectly layered */
+/* Canvas layers */
 .canvas-container canvas {
   position: absolute;
   inset: 0;
@@ -284,7 +279,6 @@ canvas {
 .canvas-overlay.hidden {
   display: none;
 }
-
 
 
 
