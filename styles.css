@@ -53,13 +53,22 @@ body::before {
 ===================================================== */
 
 .app-backdrop {
-  display: inline-block;
+  display: flex;
+  flex-direction: column;
 
-  padding: 12px 15px 10px 15px;
+  width: 100%;
+  max-width: 780px;
+
+  height: 100%;              /* 🔥 match viewport */
+  max-height: 100vh;         /* 🔥 never exceed screen */
+
+  padding: 10px 12px 8px 12px;
 
   background: #111;
   border-radius: 20px;
   box-sizing: border-box;
+
+  overflow: hidden;          /* 🔥 prevent stretch overflow */
 }
 
 /* =====================================================
@@ -245,12 +254,22 @@ body::before {
   display: none;
 }
 
+/* Modal card */
 .modal-content {
+  position: relative;
+
   background: #1a1a1a;
-  padding: 20px;
-  border-radius: 16px;
-  width: 80%;
-  max-width: 300px;
+  padding: 24px 20px 20px;
+  border-radius: 18px;
+
+  width: 85%;
+  max-width: 320px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+
   text-align: center;
 
   transform: translateY(10px);
@@ -260,6 +279,40 @@ body::before {
 .modal.show .modal-content {
   transform: translateY(0);
 }
+
+/* Close X */
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+
+  width: 32px;
+  height: 32px;
+
+  border-radius: 50%;
+  border: none;
+
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+
+  font-size: 18px;
+  line-height: 1;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* CTA at bottom */
+.modal-cta {
+  width: 100%;
+  margin-top: 10px;
+}
+
+
+
+
+
 
 
 /* =====================================================
