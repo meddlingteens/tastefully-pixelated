@@ -36,15 +36,10 @@ body::before {
 
 .app {
   width: 100%;
-  max-width: 780px;
-  box-sizing: border-box;
-
   display: flex;
   flex-direction: column;
-  gap: 10px;
 
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: calc(env(safe-area-inset-bottom) + 4px);
+  gap: 8px;
 }
 
 
@@ -53,22 +48,16 @@ body::before {
 ===================================================== */
 
 .app-backdrop {
-  display: flex;
-  flex-direction: column;
+  display: inline-block;
 
   width: 100%;
   max-width: 780px;
-
-  height: 100%;              /* 🔥 match viewport */
-  max-height: 100vh;         /* 🔥 never exceed screen */
 
   padding: 10px 12px 8px 12px;
 
   background: #111;
   border-radius: 20px;
   box-sizing: border-box;
-
-  overflow: hidden;          /* 🔥 prevent stretch overflow */
 }
 
 /* =====================================================
@@ -283,30 +272,41 @@ body::before {
 /* Close X */
 .modal-close {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 12px;
+  right: 12px;
 
-  width: 32px;
-  height: 32px;
-
-  border-radius: 50%;
+  background: none;
   border: none;
 
-  background: rgba(255,255,255,0.1);
-  color: #fff;
+  color: #aaa;
+  font-size: 22px;
+  font-weight: 600;
 
-  font-size: 18px;
+  width: auto;
+  height: auto;
+
+  padding: 4px;
+
+  cursor: pointer;
+
   line-height: 1;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
-/* CTA at bottom */
+/* Subtle hover / tap feedback */
+.modal-close:active {
+  transform: scale(0.9);
+  opacity: 0.7;
+}
+
+
+
+
 .modal-cta {
-  width: 100%;
-  margin-top: 10px;
+  width: auto;              /* 🔥 stop full-width stretching */
+  align-self: center;       /* 🔥 center inside flex container */
+
+  padding: 10px 20px;       /* optional: nicer proportions */
+  margin-top: 12px;
 }
 
 
