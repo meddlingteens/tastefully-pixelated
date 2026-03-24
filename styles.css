@@ -66,15 +66,13 @@ body::before {
 
 .app-backdrop {
   display: inline-block;
-
   width: 100%;
   max-width: 780px;
-
   padding: 10px 12px 8px 12px;
-
   background: #111;
   border-radius: 20px;
   box-sizing: border-box;
+  padding-top: calc(env(safe-area-inset-top) + 10px);
 }
 
 /* =====================================================
